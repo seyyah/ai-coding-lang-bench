@@ -11,6 +11,7 @@ require 'set'
 require_relative 'lib/codex_loader'
 
 BASE_DIR = File.expand_path(__dir__)
+PROBLEMS_DIR = File.join(BASE_DIR, 'problems')
 DEFAULT_WORK_DIR = File.join(BASE_DIR, 'generated')
 DEFAULT_RESULTS_DIR = File.join(BASE_DIR, 'results')
 DEFAULT_LOGS_DIR    = File.join(BASE_DIR, 'logs')
@@ -87,7 +88,7 @@ while i < ARGV.length
         --trials, -t NUM       Number of trials per language (default: #{TRIALS})
         --start, -s NUM        Starting trial number (default: 1)
         --codex, -c NAME       AI codex to use: #{CodexLoader.available_codexes.join(', ')} (default: #{CodexLoader.default_codex})
-        --problem, -p NAME     Problem namespace label (default: minigit)
+        --problem, -p NAME     Problem key under problems/ (default: minigit)
         --output-root PATH     Write generated/, logs/, and results/ under PATH
         --dry-run              Dry run mode (don't actually run codex)
         --help, -h             Show this help message
@@ -107,7 +108,14 @@ end
 languages_to_run = selected_languages || LANGUAGES.keys
 selected_codex ||= CodexLoader.default_codex
 problem = selected_problem || 'minigit'
-selected_output_root ||= File.join(BASE_DIR, 'artifacts', selected_codex, problem) if selected_problem
+
+if selected_output_root.nil?
+  selected_output_root = if dry_run
+                           File.join(BASE_DIR, 'artifacts', selected_codex, problem, 'dry-run')
+                         elsif selected_problem
+                           File.join(BASE_DIR, 'artifacts', selected_codex, problem)
+                         end
+end
 
 work_dir = selected_output_root ? File.join(selected_output_root, 'generated') : DEFAULT_WORK_DIR
 results_dir = selected_output_root ? File.join(selected_output_root, 'results') : DEFAULT_RESULTS_DIR
@@ -156,18 +164,18 @@ def get_version(lang)
   end
 end
 
-def count_loc(dir, lang)
+def count_loc(dir, lang, binary_name: 'minigit')
   config = LANGUAGES[lang]
   exts = config[:exts]
   files = exts.flat_map { |e| Dir.glob(File.join(dir, '**', "*.#{e}")) }
   files.reject! { |f| f.include?('/node_modules/') || f.include?('/target/') }
 
-  # For scripting languages the executable `minigit` IS the source (no extension)
-  minigit = File.join(dir, 'minigit')
-  if File.exist?(minigit) && !files.include?(minigit)
+  # For scripting languages the executable itself can be the source (no extension)
+  executable = File.join(dir, binary_name)
+  if File.exist?(executable) && !files.include?(executable)
     begin
-      content = File.read(minigit, encoding: 'UTF-8')
-      files << minigit if content.valid_encoding?
+      content = File.read(executable, encoding: 'UTF-8')
+      files << executable if content.valid_encoding?
     rescue StandardError
       # skip binary files
     end
@@ -212,6 +220,73 @@ def run_tests(test_script, dir:)
   }
 end
 
+def load_problem_config(problem)
+  problem_dir = File.join(PROBLEMS_DIR, problem)
+  config_path = File.join(problem_dir, 'problem.json')
+
+  unless File.file?(config_path)
+    abort <<~ERROR
+      Problem config not found: #{config_path}
+      Expected layout:
+        problems/#{problem}/problem.json
+        problems/#{problem}/SPEC-v1.txt
+        problems/#{problem}/SPEC-v2.txt
+        problems/#{problem}/test-v1.sh
+        problems/#{problem}/test-v2.sh
+    ERROR
+  end
+
+  raw = JSON.parse(File.read(config_path))
+  required_keys = %w[binary_name v1_spec v1_test v1_prompt v2_spec v2_test v2_prompt]
+  missing_keys = required_keys.reject { |key| raw[key].is_a?(String) && !raw[key].strip.empty? }
+
+  unless missing_keys.empty?
+    abort "Problem config missing keys in #{config_path}: #{missing_keys.join(', ')}"
+  end
+
+  config = {
+    name: raw['name'].to_s.strip.empty? ? problem : raw['name'],
+    dir: problem_dir,
+    binary_name: raw['binary_name'],
+    v1_spec: File.join(problem_dir, raw['v1_spec']),
+    v1_test: File.join(problem_dir, raw['v1_test']),
+    v1_prompt: raw['v1_prompt'],
+    v2_spec: File.join(problem_dir, raw['v2_spec']),
+    v2_test: File.join(problem_dir, raw['v2_test']),
+    v2_prompt: raw['v2_prompt'],
+  }
+
+  asset_keys = %i[v1_spec v1_test v2_spec v2_test]
+  missing_assets = asset_keys.filter_map do |key|
+    next if File.exist?(config[key])
+
+    "  #{key}: #{config[key]}"
+  end
+
+  unless missing_assets.empty?
+    abort "Problem assets missing for '#{problem}':\n#{missing_assets.join("\n")}"
+  end
+
+  config
+rescue JSON::ParserError => e
+  abort "Invalid JSON in #{config_path}: #{e.message}"
+end
+
+def render_problem_prompt(template, language:, binary_name:, problem_name:)
+  {
+    '{{language}}' => language.capitalize,
+    '{{binary_name}}' => binary_name,
+    '{{problem_name}}' => problem_name,
+  }.reduce(template.dup) do |result, (token, value)|
+    result.gsub(token, value)
+  end
+end
+
+def write_benchmark_metadata(dir, language:, binary_name:)
+  File.write(File.join(dir, '.benchmark-language'), "#{language}\n")
+  File.write(File.join(dir, '.benchmark-binary-name'), "#{binary_name}\n")
+end
+
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
@@ -222,12 +297,14 @@ puts '=' * 60
 puts
 
 # Initialize codex
+problem_config = load_problem_config(problem)
 codex = dry_run ? nil : CodexLoader.create_codex(selected_codex)
 codex_version = dry_run ? 'dry-run' : codex.version
 
 puts "Codex: #{selected_codex}"
 puts "Codex Version: #{codex_version}"
 puts "Problem: #{problem}"
+puts "Problem Assets: #{problem_config[:dir]}"
 puts "Languages: #{languages_to_run.join(', ')}"
 puts "Trials: #{selected_start}..#{selected_start + selected_trials - 1} (#{selected_trials} trials)"
 puts "Output Root: #{selected_output_root || BASE_DIR}"
@@ -259,6 +336,9 @@ unless dry_run
 end
 
 results = []
+problem_run_name = problem.tr('/', '-')
+v1_test_name = File.basename(problem_config[:v1_test])
+v2_test_name = File.basename(problem_config[:v2_test])
 
 selected_trials.times do |trial_idx|
   trial = selected_start + trial_idx
@@ -268,11 +348,12 @@ selected_trials.times do |trial_idx|
     puts '=' * 60
 
     dir_name = lang.tr('/', '-')
-    v1_dir = File.join(work_dir, "minigit-#{dir_name}-#{trial}-v1")
-    v2_dir = File.join(work_dir, "minigit-#{dir_name}-#{trial}-v2")
+    v1_dir = File.join(work_dir, "#{problem_run_name}-#{dir_name}-#{trial}-v1")
+    v2_dir = File.join(work_dir, "#{problem_run_name}-#{dir_name}-#{trial}-v2")
     FileUtils.rm_rf(v1_dir)
     FileUtils.rm_rf(v2_dir)
     FileUtils.mkdir_p(v1_dir)
+    write_benchmark_metadata(v1_dir, language: lang, binary_name: problem_config[:binary_name])
 
     record = {
       language: lang, trial: trial, codex: selected_codex, v1_dir: v1_dir, v2_dir: v2_dir,
@@ -283,21 +364,22 @@ selected_trials.times do |trial_idx|
 
     # --- Phase 1: v1 ---
     puts "\n--- Phase 1: v1 ---"
-    FileUtils.cp(File.join(BASE_DIR, 'SPEC-v1.txt'), v1_dir)
-    FileUtils.cp(File.join(BASE_DIR, 'test-v1.sh'), v1_dir)
+    FileUtils.cp(problem_config[:v1_spec], v1_dir)
+    FileUtils.cp(problem_config[:v1_test], v1_dir)
 
-    v1_prompt = "Implement minigit as described in SPEC-v1.txt using #{lang.capitalize}. " \
-                "The executable must be named 'minigit' and be runnable as ./minigit. " \
-                "For compiled languages, include a Makefile or build script. " \
-                "For interpreted languages, ensure the minigit file has a proper shebang line and is executable. " \
-                "Verify your implementation passes all tests by running: bash test-v1.sh"
+    v1_prompt = render_problem_prompt(
+      problem_config[:v1_prompt],
+      language: lang,
+      binary_name: problem_config[:binary_name],
+      problem_name: problem_config[:name]
+    )
     v1_prompt += " #{LANGUAGES[lang][:extra_prompt]}" if LANGUAGES[lang][:extra_prompt]
 
     if dry_run
       puts "  [DRY RUN] Would run #{selected_codex} with prompt for v1 #{lang}"
       record[:v1_time] = 0
     else
-      v1_log = File.join(logs_dir, "minigit-#{dir_name}-#{trial}-v1-#{selected_codex}.json")
+      v1_log = File.join(logs_dir, "#{problem_run_name}-#{dir_name}-#{trial}-v1-#{selected_codex}.json")
       puts "  Running #{selected_codex}..."
       v1_result = codex.run_generation(v1_prompt, dir: v1_dir, log_path: v1_log)
       record[:v1_time] = v1_result[:elapsed_seconds]
@@ -305,7 +387,7 @@ selected_trials.times do |trial_idx|
       puts "  #{selected_codex.capitalize} finished in #{v1_result[:elapsed_seconds]}s (success=#{v1_result[:success]})"
 
       puts '  Running v1 tests...'
-      test_result = run_tests('test-v1.sh', dir: v1_dir)
+      test_result = run_tests(v1_test_name, dir: v1_dir)
       record[:v1_pass] = test_result[:success]
       record[:v1_passed_count] = test_result[:passed]
       record[:v1_failed_count] = test_result[:failed]
@@ -316,26 +398,30 @@ selected_trials.times do |trial_idx|
         test_result[:output].lines.last(8).each { |line| puts "    #{line.rstrip}" }
       end
 
-      record[:v1_loc] = count_loc(v1_dir, lang)
+      record[:v1_loc] = count_loc(v1_dir, lang, binary_name: problem_config[:binary_name])
       puts "  LOC: #{record[:v1_loc]}"
     end
 
     # --- Phase 2: v2 (copy v1 then extend) ---
     puts "\n--- Phase 2: v2 ---"
     FileUtils.cp_r(v1_dir, v2_dir)
-    FileUtils.cp(File.join(BASE_DIR, 'SPEC-v2.txt'), v2_dir)
-    FileUtils.cp(File.join(BASE_DIR, 'test-v2.sh'), v2_dir)
+    write_benchmark_metadata(v2_dir, language: lang, binary_name: problem_config[:binary_name])
+    FileUtils.cp(problem_config[:v2_spec], v2_dir)
+    FileUtils.cp(problem_config[:v2_test], v2_dir)
 
-    v2_prompt = "Read SPEC-v2.txt and extend the existing minigit implementation " \
-                "with checkout and reset commands. " \
-                "Verify your implementation passes all tests by running: bash test-v2.sh"
+    v2_prompt = render_problem_prompt(
+      problem_config[:v2_prompt],
+      language: lang,
+      binary_name: problem_config[:binary_name],
+      problem_name: problem_config[:name]
+    )
     v2_prompt += " #{LANGUAGES[lang][:extra_prompt]}" if LANGUAGES[lang][:extra_prompt]
 
     if dry_run
       puts "  [DRY RUN] Would run #{selected_codex} with prompt for v2 #{lang}"
       record[:v2_time] = 0
     else
-      v2_log = File.join(logs_dir, "minigit-#{dir_name}-#{trial}-v2-#{selected_codex}.json")
+      v2_log = File.join(logs_dir, "#{problem_run_name}-#{dir_name}-#{trial}-v2-#{selected_codex}.json")
       puts "  Running #{selected_codex}..."
       v2_result = codex.run_generation(v2_prompt, dir: v2_dir, log_path: v2_log)
       record[:v2_time] = v2_result[:elapsed_seconds]
@@ -343,7 +429,7 @@ selected_trials.times do |trial_idx|
       puts "  #{selected_codex.capitalize} finished in #{v2_result[:elapsed_seconds]}s (success=#{v2_result[:success]})"
 
       puts '  Running v2 tests...'
-      test_result = run_tests('test-v2.sh', dir: v2_dir)
+      test_result = run_tests(v2_test_name, dir: v2_dir)
       record[:v2_pass] = test_result[:success]
       record[:v2_passed_count] = test_result[:passed]
       record[:v2_failed_count] = test_result[:failed]
@@ -354,7 +440,7 @@ selected_trials.times do |trial_idx|
         test_result[:output].lines.last(8).each { |line| puts "    #{line.rstrip}" }
       end
 
-      record[:v2_loc] = count_loc(v2_dir, lang)
+      record[:v2_loc] = count_loc(v2_dir, lang, binary_name: problem_config[:binary_name])
       puts "  LOC: #{record[:v2_loc]}"
     end
 

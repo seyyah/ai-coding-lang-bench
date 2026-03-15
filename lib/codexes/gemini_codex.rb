@@ -140,8 +140,9 @@ class GeminiCodex < BaseCodex
   end
 
   def save_generated_code(response_text, dir)
-    lang = infer_language_from_dir(dir)
-    blocks = extract_code_blocks(response_text)
+    lang = read_benchmark_value(dir, '.benchmark-language') || infer_language_from_dir(dir)
+    binary_name = read_benchmark_value(dir, '.benchmark-binary-name') || 'minigit'
+    blocks = extract_code_blocks(response_text, binary_name)
     written_files = []
 
     named_blocks = blocks.select { |block| block[:filename] }
@@ -156,9 +157,9 @@ class GeminiCodex < BaseCodex
 
     primary_block = choose_primary_block(blocks, lang)
     if primary_block
-      target = primary_target_for(lang)
+      target = primary_target_for(lang, binary_name: binary_name)
       unless target.nil? || written_files.include?(target)
-        code = normalize_script_for_target(primary_block[:code], lang, target)
+        code = normalize_script_for_target(primary_block[:code], lang, target, binary_name: binary_name)
         File.write(File.join(dir, target), code)
         written_files << target
       end
@@ -167,36 +168,48 @@ class GeminiCodex < BaseCodex
       written_files << 'generated_code.txt'
     end
 
-    ensure_runtime_files(lang, dir, written_files)
-    chmod_if_present(File.join(dir, 'minigit'))
+    ensure_runtime_files(lang, dir, written_files, binary_name: binary_name)
+    chmod_if_present(File.join(dir, binary_name))
     chmod_if_present(File.join(dir, 'build.sh'))
   end
 
+  def read_benchmark_value(dir, filename)
+    path = File.join(dir, filename)
+    return unless File.file?(path)
+
+    File.read(path, encoding: 'UTF-8').strip
+  rescue StandardError
+    nil
+  end
+
   def infer_language_from_dir(dir)
-    dir_name = File.basename(dir).sub(/^minigit-/, '').sub(/-\d+-v[12]$/, '')
+    dir_name = File.basename(dir)
+    dir_name = dir_name[/-(rust|go|c|typescript|javascript|java|perl|python(?:-mypy)?|ruby(?:-steep)?|lua|scheme|ocaml|haskell)-\d+-v[12]$/, 1] ||
+      dir_name.sub(/^minigit-/, '').sub(/-\d+-v[12]$/, '')
     {
       'python-mypy' => 'python/mypy',
       'ruby-steep' => 'ruby/steep'
     }.fetch(dir_name, dir_name)
   end
 
-  def extract_code_blocks(response_text)
+  def extract_code_blocks(response_text, binary_name)
     blocks = []
     response_text.to_enum(:scan, /```(?<lang>[A-Za-z0-9_+-]*)\n(?<code>.*?)```/m).each do
       match = Regexp.last_match
       context = response_text[[match.begin(0) - 300, 0].max...match.begin(0)]
       blocks << {
         fence_lang: match[:lang].to_s.downcase,
-        filename: infer_filename_from_context(context),
+        filename: infer_filename_from_context(context, binary_name),
         code: match[:code].strip
       }
     end
     blocks
   end
 
-  def infer_filename_from_context(context)
+  def infer_filename_from_context(context, binary_name)
+    binary_pattern = Regexp.escape(binary_name)
     backticked = context.scan(/`([^`\n]+)`/).flatten.reverse.find do |token|
-      token.match?(/\A(?:minigit|Makefile|makefile|build\.sh|[\w.\/-]+\.(?:rb|rbs|py|go|rs|c|h|ts|js|java|pl|pm|lua|scm|ml|mli|hs))\z/)
+      token.match?(/\A(?:#{binary_pattern}|Makefile|makefile|build\.sh|[\w.\/-]+\.(?:rb|rbs|py|go|rs|c|h|ts|js|java|pl|pm|lua|scm|ml|mli|hs))\z/)
     end
     return backticked if backticked
 
@@ -238,15 +251,15 @@ class GeminiCodex < BaseCodex
     }.fetch(lang, [])
   end
 
-  def primary_target_for(lang)
+  def primary_target_for(lang, binary_name: 'minigit')
     {
-      'python' => 'minigit',
-      'python/mypy' => 'minigit',
-      'ruby' => 'minigit',
-      'ruby/steep' => 'minigit',
-      'javascript' => 'minigit',
-      'perl' => 'minigit',
-      'lua' => 'minigit',
+      'python' => binary_name,
+      'python/mypy' => binary_name,
+      'ruby' => binary_name,
+      'ruby/steep' => binary_name,
+      'javascript' => binary_name,
+      'perl' => binary_name,
+      'lua' => binary_name,
       'go' => 'main.go',
       'rust' => 'main.rs',
       'c' => 'main.c',
@@ -258,8 +271,8 @@ class GeminiCodex < BaseCodex
     }[lang]
   end
 
-  def normalize_script_for_target(code, lang, target)
-    return code if target != 'minigit' || code.start_with?('#!')
+  def normalize_script_for_target(code, lang, target, binary_name: 'minigit')
+    return code if target != binary_name || code.start_with?('#!')
 
     shebang = {
       'python' => '#!/usr/bin/env python3',
@@ -274,25 +287,25 @@ class GeminiCodex < BaseCodex
     shebang ? "#{shebang}\n#{code}\n" : code
   end
 
-  def ensure_runtime_files(lang, dir, written_files)
+  def ensure_runtime_files(lang, dir, written_files, binary_name: 'minigit')
     case lang
     when 'go'
-      write_if_missing(dir, 'build.sh', "#!/usr/bin/env bash\nset -e\ngo build -o minigit main.go\n", written_files)
+      write_if_missing(dir, 'build.sh', "#!/usr/bin/env bash\nset -e\ngo build -o #{binary_name} main.go\n", written_files)
     when 'rust'
-      write_if_missing(dir, 'build.sh', "#!/usr/bin/env bash\nset -e\nrustc -O main.rs -o minigit\n", written_files)
+      write_if_missing(dir, 'build.sh', "#!/usr/bin/env bash\nset -e\nrustc -O main.rs -o #{binary_name}\n", written_files)
     when 'c'
-      write_if_missing(dir, 'build.sh', "#!/usr/bin/env bash\nset -e\ngcc -O2 -o minigit main.c\n", written_files)
+      write_if_missing(dir, 'build.sh', "#!/usr/bin/env bash\nset -e\ngcc -O2 -o #{binary_name} main.c\n", written_files)
     when 'java'
       write_if_missing(dir, 'build.sh', "#!/usr/bin/env bash\nset -e\njavac MiniGit.java\n", written_files)
-      write_if_missing(dir, 'minigit', launcher_script('java'), written_files)
+      write_if_missing(dir, binary_name, launcher_script('java'), written_files)
     when 'typescript'
-      write_if_missing(dir, 'minigit', launcher_script('typescript'), written_files)
+      write_if_missing(dir, binary_name, launcher_script('typescript'), written_files)
     when 'scheme'
-      write_if_missing(dir, 'minigit', launcher_script('scheme'), written_files)
+      write_if_missing(dir, binary_name, launcher_script('scheme'), written_files)
     when 'ocaml'
-      write_if_missing(dir, 'build.sh', "#!/usr/bin/env bash\nset -e\nocamlc -o minigit main.ml\n", written_files)
+      write_if_missing(dir, 'build.sh', "#!/usr/bin/env bash\nset -e\nocamlc -o #{binary_name} main.ml\n", written_files)
     when 'haskell'
-      write_if_missing(dir, 'build.sh', "#!/usr/bin/env bash\nset -e\nghc -O2 -o minigit Main.hs\n", written_files)
+      write_if_missing(dir, 'build.sh', "#!/usr/bin/env bash\nset -e\nghc -O2 -o #{binary_name} Main.hs\n", written_files)
     end
   end
 

@@ -1,6 +1,5 @@
 generated/
-logs/
-artifacts/
+artifacts/generated/
 .env
 config/codexes.local.yml
 _doc/

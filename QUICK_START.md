@@ -99,15 +99,15 @@ ruby benchmark.rb --dry-run --lang python
 
 ## Understanding Results
 
-After running, results are saved to:
-- `results/results.json` - Raw data
-- `results/meta.json` - Metadata (codex version, timestamps, etc.)
-- `logs/` - Detailed logs from each trial
+After running with the helper scripts, outputs are saved under:
+- `artifacts/<codex>/<problem>/results/results.json` - Raw data
+- `artifacts/<codex>/<problem>/results/meta.json` - Metadata (codex version, timestamps, etc.)
+- `artifacts/<codex>/<problem>/logs/` - Detailed logs from each trial
 
 Generate reports:
 ```bash
-ruby report.rb      # Generate markdown report
-python3 plot.py     # Generate graphs (if available)
+bash scripts/generate-report.sh gemini minigit
+bash scripts/generate-figures.sh gemini minigit
 ```
 
 ## Available Options

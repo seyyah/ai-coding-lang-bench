@@ -42,7 +42,7 @@ The task is split into two phases:
 * **v1 (New project)**: Implement `init`, `add`, `commit`, and `log`.
 * **v2 (Feature extension)**: Add `status`, `diff`, `checkout`, `reset`, `rm`, and `show`.
 
-The prompt is simply: "Read [SPEC-v1.txt](./SPEC-v1.txt), implement it, and make sure [test-v1.sh](./test-v1.sh) passes." v2 is analogous.
+Problem assets now live under `problems/<problem>/`. For MiniGit, the prompt is driven by [`problems/minigit/problem.json`](./problems/minigit/problem.json) and the benchmark copies [`SPEC-v1.txt`](./problems/minigit/SPEC-v1.txt) plus [`test-v1.sh`](./problems/minigit/test-v1.sh) from that directory. v2 is analogous.
 
 ### Languages
 
@@ -81,33 +81,33 @@ Out of 600 runs (15 configurations × 2 phases × 20 trials), only 3 failed: Rus
 
 ### Total Time and Cost (v1 + v2)
 
-![Total time](./figures/total_time.png)
+![Total time](./artifacts/gemini/minigit/figures/total_time.png)
 
-![Total cost](./figures/total_cost.png)
+![Total cost](./artifacts/gemini/minigit/figures/total_cost.png)
 
 Ruby, Python, and JavaScript are the top 3 — fast (73–81s), cheap ($0.36–0.39), and stable (low stddev). From 4th place onward, variance increases sharply.
 
 Time and cost are strongly correlated:
 
-![Time vs Cost](./figures/total_time_vs_cost.png)
+![Time vs Cost](./artifacts/gemini/minigit/figures/total_time_vs_cost.png)
 
 ### Lines of Code (v2)
 
-![Lines of code](./figures/total_lines.png)
+![Lines of code](./artifacts/gemini/minigit/figures/total_lines.png)
 
 OCaml (216), Ruby (219), and Haskell (224) are the most compact. C stands out at 517 lines. Notably, fewer LOC does not imply faster/cheaper generation — OCaml and Haskell are compact but mid-to-low in speed.
 
-![Time vs LOC](./figures/total_time_vs_loc.png)
+![Time vs LOC](./artifacts/gemini/minigit/figures/total_time_vs_loc.png)
 
 ### v1 (New Project)
 
-![v1 time](./figures/v1_time.png)
+![v1 time](./artifacts/gemini/minigit/figures/v1_time.png)
 
 Python (32.9s) and Ruby (33.2s) lead, followed by JavaScript (36.0s). Ruby/Steep takes 105.0s — 3.2× slower than plain Ruby. v1 starts from an empty directory, so languages requiring project config files (`Cargo.toml`, `package.json`, etc.) incur additional overhead.
 
 ### v2 (Feature Extension)
 
-![v2 time](./figures/v2_time.png)
+![v2 time](./artifacts/gemini/minigit/figures/v2_time.png)
 
 The gap narrows in v2. The top 3 remain Ruby (40.0s), Python (41.8s), JavaScript (45.1s). Perl (45.7s), OCaml (47.1s), and Lua (47.2s) follow closely. Haskell is the slowest at 99.6s despite having the fewest LOC.
 
@@ -151,8 +151,8 @@ ruby benchmark.rb --lang python --trials 1       # Single language quick test
 ruby benchmark.rb --codex gemini --trials 5      # Use Gemini instead of Claude
 ruby benchmark.rb --codex gemini --problem minigit   # Write to artifacts/gemini/minigit/
 ruby benchmark.rb --help                         # Show all options
-ruby report.rb                                   # Generate results/report.md
-python3 plot.py                                  # Generate figures/*.png
+ruby report.rb                                   # Generate artifacts/<codex>/<problem>/results/report.md
+python3 plot.py                                  # Generate artifacts/<codex>/<problem>/figures/*.png
 ```
 
 Structured outputs by codex + problem:
@@ -172,6 +172,17 @@ artifacts/<codex>/<problem>/
   logs/
   results/
   figures/
+```
+
+Problem definitions live under:
+
+```text
+problems/<problem>/
+  problem.json
+  SPEC-v1.txt
+  SPEC-v2.txt
+  test-v1.sh
+  test-v2.sh
 ```
 
 Requirements: Ruby, and the target language toolchains.
@@ -214,10 +225,13 @@ See **[CODEX_COMPARISON.md](./CODEX_COMPARISON.md)** for detailed comparison of 
 ├── benchmark.rb              # Main benchmark runner
 ├── report.rb                 # Report generator
 ├── plot.py                   # Graph generator
-├── SPEC-v1.txt              # MiniGit v1 specification
-├── SPEC-v2.txt              # MiniGit v2 specification
-├── test-v1.sh               # v1 test suite
-├── test-v2.sh               # v2 test suite
+├── problems/
+│   └── minigit/
+│       ├── problem.json      # Problem-specific prompt + asset config
+│       ├── SPEC-v1.txt       # MiniGit v1 specification
+│       ├── SPEC-v2.txt       # MiniGit v2 specification
+│       ├── test-v1.sh        # v1 test suite
+│       └── test-v2.sh        # v2 test suite
 ├── lib/
 │   ├── codexes/
 │   │   ├── base_codex.rb    # Abstract base class
@@ -227,12 +241,13 @@ See **[CODEX_COMPARISON.md](./CODEX_COMPARISON.md)** for detailed comparison of 
 ├── config/
 │   └── codexes.yml          # Codex configuration
 ├── artifacts/               # Namespaced outputs: <codex>/<problem>/...
+│   └── gemini/
+│       └── minigit/
+│           ├── generated/
+│           ├── logs/
+│           ├── results/
+│           └── figures/
 ├── scripts/                 # Helper scripts for namespaced benchmark/report/figures
-├── results/
-│   ├── results.json         # Raw benchmark data
-│   ├── meta.json            # Metadata
-│   └── report.md            # Generated report
-├── figures/                 # Generated graphs
 ├── QUICK_START.md          # Quick start guide
 ├── ROADMAP.md              # Multi-codex roadmap
 └── CODEX_COMPARISON.md     # Detailed codex comparison

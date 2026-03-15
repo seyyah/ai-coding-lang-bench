@@ -12,11 +12,34 @@ shift 2
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 repo_root="$(cd "$script_dir/.." && pwd)"
-base_dir="$repo_root/artifacts/$codex/$problem"
+extra_args=("$@")
+dry_run=false
+explicit_output_root=""
 
-bash "$script_dir/run-benchmark.sh" "$codex" "$problem" "$@"
-bash "$script_dir/generate-report.sh" "$codex" "$problem"
-bash "$script_dir/generate-figures.sh" "$codex" "$problem"
+for ((i = 0; i < ${#extra_args[@]}; i++)); do
+  case "${extra_args[$i]}" in
+    --dry-run)
+      dry_run=true
+      ;;
+    --output-root)
+      if (( i + 1 < ${#extra_args[@]} )); then
+        explicit_output_root="${extra_args[$((i + 1))]}"
+      fi
+      ;;
+  esac
+done
+
+if [[ -n "$explicit_output_root" ]]; then
+  base_dir="$explicit_output_root"
+elif [[ "$dry_run" == true ]]; then
+  base_dir="$repo_root/artifacts/$codex/$problem/dry-run"
+else
+  base_dir="$repo_root/artifacts/$codex/$problem"
+fi
+
+bash "$script_dir/run-benchmark.sh" "$codex" "$problem" "${extra_args[@]}"
+bash "$script_dir/generate-report.sh" "$codex" "$problem" --base-dir "$base_dir"
+bash "$script_dir/generate-figures.sh" "$codex" "$problem" --base-dir "$base_dir"
 
 echo
 echo "All artifacts written under: $base_dir"

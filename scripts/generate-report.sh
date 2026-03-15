@@ -8,10 +8,25 @@ fi
 
 codex="$1"
 problem="$2"
+shift 2
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 repo_root="$(cd "$script_dir/.." && pwd)"
 base_dir="$repo_root/artifacts/$codex/$problem"
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --base-dir)
+      base_dir="$2"
+      shift 2
+      ;;
+    *)
+      echo "Unknown argument: $1" >&2
+      exit 1
+      ;;
+  esac
+done
+
 results_dir="$base_dir/results"
 results_json="$results_dir/results.json"
 meta_json="$results_dir/meta.json"

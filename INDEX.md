@@ -95,7 +95,7 @@ export GOOGLE_API_KEY="your-key"
 - **What it does**: [README.md](./README.md#experiment)
 - **Why it matters**: [README.md](./README.md#motivation)
 - **How it works**: [CLAUDE.md](./CLAUDE.md#how-it-works)
-- **MiniGit spec**: [SPEC-v1.txt](./SPEC-v1.txt), [SPEC-v2.txt](./SPEC-v2.txt)
+- **MiniGit spec**: [problems/minigit/SPEC-v1.txt](./problems/minigit/SPEC-v1.txt), [problems/minigit/SPEC-v2.txt](./problems/minigit/SPEC-v2.txt)
 
 ### Supported Languages
 
@@ -114,8 +114,8 @@ export GOOGLE_API_KEY="your-key"
 
 - **Original results**: [README.md](./README.md#results)
 - **Discussion**: [README.md](./README.md#discussion)
-- **Generated reports**: [results/report.md](./results/report.md) (after running)
-- **Raw data**: [results/results.json](./results/results.json) (after running)
+- **Generated reports**: `artifacts/<codex>/<problem>/results/report.md` (after running)
+- **Raw data**: `artifacts/<codex>/<problem>/results/results.json` (after running)
 
 ## 🗂️ File Structure
 
@@ -132,10 +132,13 @@ export GOOGLE_API_KEY="your-key"
 ├── report.rb                # Report generator
 ├── plot.py                  # Graph generator
 │
-├── SPEC-v1.txt             # MiniGit v1 spec
-├── SPEC-v2.txt             # MiniGit v2 spec
-├── test-v1.sh              # v1 tests
-├── test-v2.sh              # v2 tests
+├── problems/
+│   └── minigit/
+│       ├── problem.json    # Problem-specific asset config
+│       ├── SPEC-v1.txt     # MiniGit v1 spec
+│       ├── SPEC-v2.txt     # MiniGit v2 spec
+│       ├── test-v1.sh      # v1 tests
+│       └── test-v2.sh      # v2 tests
 │
 ├── lib/                    # Core library
 │   ├── codexes/           # Codex adapters
@@ -148,13 +151,12 @@ export GOOGLE_API_KEY="your-key"
 │   ├── codexes.yml        # Main config
 │   └── codexes.local.yml  # Local override (gitignored)
 │
-├── results/               # Output (gitignored in data branch)
-│   ├── results.json
-│   ├── meta.json
-│   └── report.md
-│
-├── generated/             # Generated code (gitignored)
-└── logs/                  # Codex logs (gitignored)
+├── artifacts/             # Namespaced output roots
+│   └── <codex>/<problem>/
+│       ├── generated/
+│       ├── logs/
+│       ├── results/
+│       └── figures/
 ```
 
 ## ❓ FAQ
