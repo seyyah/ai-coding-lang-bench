@@ -62,15 +62,22 @@ codexes:
   #     region: "us-west-1"  # Alibaba Cloud region
 
   # Aider (CLI Tool - wraps other models)
-  # Priority: MEDIUM | Status: Planned
-  # Supports: 75+ models | Free tier: N/A (uses backend model)
-  # aider:
-  #   enabled: false
-  #   class: AiderCodex
-  #   config:
-  #     backend_model: "claude-opus"  # Or gpt-4o, deepseek, etc.
-  #     api_key: "${AIDER_API_KEY}"  # For the backend model
-  #     aider_path: "aider"  # Path to aider executable
+  # Priority: MEDIUM | Status: Implemented
+  # Supports: 75+ models | Free tier: Ollama (local, zero cost)
+  # Install: pip install aider-chat
+  # Free local model: ollama pull qwen2.5-coder:7b
+  aider:
+    enabled: false
+    class: AiderCodex
+    config:
+      # Primary: free local model via Ollama (no API key needed)
+      model: "ollama/qwen2.5-coder:7b"
+      aider_path: "aider"
+      timeout_seconds: 1200
+      cooldown_seconds: 0.0
+      # Alternative: Gemini free tier (1000 req/day)
+      # model: "gemini/gemini-2.0-flash-exp"
+      # api_key: "${GOOGLE_API_KEY}"
 
   # Cline (CLI mode)
   # Priority: MEDIUM | Status: Planned

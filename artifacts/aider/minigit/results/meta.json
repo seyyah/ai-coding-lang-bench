@@ -1,0 +1,10 @@
+{
+  "date": "2026-03-19 14:45:00",
+  "codex": "aider",
+  "problem": "minigit",
+  "codex_version": "aider 0.86.2",
+  "model": "ollama/qwen2.5-coder:7b",
+  "trials": 1,
+  "languages": 15,
+  "notes": "Haskell timed out (>14h); all other 14 languages completed. Model: local Ollama via WSL2."
+}

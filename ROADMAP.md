@@ -11,6 +11,7 @@ This document tracks the implementation status and plans for supporting various 
 | **Claude Code** | Anthropic | CLI | ✅ Complete | Default codex, full integration with Opus/Sonnet models |
 | **Gemini** | Google | API | ✅ Complete | Gemini 3.1 Flash-Lite/Pro, 1M context, free tier: 1000 req/day |
 | **OpenAI Codex** | OpenAI | API | ✅ Complete | Responses API adapter with configurable model, headers, and cost accounting |
+| **Aider** | Open Source | CLI | ✅ Complete | 75+ model support; default: Ollama qwen2.5-coder:7b (free, local); OLLAMA_API_BASE passthrough for WSL2 |
 
 ## Planned Implementations
 
@@ -25,7 +26,6 @@ This document tracks the implementation status and plans for supporting various 
 
 | Tool | Maintainer | Models Supported | Priority | Notes |
 |------|-----------|------------------|----------|-------|
-| **Aider** | Open Source | 75+ models | 🟡 Medium | Claude, GPT, DeepSeek, Ollama support |
 | **Cline** | Open Source | Multiple | 🟡 Medium | VS Code + CLI + JetBrains, 4M+ installations |
 | **Goose** | Block/Square | Multiple | 🟡 Medium | Autonomous agent, MCP support |
 | **OpenCode** | Open Source | 75+ providers | 🟢 Low | Multi-session, local model support |
@@ -81,7 +81,7 @@ This document tracks the implementation status and plans for supporting various 
 7. 🟡 GLM-4.7 Thinking (LiveCodeBench leader)
 
 ### Phase 3: Popular CLI Tools (Q4 2026)
-8. 🟡 Aider (75+ model support)
+8. ✅ Aider (75+ model support) — Complete
 9. 🟡 Cline (4M+ users)
 10. 🟡 Goose (MCP support)
 
@@ -189,5 +189,5 @@ To add a new codex:
 
 ---
 
-**Last Updated**: 2026-03-15
+**Last Updated**: 2026-03-17
 **Maintained By**: Community Contributors
