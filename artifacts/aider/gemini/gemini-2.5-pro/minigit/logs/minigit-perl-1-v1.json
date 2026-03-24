@@ -1,0 +1,463 @@
+Can't initialize prompt toolkit: Found xterm, while expecting a Windows 
+console. Maybe try to run this program using "winpty" or run it in cmd.exe 
+instead. Or otherwise, in case of Cygwin, use the Python executable that is 
+compiled for Cygwin.
+───────────────────────────────────────────────────────────────────────────────
+Aider v0.86.2
+Main model: gemini/gemini-2.5-pro with whole edit format
+Weak model: gemini/gemini-2.5-flash
+Git repo: none
+Repo-map: disabled
+Added SPEC-v1.txt to the chat.
+Added test-v1.sh to the chat.
+Note: in-chat filenames are always relative to the git working dir, not the 
+current working dir.
+Cur working dir: 
+C:\Users\ahmet\Desktop\WL\which-language-ahmettngz\artifacts\aider\minigit\gene
+rated\minigit-perl-1-v1
+Git working dir: C:\Users\ahmet\Desktop\WL\which-language-ahmettngz
+
+litellm.ServiceUnavailableError: Vertex_ai_betaException - b'{\n  "error": {\n 
+"code": 503,\n    "message": "This model is currently experiencing high demand.
+Spikes in demand are usually temporary. Please try again later.",\n    
+"status": "UNAVAILABLE"\n  }\n}\n'
+The API provider's servers are down or overloaded.
+Retrying in 0.2 seconds...
+Merhaba, isteğiniz üzerine SPEC-v1.txt dosyasında belirtilen özelliklere göre  
+minigit aracını Perl dilinde uygulayacağım. Bu uygulama, test-v1.sh betiğindeki
+tüm testleri geçecek şekilde tasarlanmıştır.                                   
+
+İsteğiniz, minigit adında yeni bir çalıştırılabilir dosya oluşturulmasını      
+gerektiriyor. Bu dosyayı aşağıda sunuyorum. SPEC-v1.txt ve test-v1.sh          
+dosyalarında herhangi bir değişiklik yapılması istenmediğinden, bu dosyaları   
+tekrar listelemeyeceğim.                                                       
+
+İşte minigit betiğinin tam içeriği:                                            
+
+minigit                                                                        
+
+                                                                               
+#!/usr/bin/env perl                                                            
+                                                                               
+                                                                               
+                                                                               
+use strict;                                                                    
+                                                                               
+use warnings;                                                                  
+                                                                               
+use File::Path qw(make_path);                                                  
+                                                                               
+use Getopt::Long;                                                              
+                                                                               
+use Math::BigInt;                                                              
+                                                                               
+                                                                               
+                                                                               
+# Constants for repository structure                                           
+                                                                               
+use constant MINIGIT_DIR => '.minigit';                                        
+                                                                               
+use constant OBJECTS_DIR => '.minigit/objects';                                
+                                                                               
+use constant COMMITS_DIR => '.minigit/commits';                                
+                                                                               
+use constant INDEX_FILE  => '.minigit/index';                                  
+                                                                               
+use constant HEAD_FILE   => '.minigit/HEAD';                                   
+                                                                               
+                                                                               
+                                                                               
+main();                                                                        
+                                                                               
+                                                                               
+                                                                               
+sub main {                                                                     
+                                                                               
+    my $command = shift @ARGV;                                                 
+                                                                               
+                                                                               
+                                                                               
+    if (!defined $command) {                                                   
+                                                                               
+        # Spec does not define this behavior, but it's required for a          
+functioning tool.                                                              
+                                                                               
+        # Exiting with an error is a sensible default.                         
+                                                                               
+        exit 1;                                                                
+                                                                               
+    }                                                                          
+                                                                               
+                                                                               
+                                                                               
+    if ($command eq 'init') {                                                  
+                                                                               
+        cmd_init();                                                            
+                                                                               
+    } elsif ($command eq 'add') {                                              
+                                                                               
+        my $file = shift @ARGV;                                                
+                                                                               
+        cmd_add($file);                                                        
+                                                                               
+    } elsif ($command eq 'commit') {                                           
+                                                                               
+        cmd_commit();                                                          
+                                                                               
+    } elsif ($command eq 'log') {                                              
+                                                                               
+        cmd_log();                                                             
+                                                                               
+    } else {                                                                   
+                                                                               
+        # Spec does not define this behavior.                                  
+                                                                               
+        exit 1;                                                                
+                                                                               
+    }                                                                          
+                                                                               
+}                                                                              
+                                                                               
+                                                                               
+                                                                               
+# --- Custom Hash Algorithm (MiniHash) ---                                     
+                                                                               
+sub minihash {                                                                 
+                                                                               
+    my ($data) = @_;                                                           
+                                                                               
+    my $h = Math::BigInt->new('1469598103934665603');                          
+                                                                               
+    my $prime = Math::BigInt->new('1099511628211');                            
+                                                                               
+    my $mod_val = Math::BigInt->new(2)->bpow(64);                              
+                                                                               
+                                                                               
+                                                                               
+    for my $byte (unpack("C*", $data)) {                                       
+                                                                               
+        $h->bxor($byte);                                                       
+                                                                               
+        $h->bmul($prime);                                                      
+                                                                               
+        $h->bmod($mod_val);                                                    
+                                                                               
+    }                                                                          
+                                                                               
+                                                                               
+                                                                               
+    my $hex = substr($h->as_hex(), 2);                                         
+                                                                               
+    return sprintf('%016s', lc($hex));                                         
+                                                                               
+}                                                                              
+                                                                               
+                                                                               
+                                                                               
+# --- Command Implementations ---                                              
+                                                                               
+sub cmd_init {                                                                 
+                                                                               
+    if (-d MINIGIT_DIR) {                                                      
+                                                                               
+        print "Repository already initialized\n";                              
+                                                                               
+        exit 0;                                                                
+                                                                               
+    }                                                                          
+                                                                               
+                                                                               
+                                                                               
+    make_path(OBJECTS_DIR, COMMITS_DIR) or die "Cannot create .minigit         
+directories: $!";                                                              
+                                                                               
+                                                                               
+                                                                               
+    open my $fh, '>', INDEX_FILE or die "Cannot create " . INDEX_FILE . ": $!";
+                                                                               
+    close $fh;                                                                 
+                                                                               
+                                                                               
+                                                                               
+    open $fh, '>', HEAD_FILE or die "Cannot create " . HEAD_FILE . ": $!";     
+                                                                               
+    close $fh;                                                                 
+                                                                               
+                                                                               
+                                                                               
+    exit 0;                                                                    
+                                                                               
+}                                                                              
+                                                                               
+                                                                               
+                                                                               
+sub cmd_add {                                                                  
+                                                                               
+    my ($file) = @_;                                                           
+                                                                               
+    unless (defined $file) {                                                   
+                                                                               
+        # The spec does not cover this case (no file provided).                
+                                                                               
+        # We exit with an error, as the test script always provides a file.    
+                                                                               
+        exit 1;                                                                
+                                                                               
+    }                                                                          
+                                                                               
+                                                                               
+                                                                               
+    unless (-f $file) {                                                        
+                                                                               
+        print "File not found\n";                                              
+                                                                               
+        exit 1;                                                                
+                                                                               
+    }                                                                          
+                                                                               
+                                                                               
+                                                                               
+    open my $fh, '<:raw', $file or die "Cannot open $file: $!";                
+                                                                               
+    my $content = do { local $/; <$fh> };                                      
+                                                                               
+    close $fh;                                                                 
+                                                                               
+                                                                               
+                                                                               
+    my $hash = minihash($content);                                             
+                                                                               
+    my $object_path = OBJECTS_DIR . "/$hash";                                  
+                                                                               
+                                                                               
+                                                                               
+    open my $obj_fh, '>:raw', $object_path or die "Cannot create object file   
+$object_path: $!";                                                             
+                                                                               
+    print $obj_fh $content;                                                    
+                                                                               
+    close $obj_fh;                                                             
+                                                                               
+                                                                               
+                                                                               
+    open my $idx_fh, '<', INDEX_FILE or die "Cannot read index: $!";           
+                                                                               
+    my @lines = <$idx_fh>;                                                     
+                                                                               
+    close $idx_fh;                                                             
+                                                                               
+    chomp @lines;                                                              
+                                                                               
+                                                                               
+                                                                               
+    my %indexed_files = map { $_ => 1 } @lines;                                
+                                                                               
+    unless (exists $indexed_files{$file}) {                                    
+                                                                               
+        open my $idx_append_fh, '>>', INDEX_FILE or die "Cannot append to      
+index: $!";                                                                    
+                                                                               
+        print $idx_append_fh "$file\n";                                        
+                                                                               
+        close $idx_append_fh;                                                  
+                                                                               
+    }                                                                          
+                                                                               
+                                                                               
+                                                                               
+    exit 0;                                                                    
+                                                                               
+}                                                                              
+                                                                               
+                                                                               
+                                                                               
+sub cmd_commit {                                                               
+                                                                               
+    my $message = '';                                                          
+                                                                               
+    GetOptions('m|message=s' => \$message) or exit 1;                          
+                                                                               
+                                                                               
+                                                                               
+    open my $idx_fh, '<', INDEX_FILE or die "Cannot read index: $!";           
+                                                                               
+    my @files = <$idx_fh>;                                                     
+                                                                               
+    close $idx_fh;                                                             
+                                                                               
+    chomp @files;                                                              
+                                                                               
+                                                                               
+                                                                               
+    if (scalar @files == 0) {                                                  
+                                                                               
+        print "Nothing to commit\n";                                           
+                                                                               
+        exit 1;                                                                
+                                                                               
+    }                                                                          
+                                                                               
+                                                                               
+                                                                               
+    open my $head_fh, '<', HEAD_FILE or die "Cannot read HEAD: $!";            
+                                                                               
+    my $parent = <$head_fh>;                                                   
+                                                                               
+    close $head_fh;                                                            
+                                                                               
+    chomp $parent if $parent;                                                  
+                                                                               
+    $parent = "NONE" if !$parent || $parent eq '';                             
+                                                                               
+                                                                               
+                                                                               
+    my $timestamp = time();                                                    
+                                                                               
+                                                                               
+                                                                               
+    my @file_lines;                                                            
+                                                                               
+    @files = sort @files;                                                      
+                                                                               
+                                                                               
+                                                                               
+    for my $file (@files) {                                                    
+                                                                               
+        open my $file_fh, '<:raw', $file or die "Cannot open $file: $!";       
+                                                                               
+        my $content = do { local $/; <$file_fh> };                             
+                                                                               
+        close $file_fh;                                                        
+                                                                               
+        my $hash = minihash($content);                                         
+                                                                               
+        push @file_lines, "$file $hash";                                       
+                                                                               
+    }                                                                          
+                                                                               
+                                                                               
+                                                                               
+    my $commit_content = "parent: $parent\n";                                  
+                                                                               
+    $commit_content .= "timestamp: $timestamp\n";                              
+                                                                               
+    $commit_content .= "message: $message\n";                                  
+                                                                               
+    $commit_content .= "files:\n";                                             
+                                                                               
+    $commit_content .= join("\n", @file_lines) . "\n";                         
+                                                                               
+                                                                               
+                                                                               
+    my $commit_hash = minihash($commit_content);                               
+                                                                               
+                                                                               
+                                                                               
+    my $commit_path = COMMITS_DIR . "/$commit_hash";                           
+                                                                               
+    open my $commit_fh, '>:raw', $commit_path or die "Cannot create commit     
+file: $!";                                                                     
+                                                                               
+    print $commit_fh $commit_content;                                          
+                                                                               
+    close $commit_fh;                                                          
+                                                                               
+                                                                               
+                                                                               
+    open my $new_head_fh, '>', HEAD_FILE or die "Cannot write to HEAD: $!";    
+                                                                               
+    print $new_head_fh "$commit_hash\n";                                       
+                                                                               
+    close $new_head_fh;                                                        
+                                                                               
+                                                                               
+                                                                               
+    open my $new_idx_fh, '>', INDEX_FILE or die "Cannot clear index: $!";      
+                                                                               
+    close $new_idx_fh;                                                         
+                                                                               
+                                                                               
+                                                                               
+    print "Committed $commit_hash\n";                                          
+                                                                               
+    exit 0;                                                                    
+                                                                               
+}                                                                              
+                                                                               
+                                                                               
+                                                                               
+sub cmd_log {                                                                  
+                                                                               
+    open my $head_fh, '<', HEAD_FILE or die "Cannot read HEAD: $!";            
+                                                                               
+    my $current_hash = <$head_fh>;                                             
+                                                                               
+    close $head_fh;                                                            
+                                                                               
+                                                                               
+                                                                               
+    if (!defined $current_hash || $current_hash =~ /^\s*$/) {                  
+                                                                               
+        print "No commits\n";                                                  
+                                                                               
+        exit 0;                                                                
+                                                                               
+    }                                                                          
+                                                                               
+                                                                               
+                                                                               
+    chomp $current_hash;                                                       
+                                                                               
+                                                                               
+                                                                               
+    while (defined $current_hash and $current_hash ne '' and $current_hash ne  
+'NONE') {                                                                      
+                                                                               
+        my $commit_path = COMMITS_DIR . "/$current_hash";                      
+                                                                               
+        unless (-f $commit_path) {                                             
+                                                                               
+            die "Fatal: commit object $current_hash not found";                
+                                                                               
+        }                                                                      
+                                                                               
+                                                                               
+                                                                               
+        open my $commit_fh, '<', $commit_path or die "Cannot read commit       
+$current_hash: $!";                                                            
+                                                                               
+        my $content = do { local $/; <$commit_fh> };                           
+                                                                               
+        close $commit_fh;                                                      
+                                                                               
+                                                                               
+                                                                               
+        my ($parent) = $content =~ /^parent: (.*)$/m;                          
+                                                                               
+        my ($timestamp) = $content =~ /^timestamp: (.*)$/m;                    
+                                                                               
+        my ($message) = $content =~ /^message: (.*)$/m;                        
+                                                                               
+                                                                               
+                                                                               
+        print "commit $current_hash\n";                                        
+                                                                               
+        print "Date: $timestamp\n";                                            
+                                                                               
+        print "Message: $message\n";                                           
+                                                                               
+                                                                               
+                                                                               
+        $current_hash = $parent;                                               
+                                                                               
+    }                                                                          
+                                                                               
+    exit 0;                                                                    
+                                                                               
+}                                                                              
+                                                                               
+
+Tokens: 3.0k sent, 1.8k received. Cost: $0.02 message, $0.02 session.
+
+minigit
+Applied edit to minigit

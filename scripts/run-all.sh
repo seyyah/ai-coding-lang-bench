@@ -31,10 +31,8 @@ done
 
 if [[ -n "$explicit_output_root" ]]; then
   base_dir="$explicit_output_root"
-elif [[ "$dry_run" == true ]]; then
-  base_dir="$repo_root/artifacts/$codex/$problem/dry-run"
 else
-  base_dir="$repo_root/artifacts/$codex/$problem"
+  base_dir="$(bash "$script_dir/resolve-output-root.sh" "$codex" "$problem" "$dry_run")"
 fi
 
 bash "$script_dir/run-benchmark.sh" "$codex" "$problem" "${extra_args[@]}"

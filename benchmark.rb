@@ -11,8 +11,14 @@ require 'set'
 require 'rbconfig'
 require_relative 'lib/codex_loader'
 
+<<<<<<< HEAD
 # --- SENIN SISTEMINE OZEL AYARLAR (WINDOWS) ---
 IS_WINDOWS = true 
+=======
+require 'dotenv'
+Dotenv.load
+
+>>>>>>> 6019372e73af381488a9a9d215358d11fd81cf95
 BASE_DIR = File.expand_path(__dir__)
 PROBLEMS_DIR = File.join(BASE_DIR, 'problems')
 TRIALS = 3
@@ -79,6 +85,37 @@ while i < ARGV.length
   when '--dry-run'
     dry_run = true
     i += 1
+<<<<<<< HEAD
+=======
+  when '--help', '-h'
+    available_problems = available_problem_keys
+    puts <<~HELP
+      Usage: ruby benchmark.rb [OPTIONS]
+
+      Options:
+        --lang, -l LANGS       Comma-separated list of languages to test
+        --trials, -t NUM       Number of trials per language (default: #{TRIALS})
+        --start, -s NUM        Starting trial number (default: 1)
+        --codex, -c NAME       AI codex to use: #{CodexLoader.available_codexes.join(', ')} (default: #{CodexLoader.default_codex})
+        --problem, -p NAME     Problem key under problems/ (default: minigit#{available_problems.empty? ? '' : "; available: #{available_problems.join(', ')}"})
+        --output-root PATH     Write generated/, logs/, and results/ under PATH
+        --dry-run              Dry run mode (don't actually run codex)
+        --help, -h             Show this help message
+
+      Examples:
+        ruby benchmark.rb --lang python --trials 1
+        ruby benchmark.rb --codex gemini --lang ruby,python
+        ruby benchmark.rb --codex gemini --problem minigit
+        ruby benchmark.rb --codex claude --problem minigit --lang python --dry-run
+        ruby benchmark.rb --trials 10 --start 11
+
+      By default, outputs are written under:
+        artifacts/<codex>/<model>/<problem>/
+      or, for dry runs:
+        artifacts/<codex>/<model>/<problem>/dry-run/
+    HELP
+    exit 0
+>>>>>>> 6019372e73af381488a9a9d215358d11fd81cf95
   else
     i += 1
   end
@@ -89,7 +126,16 @@ selected_codex ||= CodexLoader.default_codex
 problem = selected_problem || 'minigit'
 
 if selected_output_root.nil?
+<<<<<<< HEAD
   selected_output_root = File.join(BASE_DIR, 'artifacts', selected_codex, problem, (dry_run ? 'dry-run' : ''))
+=======
+  selected_output_root = CodexLoader.default_output_root(
+    selected_codex,
+    problem: problem,
+    base_dir: BASE_DIR,
+    dry_run: dry_run,
+  )
+>>>>>>> 6019372e73af381488a9a9d215358d11fd81cf95
 end
 
 work_dir = File.join(selected_output_root, 'generated')

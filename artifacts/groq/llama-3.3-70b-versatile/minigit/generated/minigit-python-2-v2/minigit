@@ -1,0 +1,126 @@
+#!/usr/bin/env python3
+import os
+import sys
+import hashlib
+import shutil
+
+class MiniGit:
+    def __init__(self):
+        self.git_dir = '.minigit'
+        self.objects_dir = os.path.join(self.git_dir, 'objects')
+        self.refs_dir = os.path.join(self.git_dir, 'refs')
+        self.head_file = os.path.join(self.git_dir, 'HEAD')
+        self.index_file = os.path.join(self.git_dir, 'index')
+
+    def init(self):
+        if os.path.exists(self.git_dir):
+            print("minigit repository already exists")
+            return
+        os.makedirs(self.git_dir)
+        os.makedirs(self.objects_dir)
+        os.makedirs(self.refs_dir)
+        with open(self.head_file, 'w') as f:
+            f.write('ref: refs/heads/master\n')
+        with open(self.index_file, 'w') as f:
+            pass
+
+    def add(self, file_name):
+        with open(file_name, 'rb') as f:
+            file_content = f.read()
+        file_hash = hashlib.sha1(file_content).hexdigest()
+        file_path = os.path.join(self.objects_dir, file_hash[:2], file_hash[2:])
+        if not os.path.exists(os.path.dirname(file_path)):
+            os.makedirs(os.path.dirname(file_path))
+        with open(file_path, 'wb') as f:
+            f.write(file_content)
+        with open(self.index_file, 'a') as f:
+            f.write(f'{file_hash} {file_name}\n')
+
+    def commit(self, message):
+        with open(self.index_file, 'r') as f:
+            index_content = f.readlines()
+        commit_hash = hashlib.sha1(''.join([line.split()[0] for line in index_content])).hexdigest()
+        commit_path = os.path.join(self.objects_dir, commit_hash[:2], commit_hash[2:])
+        if not os.path.exists(os.path.dirname(commit_path)):
+            os.makedirs(os.path.dirname(commit_path))
+        with open(commit_path, 'w') as f:
+            f.write(message)
+        with open(self.head_file, 'r') as f:
+            head_content = f.read()
+        head_ref = head_content.split()[1]
+        with open(os.path.join(self.refs_dir, head_ref), 'w') as f:
+            f.write(commit_hash)
+        with open(self.index_file, 'w') as f:
+            pass
+
+    def log(self):
+        with open(self.head_file, 'r') as f:
+            head_content = f.read()
+        head_ref = head_content.split()[1]
+        commit_hash = open(os.path.join(self.refs_dir, head_ref), 'r').read()
+        while commit_hash:
+            commit_path = os.path.join(self.objects_dir, commit_hash[:2], commit_hash[2:])
+            with open(commit_path, 'r') as f:
+                print(f'commit {commit_hash}')
+                print(f'    {f.read()}')
+            parent_hash = None
+            with open(self.index_file, 'r') as f:
+                for line in f.readlines():
+                    if line.split()[0] == commit_hash:
+                        parent_hash = line.split()[1]
+                        break
+            if parent_hash:
+                commit_hash = parent_hash
+            else:
+                break
+
+    def checkout(self, commit_hash):
+        commit_path = os.path.join(self.objects_dir, commit_hash[:2], commit_hash[2:])
+        if not os.path.exists(commit_path):
+            print("Commit not found")
+            return
+        with open(commit_path, 'r') as f:
+            commit_content = f.read()
+        with open(self.head_file, 'w') as f:
+            f.write(f'ref: {commit_hash}\n')
+        with open(self.index_file, 'w') as f:
+            f.write(commit_content)
+
+    def reset(self, commit_hash):
+        self.checkout(commit_hash)
+
+def main():
+    minigit = MiniGit()
+    if len(sys.argv) < 2:
+        print("Usage: python minigit.py <command>")
+        return
+    command = sys.argv[1]
+    if command == 'init':
+        minigit.init()
+    elif command == 'add':
+        if len(sys.argv) < 3:
+            print("Usage: python minigit.py add <file_name>")
+            return
+        minigit.add(sys.argv[2])
+    elif command == 'commit':
+        if len(sys.argv) < 3:
+            print("Usage: python minigit.py commit <message>")
+            return
+        minigit.commit(sys.argv[2])
+    elif command == 'log':
+        minigit.log()
+    elif command == 'checkout':
+        if len(sys.argv) < 3:
+            print("Usage: python minigit.py checkout <commit_hash>")
+            return
+        minigit.checkout(sys.argv[2])
+    elif command == 'reset':
+        if len(sys.argv) < 3:
+            print("Usage: python minigit.py reset <commit_hash>")
+            return
+        minigit.reset(sys.argv[2])
+    else:
+        print("Unknown command")
+
+if __name__ == '__main__':
+    main()

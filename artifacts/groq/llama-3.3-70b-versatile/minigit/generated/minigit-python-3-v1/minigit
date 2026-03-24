@@ -1,0 +1,108 @@
+#!/usr/bin/env python3
+
+import os
+import sys
+import hashlib
+import datetime
+
+def init():
+    if os.path.exists('.minigit'):
+        print('minigit repository already exists')
+        return
+    os.mkdir('.minigit')
+    os.mkdir('.minigit/objects')
+    os.mkdir('.minigit/refs')
+    os.mkdir('.minigit/refs/heads')
+    with open('.minigit/HEAD', 'w') as f:
+        f.write('ref: refs/heads/master\n')
+
+def hash_object(data):
+    obj_type = 'blob'
+    header = f'{obj_type} {len(data)}\0'
+    full_data = header.encode() + data
+    sha1 = hashlib.sha1(full_data).hexdigest()
+    return sha1
+
+def write_object(data):
+    sha1 = hash_object(data)
+    path = f'.minigit/objects/{sha1[:2]}/{sha1[2:]}'
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, 'wb') as f:
+        f.write(data)
+    return sha1
+
+def read_object(sha1):
+    path = f'.minigit/objects/{sha1[:2]}/{sha1[2:]}'
+    with open(path, 'rb') as f:
+        data = f.read()
+    return data
+
+def update_ref(ref, sha1):
+    with open(f'.minigit/{ref}', 'w') as f:
+        f.write(sha1 + '\n')
+
+def log_commit(sha1):
+    commit_data = read_object(sha1)
+    commit_msg = commit_data.decode().split('\n\n', 1)[1]
+    print(f'commit {sha1}')
+    print(f'Date: {datetime.datetime.now().strftime("%a %b %d %H:%M:%S %Y %z")}')
+    print(f'\n    {commit_msg}')
+
+def commit(message):
+    tree = write_object(b'')
+    parent = None
+    try:
+        with open('.minigit/HEAD', 'r') as f:
+            head_ref = f.read().strip()
+        with open(f'.minigit/{head_ref}', 'r') as f:
+            parent = f.read().strip()
+    except FileNotFoundError:
+        pass
+    commit_data = f'tree {tree}\n'
+    if parent:
+        commit_data += f'parent {parent}\n'
+    commit_data += f'\n{message}'
+    sha1 = write_object(commit_data.encode())
+    update_ref('refs/heads/master', sha1)
+    update_ref('HEAD', 'refs/heads/master')
+    log_commit(sha1)
+
+def log():
+    try:
+        with open('.minigit/HEAD', 'r') as f:
+            head_ref = f.read().strip()
+        with open(f'.minigit/{head_ref}', 'r') as f:
+            sha1 = f.read().strip()
+    except FileNotFoundError:
+        print('No commits yet')
+        return
+    while sha1:
+        log_commit(sha1)
+        commit_data = read_object(sha1)
+        commit_msg = commit_data.decode().split('\n\n', 1)[1]
+        print(f'\n    {commit_msg}\n')
+        parent = None
+        for line in commit_data.decode().split('\n'):
+            if line.startswith('parent '):
+                parent = line.split(' ', 1)[1]
+                break
+        sha1 = parent
+
+if __name__ == '__main__':
+    if len(sys.argv) < 2:
+        print('Usage: minigit <command>')
+        sys.exit(1)
+    command = sys.argv[1]
+    if command == 'init':
+        init()
+    elif command == 'commit':
+        if len(sys.argv) < 3:
+            print('Usage: minigit commit <message>')
+            sys.exit(1)
+        message = ' '.join(sys.argv[2:])
+        commit(message)
+    elif command == 'log':
+        log()
+    else:
+        print('Unknown command')
+        sys.exit(1)

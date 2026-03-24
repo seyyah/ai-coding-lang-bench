@@ -1,0 +1,92 @@
+#!/usr/bin/env python3
+import os
+import sys
+import hashlib
+import shutil
+
+class MiniGit:
+    def __init__(self):
+        self.git_dir = '.minigit'
+        self.objects_dir = os.path.join(self.git_dir, 'objects')
+        self.refs_dir = os.path.join(self.git_dir, 'refs')
+        self.head_file = os.path.join(self.git_dir, 'HEAD')
+
+    def init(self):
+        if not os.path.exists(self.git_dir):
+            os.makedirs(self.git_dir)
+            os.makedirs(self.objects_dir)
+            os.makedirs(self.refs_dir)
+            with open(self.head_file, 'w') as f:
+                f.write('ref: refs/heads/master\n')
+
+    def hash_object(self, data):
+        return hashlib.sha1(data.encode()).hexdigest()
+
+    def write_object(self, data):
+        obj_hash = self.hash_object(data)
+        obj_path = os.path.join(self.objects_dir, obj_hash[:2], obj_hash[2:])
+        obj_dir = os.path.dirname(obj_path)
+        if not os.path.exists(obj_dir):
+            os.makedirs(obj_dir)
+        with open(obj_path, 'w') as f:
+            f.write(data)
+
+    def read_object(self, obj_hash):
+        obj_path = os.path.join(self.objects_dir, obj_hash[:2], obj_hash[2:])
+        with open(obj_path, 'r') as f:
+            return f.read()
+
+    def commit(self, message):
+        tree = self.write_tree()
+        commit_data = f'tree {tree}\nauthor <author>\ncommitter <committer>\n\n{message}'
+        commit_hash = self.hash_object(commit_data)
+        self.write_object(commit_data)
+        self.update_head(commit_hash)
+
+    def write_tree(self):
+        tree_data = ''
+        for root, dirs, files in os.walk('.'):
+            for file in files:
+                if file == '.gitignore':
+                    continue
+                file_path = os.path.join(root, file)
+                file_hash = self.hash_object(open(file_path, 'r').read())
+                tree_data += f'100644 blob {file_hash}\t{file_path}\n'
+        tree_hash = self.hash_object(tree_data)
+        self.write_object(tree_data)
+        return tree_hash
+
+    def update_head(self, commit_hash):
+        with open(self.head_file, 'w') as f:
+            f.write(f'ref: refs/heads/master\n{commit_hash}\n')
+
+    def checkout(self, commit_hash):
+        commit_data = self.read_object(commit_hash)
+        tree_hash = commit_data.split('\n')[0].split(' ')[1]
+        tree_data = self.read_object(tree_hash)
+        files = tree_data.split('\n')
+        for file in files:
+            if file:
+                file_path = file.split('\t')[1]
+                file_hash = file.split(' ')[2]
+                file_data = self.read_object(file_hash)
+                with open(file_path, 'w') as f:
+                    f.write(file_data)
+
+    def reset(self, commit_hash):
+        self.update_head(commit_hash)
+        self.checkout(commit_hash)
+
+def main():
+    minigit = MiniGit()
+    if sys.argv[1] == 'init':
+        minigit.init()
+    elif sys.argv[1] == 'commit':
+        minigit.commit(sys.argv[2])
+    elif sys.argv[1] == 'checkout':
+        minigit.checkout(sys.argv[2])
+    elif sys.argv[1] == 'reset':
+        minigit.reset(sys.argv[2])
+
+if __name__ == '__main__':
+    main()

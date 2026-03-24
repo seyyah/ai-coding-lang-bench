@@ -1,0 +1,441 @@
+Can't initialize prompt toolkit: Found xterm, while expecting a Windows 
+console. Maybe try to run this program using "winpty" or run it in cmd.exe 
+instead. Or otherwise, in case of Cygwin, use the Python executable that is 
+compiled for Cygwin.
+───────────────────────────────────────────────────────────────────────────────
+Aider v0.86.2
+Main model: gemini/gemini-2.5-pro with whole edit format
+Weak model: gemini/gemini-2.5-flash
+Git repo: none
+Repo-map: disabled
+Added SPEC-v1.txt to the chat.
+Added test-v1.sh to the chat.
+Note: in-chat filenames are always relative to the git working dir, not the 
+current working dir.
+Cur working dir: 
+C:\Users\ahmet\Desktop\WL\which-language-ahmettngz\artifacts\aider\minigit\gene
+rated\minigit-perl-2-v1
+Git working dir: C:\Users\ahmet\Desktop\WL\which-language-ahmettngz
+
+Merhaba, isteğiniz üzerine, SPEC-v1.txt dosyasında belirtilen minigit aracını  
+Perl dilinde uyguladım. Bu uygulama, test-v1.sh betiğindeki tüm testleri       
+geçmelidir.                                                                    
+
+Aşağıda, çalıştırılabilir minigit dosyasının içeriğini bulabilirsiniz. Bu yeni 
+bir dosyadır.                                                                  
+
+minigit                                                                        
+
+                                                                               
+#!/usr/bin/env perl                                                            
+                                                                               
+                                                                               
+                                                                               
+use strict;                                                                    
+                                                                               
+use warnings;                                                                  
+                                                                               
+                                                                               
+                                                                               
+use File::Path qw(make_path);                                                  
+                                                                               
+use File::Spec;                                                                
+                                                                               
+use Math::BigInt;                                                              
+                                                                               
+                                                                               
+                                                                               
+# MiniGit dizin yapısı için sabitler                                           
+                                                                               
+use constant MINIGIT_DIR => '.minigit';                                        
+                                                                               
+use constant OBJECTS_DIR => File::Spec->catdir(MINIGIT_DIR, 'objects');        
+                                                                               
+use constant COMMITS_DIR => File::Spec->catdir(MINIGIT_DIR, 'commits');        
+                                                                               
+use constant INDEX_FILE  => File::Spec->catfile(MINIGIT_DIR, 'index');         
+                                                                               
+use constant HEAD_FILE   => File::Spec->catfile(MINIGIT_DIR, 'HEAD');          
+                                                                               
+                                                                               
+                                                                               
+sub minihash {                                                                 
+                                                                               
+    my ($data) = @_;                                                           
+                                                                               
+                                                                               
+                                                                               
+    my $h = Math::BigInt->new('1469598103934665603');                          
+                                                                               
+    my $p = Math::BigInt->new('1099511628211');                                
+                                                                               
+    my $m = Math::BigInt->new(2)->bpow(64);                                    
+                                                                               
+                                                                               
+                                                                               
+    for my $byte (unpack('C*', $data)) {                                       
+                                                                               
+        # Bu metodlar $h'ı yerinde değiştirir                                  
+                                                                               
+        $h->bxor($byte);                                                       
+                                                                               
+        $h->bmul($p);                                                          
+                                                                               
+        $h->bmod($m);                                                          
+                                                                               
+    }                                                                          
+                                                                               
+                                                                               
+                                                                               
+    my $hex = lc($h->as_hex());                                                
+                                                                               
+    $hex =~ s/^0x//;                                                           
+                                                                               
+    return sprintf('%016s', $hex);                                             
+                                                                               
+}                                                                              
+                                                                               
+                                                                               
+                                                                               
+sub read_file {                                                                
+                                                                               
+    my ($filename) = @_;                                                       
+                                                                               
+    open my $fh, '<:raw', $filename or return undef;                           
+                                                                               
+    my $content = do { local $/; <$fh> };                                      
+                                                                               
+    close $fh;                                                                 
+                                                                               
+    return $content;                                                           
+                                                                               
+}                                                                              
+                                                                               
+                                                                               
+                                                                               
+sub write_file {                                                               
+                                                                               
+    my ($filename, $content) = @_;                                             
+                                                                               
+    open my $fh, '>:raw', $filename or die "Cannot write to $filename: $!";    
+                                                                               
+    print $fh $content;                                                        
+                                                                               
+    close $fh;                                                                 
+                                                                               
+}                                                                              
+                                                                               
+                                                                               
+                                                                               
+sub do_init {                                                                  
+                                                                               
+    if (-d MINIGIT_DIR) {                                                      
+                                                                               
+        print "Repository already initialized\n";                              
+                                                                               
+        exit 0;                                                                
+                                                                               
+    }                                                                          
+                                                                               
+                                                                               
+                                                                               
+    make_path(OBJECTS_DIR, COMMITS_DIR) or die "Cannot create directories: $!";
+                                                                               
+    write_file(INDEX_FILE, '');                                                
+                                                                               
+    write_file(HEAD_FILE, '');                                                 
+                                                                               
+}                                                                              
+                                                                               
+                                                                               
+                                                                               
+sub do_add {                                                                   
+                                                                               
+    my ($file) = @_;                                                           
+                                                                               
+                                                                               
+                                                                               
+    unless (defined $file) {                                                   
+                                                                               
+        exit 1;                                                                
+                                                                               
+    }                                                                          
+                                                                               
+                                                                               
+                                                                               
+    unless (-f $file) {                                                        
+                                                                               
+        print "File not found\n";                                              
+                                                                               
+        exit 1;                                                                
+                                                                               
+    }                                                                          
+                                                                               
+                                                                               
+                                                                               
+    my $content = read_file($file);                                            
+                                                                               
+    die "Could not read file $file" unless defined $content;                   
+                                                                               
+                                                                               
+                                                                               
+    my $hash = minihash($content);                                             
+                                                                               
+    my $object_path = File::Spec->catfile(OBJECTS_DIR, $hash);                 
+                                                                               
+    write_file($object_path, $content);                                        
+                                                                               
+                                                                               
+                                                                               
+    my $index_content = read_file(INDEX_FILE);                                 
+                                                                               
+    my @staged_files = split /\n/, $index_content;                             
+                                                                               
+                                                                               
+                                                                               
+    my $found = 0;                                                             
+                                                                               
+    foreach my $staged_file (@staged_files) {                                  
+                                                                               
+        if ($staged_file eq $file) {                                           
+                                                                               
+            $found = 1;                                                        
+                                                                               
+            last;                                                              
+                                                                               
+        }                                                                      
+                                                                               
+    }                                                                          
+                                                                               
+                                                                               
+                                                                               
+    unless ($found) {                                                          
+                                                                               
+        open my $fh, '>>', INDEX_FILE or die "Cannot open index file: $!";     
+                                                                               
+        print $fh "$file\n";                                                   
+                                                                               
+        close $fh;                                                             
+                                                                               
+    }                                                                          
+                                                                               
+}                                                                              
+                                                                               
+                                                                               
+                                                                               
+sub do_commit {                                                                
+                                                                               
+    unless (@ARGV == 2 && $ARGV[0] eq '-m') {                                  
+                                                                               
+        # Spec bu durumu tanımlamıyor, ancak bir hata.                         
+                                                                               
+        exit 1;                                                                
+                                                                               
+    }                                                                          
+                                                                               
+    my $message = $ARGV[1];                                                    
+                                                                               
+                                                                               
+                                                                               
+    my $index_content = read_file(INDEX_FILE);                                 
+                                                                               
+    # Dosya içeriğinin sadece boşluklardan oluşup oluşmadığını kontrol et      
+                                                                               
+    unless (defined $index_content && $index_content =~ /\S/) {                
+                                                                               
+        print "Nothing to commit\n";                                           
+                                                                               
+        exit 1;                                                                
+                                                                               
+    }                                                                          
+                                                                               
+                                                                               
+                                                                               
+    my @files = sort(grep { /\S/ } split /\n/, $index_content);                
+                                                                               
+    if (!@files) {                                                             
+                                                                               
+        print "Nothing to commit\n";                                           
+                                                                               
+        exit 1;                                                                
+                                                                               
+    }                                                                          
+                                                                               
+                                                                               
+                                                                               
+                                                                               
+                                                                               
+    my $parent_hash = read_file(HEAD_FILE);                                    
+                                                                               
+    chomp $parent_hash if defined $parent_hash;                                
+                                                                               
+    $parent_hash = 'NONE' unless ($parent_hash && $parent_hash ne '');         
+                                                                               
+                                                                               
+                                                                               
+    my $timestamp = time();                                                    
+                                                                               
+                                                                               
+                                                                               
+    my $commit_data = "parent: $parent_hash\n";                                
+                                                                               
+    $commit_data .= "timestamp: $timestamp\n";                                 
+                                                                               
+    $commit_data .= "message: $message\n";                                     
+                                                                               
+    $commit_data .= "files:\n";                                                
+                                                                               
+                                                                               
+                                                                               
+    for my $file (@files) {                                                    
+                                                                               
+        my $content = read_file($file);                                        
+                                                                               
+        die "Cannot read staged file $file" unless defined $content;           
+                                                                               
+        my $blob_hash = minihash($content);                                    
+                                                                               
+        $commit_data .= "$file $blob_hash\n";                                  
+                                                                               
+    }                                                                          
+                                                                               
+                                                                               
+                                                                               
+    my $commit_hash = minihash($commit_data);                                  
+                                                                               
+                                                                               
+                                                                               
+    my $commit_path = File::Spec->catfile(COMMITS_DIR, $commit_hash);          
+                                                                               
+    write_file($commit_path, $commit_data);                                    
+                                                                               
+                                                                               
+                                                                               
+    write_file(HEAD_FILE, "$commit_hash\n");                                   
+                                                                               
+    write_file(INDEX_FILE, ''); # index'i temizle                              
+                                                                               
+                                                                               
+                                                                               
+    print "Committed $commit_hash\n";                                          
+                                                                               
+}                                                                              
+                                                                               
+                                                                               
+                                                                               
+sub do_log {                                                                   
+                                                                               
+    my $head_content = read_file(HEAD_FILE);                                   
+                                                                               
+    unless (defined $head_content and $head_content =~ /\S/) {                 
+                                                                               
+        print "No commits\n";                                                  
+                                                                               
+        return;                                                                
+                                                                               
+    }                                                                          
+                                                                               
+                                                                               
+                                                                               
+    my $current_hash = $head_content;                                          
+                                                                               
+    chomp $current_hash;                                                       
+                                                                               
+                                                                               
+                                                                               
+    while (defined $current_hash && $current_hash ne 'NONE' && $current_hash ne
+'') {                                                                          
+                                                                               
+        my $commit_path = File::Spec->catfile(COMMITS_DIR, $current_hash);     
+                                                                               
+        my $commit_data = read_file($commit_path);                             
+                                                                               
+                                                                               
+                                                                               
+        unless (defined $commit_data) {                                        
+                                                                               
+            # Bu bir depo bozulması olurdu.                                    
+                                                                               
+            last;                                                              
+                                                                               
+        }                                                                      
+                                                                               
+                                                                               
+                                                                               
+        my ($parent)    = $commit_data =~ /^parent: (.*)$/m;                   
+                                                                               
+        my ($timestamp) = $commit_data =~ /^timestamp: (.*)$/m;                
+                                                                               
+        my ($message)   = $commit_data =~ /^message: (.*)$/m;                  
+                                                                               
+                                                                               
+                                                                               
+        print "commit $current_hash\n";                                        
+                                                                               
+        print "Date: $timestamp\n";                                            
+                                                                               
+        print "Message: $message\n";                                           
+                                                                               
+                                                                               
+                                                                               
+        $current_hash = $parent;                                               
+                                                                               
+    }                                                                          
+                                                                               
+}                                                                              
+                                                                               
+                                                                               
+                                                                               
+# Ana yönlendirme                                                              
+                                                                               
+my $command = shift @ARGV;                                                     
+                                                                               
+                                                                               
+                                                                               
+if (not defined $command) {                                                    
+                                                                               
+    # Spec kullanım talimatı belirtmiyor.                                      
+                                                                               
+    exit 1;                                                                    
+                                                                               
+}                                                                              
+                                                                               
+                                                                               
+                                                                               
+if ($command eq 'init') {                                                      
+                                                                               
+    do_init();                                                                 
+                                                                               
+}                                                                              
+                                                                               
+elsif ($command eq 'add') {                                                    
+                                                                               
+    do_add(@ARGV);                                                             
+                                                                               
+}                                                                              
+                                                                               
+elsif ($command eq 'commit') {                                                 
+                                                                               
+    do_commit(@ARGV);                                                          
+                                                                               
+}                                                                              
+                                                                               
+elsif ($command eq 'log') {                                                    
+                                                                               
+    do_log();                                                                  
+                                                                               
+}                                                                              
+                                                                               
+else {                                                                         
+                                                                               
+    # Bilinmeyen komut.                                                        
+                                                                               
+    exit 1;                                                                    
+                                                                               
+}                                                                              
+                                                                               
+
+Tokens: 3.0k sent, 1.6k received. Cost: $0.02 message, $0.02 session.
+
+minigit
+Applied edit to minigit

@@ -1,0 +1,152 @@
+Can't initialize prompt toolkit: Found xterm, while expecting a Windows 
+console. Maybe try to run this program using "winpty" or run it in cmd.exe 
+instead. Or otherwise, in case of Cygwin, use the Python executable that is 
+compiled for Cygwin.
+───────────────────────────────────────────────────────────────────────────────
+Aider v0.86.2
+Main model: gemini/gemini-2.5-pro with whole edit format
+Weak model: gemini/gemini-2.5-flash
+Git repo: none
+Repo-map: disabled
+Added SPEC-v1.txt to the chat.
+Added SPEC-v2.txt to the chat.
+Added minigit to the chat.
+Added test-v1.sh to the chat.
+Added test-v2.sh to the chat.
+Note: in-chat filenames are always relative to the git working dir, not the 
+current working dir.
+Cur working dir: 
+C:\Users\ahmet\Desktop\WL\which-language-ahmettngz\artifacts\aider\minigit\gene
+rated\minigit-lua-1-v2
+Git working dir: C:\Users\ahmet\Desktop\WL\which-language-ahmettngz
+
+Merhaba, isteğiniz üzerine minigit betiğini SPEC-v2.txt spesifikasyonuna göre  
+checkout ve reset komutlarını içerecek şekilde güncelledim.                    
+
+ • checkout komutu: Belirtilen bir commit hash'ine geri dönerek çalışma        
+   dizinindeki dosyaları o commit'teki durumlarına getirir, HEAD'i günceller ve
+   hazırlık alanını (index) temizler.                                          
+ • reset komutu: Çalışma dizinindeki dosyalara dokunmadan sadece HEAD'i        
+   belirtilen commit'e taşır ve hazırlık alanını (index) temizler.             
+
+Bu yeni komutlar için gerekli fonksiyonları ve ana komut işleme mantığını      
+minigit dosyasına ekledim. İsteğiniz uyarınca, değişiklik gerektirmeyen diğer  
+tüm dosyalar da içerikleriyle birlikte aşağıda listelenmiştir.                 
+
+İşte güncellenmiş dosyalar:                                                    
+
+SPEC-v2.txt                                                                    
+
+                                                                               
+@@ -1,5 +1,6 @@                                                                
+ MiniGit Specification                                                         
+
+minigit                                                                        
+
+                                                                               
+@@ -1,4 +1,5 @@                                                                
+ local table = table                                                           
+                                                                               
+     end                                                                       
+ end                                                                           
+                                                                               
+-                                                                              
+--- Main argument parsing                                                      
+-if #arg < 1 then                                                              
+-    return                                                                    
+-end                                                                           
+-                                                                              
+-local command = arg[1]                                                        
+-                                                                              
+-if command == "init" then                                                     
+-    cmd_init()                                                                
+-elseif command == "add" then                                                  
+-    if not arg[2] then print("Usage: minigit add <file>"); os.exit(1) end     
+-    cmd_add(arg[2])                                                           
+-elseif command == "commit" then                                               
+-    if arg[2] ~= "-m" or not arg[3] then                                      
+-        print("Usage: minigit commit -m \"<message>\"")                       
++function cmd_checkout(commit_hash)                                            
++    local commit_path = ".minigit/commits/" .. commit_hash                    
++    if not fs.exists(commit_path) then                                        
++        print("Invalid commit")                                               
+         os.exit(1)                                                            
+     end                                                                       
++                                                                              
++    local content = fs.read(commit_path)                                      
++                                                                              
++    local files_section = content:match("files:\n(.*)")                       
++    if files_section then                                                     
++        for line in files_section:gmatch("[^\n]+") do                         
++            if #fs.trim(line) > 0 then                                        
++                local filename, blobhash = line:match("^(%S+)%s+(%S+)$")      
++                if filename and blobhash then                                 
++                    local blob_content = fs.read(".minigit/objects/" ..       
+blobhash)                                                                      
++                    if blob_content then                                      
++                        fs.write(filename, blob_content)                      
++                    end                                                       
++                end                                                           
++            end                                                               
++                local filename, blobhash = line:match("^(%S+)%s+(%S+)$")      
++                if filename and blobhash then                                 
++                    local blob_content = fs.read(".minigit/objects/" ..       
+blobhash)                                                                      
++                    if blob_content then                                      
++                        fs.write(filename, blob_content)                      
++                    end                                                       
++                end                                                           
++            end                                                               
++        end                                                                   
++    end                                                                       
++                                                                              
++    fs.write(".minigit/HEAD", commit_hash .. "\n")                            
++    fs.write(".minigit/index", "")                                            
++                                                                              
++    print("Checked out " .. commit_hash)                                      
++end                                                                           
++                                                                              
++function cmd_reset(commit_hash)                                               
++    local commit_path = ".minigit/commits/" .. commit_hash                    
++    if not fs.exists(commit_path) then                                        
++        print("Invalid commit")                                               
+end                                                                            
++    cmd_reset(arg[2])                                                         
+ else                                                                          
+     print("Unknown command: " .. command)                                     
+     os.exit(1)                                                                
+ end                                                                           
+                                                                               
+
+test-v1.sh                                                                     
+
+                                                                               
+@@ -2,5 +2,6 @@                                                                
+ set -e                                                                        
+                                                                               
+ ../minigit add a.txt 2>/dev/null || true                                      
+
+                                                                               
+@@ -1,4 +1,5 @@                                                                
+ PASS_COUNT=0                                                                  
+                                                                               
+SPEC-v1.txt                                                                    
+
+                                                                               
+@@ -19,5 +19,6 @@                                                              
+                                                                               
+     .minigit/                                                                 
+                                                                               
+ All commands operate relative to current directory.                           
+                                                                               
++  23 / 168 lines [████░░░░░░░░░░░░░░░░░░░░░░░░░░]  14%                        
+                                                                               
+Tokens: 9.1k sent, 8.9k received. Cost: $0.10 message, $0.10 session.
+Applied edit to test-v1.sh
+Applied edit to SPEC-v2.txt
+Applied edit to minigit
+Applied edit to test-v2.sh
+Applied edit to SPEC-v1.txt
+Summarization failed for model gemini/gemini-2.5-flash: cannot schedule new futures after shutdown
+Summarization failed for model gemini/gemini-2.5-pro: cannot schedule new futures after shutdown
+summarizer unexpectedly failed for all models

@@ -16,7 +16,7 @@ class OpenAICodex < BaseCodex
   def initialize(config = {})
     super('openai', config)
     @api_key = presence(config[:api_key]) || ENV['OPENAI_API_KEY']
-    @model_name = presence(config[:model_name]) || 'gpt-4.1'
+    @model_name = presence(config[:model]) || presence(config[:model_name]) || 'gpt-4.1'
     @organization = presence(config[:organization]) || ENV['OPENAI_ORG_ID']
     @project = presence(config[:project]) || ENV['OPENAI_PROJECT_ID']
     @api_endpoint = presence(config[:api_endpoint]) || API_ENDPOINT

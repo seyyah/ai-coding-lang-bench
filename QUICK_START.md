@@ -68,7 +68,7 @@ codexes:
     enabled: true
     config:
       api_key: "${OPENAI_API_KEY}"
-      model_name: "gpt-4.1"
+      model: "gpt-4.1"
 ```
 
 Then export your key:
@@ -96,7 +96,7 @@ This checks the full pipeline without making a paid API call:
 Dry-run artifacts go to:
 
 ```text
-artifacts/<codex>/<problem>/dry-run/
+artifacts/<codex>/<model>/<problem>/dry-run/
 ```
 
 ## Step 4: run your first real benchmark
@@ -132,10 +132,10 @@ If you want to run the same flow step by step, use:
 ```bash
 ruby benchmark.rb --codex openai --problem minigit --lang python --trials 1
 ruby report.rb \
-  --results artifacts/openai/minigit/results/results.json \
-  --meta artifacts/openai/minigit/results/meta.json \
-  --output artifacts/openai/minigit/results/report.md
-python3 plot.py artifacts/openai/minigit/results/results.json
+  --results artifacts/openai/gpt-4.1/minigit/results/results.json \
+  --meta artifacts/openai/gpt-4.1/minigit/results/meta.json \
+  --output artifacts/openai/gpt-4.1/minigit/results/report.md
+python3 plot.py artifacts/openai/gpt-4.1/minigit/results/results.json
 ```
 
 For dry-run validation without a paid API call:
@@ -149,7 +149,7 @@ bash scripts/run-all.sh openai minigit --dry-run --lang python --trials 1
 After a real run, the canonical outputs live under:
 
 ```text
-artifacts/<codex>/<problem>/
+artifacts/<codex>/<model>/<problem>/
   generated/
   logs/
   results/

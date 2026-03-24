@@ -12,7 +12,7 @@ shift 2
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 repo_root="$(cd "$script_dir/.." && pwd)"
-base_dir="$repo_root/artifacts/$codex/$problem"
+base_dir="$(bash "$script_dir/resolve-output-root.sh" "$codex" "$problem")"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in

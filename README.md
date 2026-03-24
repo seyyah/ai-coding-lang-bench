@@ -34,12 +34,15 @@ Think of the benchmark as a matrix:
 Each benchmark run writes outputs under a namespaced root:
 
 ```text
-artifacts/<codex>/<problem>/
+artifacts/<codex>/<model>/<problem>/
   generated/
   logs/
   results/
   figures/
 ```
+
+The `<model>` segment comes from `config.model`. Values like `gemini/gemini-2.5-pro`
+intentionally create deeper namespaces under the selected codex.
 
 That layout is now the default for both helper scripts and direct `benchmark.rb` usage.
 
@@ -89,7 +92,7 @@ This verifies:
 Dry runs are isolated under:
 
 ```text
-artifacts/<codex>/<problem>/dry-run/
+artifacts/<codex>/<model>/<problem>/dry-run/
 ```
 
 ### 4. Run a real benchmark
@@ -106,10 +109,10 @@ ruby benchmark.rb --codex gemini --problem minigit --lang python --trials 1
 
 ### 5. Read the outputs
 
-- raw results: `artifacts/<codex>/<problem>/results/results.json`
-- report: `artifacts/<codex>/<problem>/results/report.md`
-- figures: `artifacts/<codex>/<problem>/figures/`
-- generated code / build artifacts: `artifacts/<codex>/<problem>/generated/`
+- raw results: `artifacts/<codex>/<model>/<problem>/results/results.json`
+- report: `artifacts/<codex>/<model>/<problem>/results/report.md`
+- figures: `artifacts/<codex>/<model>/<problem>/figures/`
+- generated code / build artifacts: `artifacts/<codex>/<model>/<problem>/generated/`
 
 ### Installation
 
@@ -119,6 +122,21 @@ If you are running the benchmarks on Windows, you can automatically install the 
 Open your terminal as Administrator and run:
 ```powershell
 .\scripts\install_windows.ps1
+
+### 🍏 macOS Setup
+
+For macOS users, we provide an automated setup script that uses **Homebrew** to seamlessly install all required languages, compilers, and sub-dependencies. The script is idempotent, meaning it will safely skip packages that are already installed on your system.
+
+**Prerequisites:**
+Ensure you have [Homebrew](https://brew.sh/) installed before running the script.
+
+**Installation Steps:**
+1. Open your terminal in the root directory of the project.
+2. Make the script executable:
+   ```bash
+   chmod +x scripts/install_mac.sh
+
+
 
 ## What is already generalized
 
@@ -143,7 +161,7 @@ problems/<problem>/
 - phase-specific tests
 - prompt templates
 
-### Multiple codexes
+#### Multiple codexes
 
 Codexes use an adapter interface:
 
@@ -173,6 +191,7 @@ Each entry provides things like:
 | Claude Code | ✅ | default CLI adapter |
 | Gemini | ✅ | API adapter with metrics extraction |
 | OpenAI | ✅ | Responses API adapter with optional cost accounting |
+| Groq | ✅ | API adapter with robust parsing features for supported models |
 
 See [ROADMAP.md](./ROADMAP.md) for planned adapters such as DeepSeek, Qwen, Aider, Cline, and more.
 
@@ -211,7 +230,7 @@ Those constraints are acceptable for now, but they are worth knowing if you plan
 │   └── codexes.local.yml   # local override, gitignored
 ├── scripts/
 └── artifacts/
-    └── <codex>/<problem>/
+    └── <codex>/<model>/<problem>/
 ```
 
 ## Recommended commands

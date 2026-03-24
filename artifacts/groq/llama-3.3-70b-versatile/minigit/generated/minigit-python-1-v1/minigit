@@ -1,0 +1,115 @@
+#!/usr/bin/env python3
+
+import os
+import sys
+import hashlib
+import datetime
+
+def init():
+    if os.path.exists('.minigit'):
+        print('minigit repository already exists')
+        return
+    os.mkdir('.minigit')
+    os.mkdir('.minigit/objects')
+    os.mkdir('.minigit/refs')
+    os.mkdir('.minigit/refs/heads')
+    with open('.minigit/HEAD', 'w') as f:
+        f.write('ref: refs/heads/master\n')
+
+def hash_object(data):
+    obj_type = 'blob'
+    header = f'{obj_type} {len(data)}\0'
+    full_data = header.encode() + data
+    sha1 = hashlib.sha1(full_data).hexdigest()
+    return sha1
+
+def write_object(data):
+    sha1 = hash_object(data)
+    path = f'.minigit/objects/{sha1[:2]}/{sha1[2:]}'
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, 'wb') as f:
+        f.write(data)
+    return sha1
+
+def read_object(sha1):
+    path = f'.minigit/objects/{sha1[:2]}/{sha1[2:]}'
+    with open(path, 'rb') as f:
+        data = f.read()
+    return data
+
+def update_ref(ref, sha1):
+    with open(f'.minigit/{ref}', 'w') as f:
+        f.write(sha1 + '\n')
+
+def log_commit(sha1):
+    commit_data = read_object(sha1)
+    commit_obj = commit_data.decode().split('\n\n', 1)
+    commit_header = commit_obj[0].split('\n')
+    tree_sha1 = commit_header[1].split(' ')[1]
+    parent_sha1 = commit_header[2].split(' ')[1] if len(commit_header) > 2 else None
+    author = commit_header[3].split(' ')[1]
+    date = commit_header[4].split(' ')[1]
+    message = commit_obj[1] if len(commit_obj) > 1 else ''
+    print(f'commit {sha1}')
+    print(f'Tree: {tree_sha1}')
+    if parent_sha1:
+        print(f'Parent: {parent_sha1}')
+    print(f'Author: {author} <{author}@example.com>')
+    print(f'Date: {date}')
+    print()
+    print(message)
+
+def commit(message):
+    tree_sha1 = write_object(b'tree')
+    parent_sha1 = None
+    with open('.minigit/HEAD', 'r') as f:
+        head_ref = f.read().strip()
+    if head_ref.startswith('ref: '):
+        head_ref = head_ref[5:]
+        with open(f'.minigit/{head_ref}', 'r') as f:
+            parent_sha1 = f.read().strip()
+    commit_data = f'tree {tree_sha1}\n'
+    if parent_sha1:
+        commit_data += f'parent {parent_sha1}\n'
+    commit_data += f'author {os.getlogin()}\n'
+    commit_data += f'date {datetime.datetime.now().strftime("%a %b %d %H:%M:%S %Y %z")}\n'
+    commit_data += f'\n{message}\n'
+    commit_sha1 = write_object(commit_data.encode())
+    update_ref('refs/heads/master', commit_sha1)
+    update_ref('HEAD', 'ref: refs/heads/master')
+
+def log():
+    with open('.minigit/HEAD', 'r') as f:
+        head_ref = f.read().strip()
+    if head_ref.startswith('ref: '):
+        head_ref = head_ref[5:]
+        with open(f'.minigit/{head_ref}', 'r') as f:
+            commit_sha1 = f.read().strip()
+    else:
+        commit_sha1 = head_ref
+    while commit_sha1:
+        log_commit(commit_sha1)
+        commit_data = read_object(commit_sha1)
+        commit_obj = commit_data.decode().split('\n\n', 1)
+        commit_header = commit_obj[0].split('\n')
+        parent_sha1 = commit_header[2].split(' ')[1] if len(commit_header) > 2 else None
+        commit_sha1 = parent_sha1
+
+if __name__ == '__main__':
+    if len(sys.argv) < 2:
+        print('usage: minigit <command>')
+        sys.exit(1)
+    command = sys.argv[1]
+    if command == 'init':
+        init()
+    elif command == 'commit':
+        if len(sys.argv) < 3:
+            print('usage: minigit commit <message>')
+            sys.exit(1)
+        message = ' '.join(sys.argv[2:])
+        commit(message)
+    elif command == 'log':
+        log()
+    else:
+        print('unknown command')
+        sys.exit(1)

@@ -1,0 +1,22 @@
+{
+  "date": "2026-03-19 16:02:59 +0300",
+  "codex": "aider",
+  "problem": "minigit",
+  "trials": 3,
+  "versions": {
+    "rust": "rustc 1.94.0 (4a4ef493e 2026-03-02)",
+    "go": "go version go1.26.1 windows/amd64",
+    "c": "gcc (MinGW-W64 x86_64-ucrt-posix-seh, built by Brecht Sanders, r8) 13.2.0",
+    "typescript": "tsx v4.21.0",
+    "javascript": "v25.8.1",
+    "java": "openjdk 21.0.10 2026-01-20 LTS",
+    "perl": "This is perl 5, version 38, subversion 2 (v5.38.2) built for x86_64-msys-thread-multi",
+    "python": "Python 3.13.12",
+    "ruby": "ruby 3.3.10 (2025-10-23 revision 343ea05002) [x64-mingw-ucrt]",
+    "ruby/steep": "1.10.0",
+    "lua": "Lua 5.4.6  Copyright (C) 1994-2023 Lua.org, PUC-Rio",
+    "scheme": "not installed",
+    "ocaml": "The OCaml toplevel, version 4.14.2",
+    "haskell": "not installed"
+  }
+}

@@ -1,0 +1,299 @@
+Can't initialize prompt toolkit: Found xterm, while expecting a Windows 
+console. Maybe try to run this program using "winpty" or run it in cmd.exe 
+instead. Or otherwise, in case of Cygwin, use the Python executable that is 
+compiled for Cygwin.
+───────────────────────────────────────────────────────────────────────────────
+Aider v0.86.2
+Main model: gemini/gemini-2.5-pro with whole edit format
+Weak model: gemini/gemini-2.5-flash
+Git repo: none
+Repo-map: disabled
+Added SPEC-v1.txt to the chat.
+Added SPEC-v2.txt to the chat.
+Added minigit to the chat.
+Added test-v1.sh to the chat.
+Added test-v2.sh to the chat.
+Note: in-chat filenames are always relative to the git working dir, not the 
+current working dir.
+Cur working dir: 
+C:\Users\ahmet\Desktop\WL\which-language-ahmettngz\artifacts\aider\minigit\gene
+rated\minigit-lua-2-v2
+Git working dir: C:\Users\ahmet\Desktop\WL\which-language-ahmettngz
+
+Elbette, isteğinizi anladım. minigit betiğini, checkout ve reset komutlarını   
+içerecek şekilde genişleteceğim. Ayrıca, test-v2.sh betiğindeki tüm testlerin  
+başarıyla geçmesi için status, diff, rm ve show komutlarını da SPEC-v2.txt     
+spesifikasyonuna göre ekleyeceğim.                                             
+
+İşte istenen değişiklikler:                                                    
+
+minigit dosyasına yeni komutlar (status, diff, checkout, reset, rm, show) için 
+fonksiyonlar eklenecek ve ana komut yönlendirici bu yeni komutları tanıyacak   
+şekilde güncellenecektir. Diğer dosyalar değiştirilmeyecektir.                 
+
+Aşağıda değişikliklerin uygulanacağı dosyanın tam içeriği bulunmaktadır.       
+
+minigit                                                                        
+
+                                                                               
+@@ -3,5 +3,6 @@                                                                
+ -- Spesifikasyonun hash algoritması, standart Lua'da olmayan 64-bit           
+                                                                               
+     end                                                                       
+ end                                                                           
+                                                                               
++function cmd_status()                                                         
+--- Ana Dağıtıcı                                                               
+--- ========================================                                   
+-                                                                              
++function cmd_status()                                                         
++    print("Staged files:")                                                    
++    local index_content = fs.read(".minigit/index") or ""                     
++    local files = {}                                                          
++    for file in index_content:gmatch("[^\r\n]+") do                           
++        table.insert(files, file)                                             
++    end                                                                       
++                                                                              
++    if #files == 0 then                                                       
+-    cmd_log()                                                                 
+-else                                                                          
+-    -- Spesifikasyonda belirtilmemiş davranış, çıkış yap.                     
+-    os.exit(1)                                                                
+-end                                                                           
++function cmd_status()                                                         
++    print("Staged files:")                                                    
++    local index_content = fs.read(".minigit/index") or ""                     
++    local files = {}                                                          
++    for file in index_content:gmatch("[^\r\n]+") do                           
++        table.insert(files, file)                                             
++    end                                                                       
++                                                                              
++    if #files == 0 then                                                       
++        print("(none)")                                                       
++    else                                                                      
++        table.sort(files)                                                     
++        for _, file in ipairs(files) do                                       
++            print(file)                                                       
++        end                                                                   
++    end                                                                       
++end                                                                           
++                                                                              
++local function get_commit_files(commit_hash)                                  
++    local commit_path = ".minigit/commits/" .. commit_hash                    
++    if not fs.exists(commit_path) then                                        
++        return nil                                                            
++    end                                                                       
++                                                                              
++    local files = {} -- map of filename -> hash                               
++    local commit_content = fs.read(commit_path)                               
++    local in_files_section = false                                            
++                                                                              
++    for line in commit_content:gmatch("[^\r\n]+") do                          
++        if in_files_section then                                              
++            local filename, hash = line:match("^(.-) (%S+)$")                 
++            if filename and hash then                                         
++                files[filename] = hash                                        
++            end                                                               
++        elseif line == "files:" then                                          
++            in_files_section = true                                           
++        end                                                                   
++    end                                                                       
++    return files                                                              
++end                                                                           
++                                                                              
++                                                                              
++    local sorted_filenames = {}                                               
++    for filename, _ in pairs(all_files) do                                    
++        table.insert(sorted_filenames, filename)                              
++    end                                                                       
++    table.sort(sorted_filenames)                                              
++                                                                              
++    for _, filename in ipairs(sorted_filenames) do                            
++        local hash1 = files1[filename]                                        
++        local hash2 = files2[filename]                                        
++    for filename, _ in pairs(files1) do all_files[filename] = true end        
++    for filename, _ in pairs(files2) do all_files[filename] = true end        
++                                                                              
++    local sorted_filenames = {}                                               
++    for filename, _ in pairs(all_files) do                                    
++        table.insert(sorted_filenames, filename)                              
++    end                                                                       
++    table.sort(sorted_filenames)                                              
++                                                                              
++    for _, filename in ipairs(sorted_filenames) do                            
++        local hash1 = files1[filename]                                        
++        local hash2 = files2[filename]                                        
++                                                                              
++        if hash1 and not hash2 then                                           
++            print("Removed: " .. filename)                                    
++        elseif not hash1 and hash2 then                                       
++            print("Added: " .. filename)                                      
++        elseif hash1 and hash2 and hash1 ~= hash2 then                        
++            print("Modified: " .. filename)                                   
++        end                                                                   
++    end                                                                       
++end                                                                           
++                                                                              
++function cmd_checkout(commit_hash)                                            
++    local commit_path = ".minigit/commits/" .. commit_hash                    
++    if not fs.exists(commit_path) then                                        
++        print("Invalid commit")                                               
++        os.exit(1)                                                            
++    end                                                                       
++                                                                              
++    local commit_content = fs.read(commit_path)                               
++    local in_files_section = false                                            
++    local files_to_checkout = {}                                              
++                                                                              
++    for line in commit_content:gmatch("[^\r\n]+") do                          
++        if in_files_section then                                              
++            local filename, blob_hash = line:match("^(.-) (%S+)$")            
++            if filename and blob_hash then                                    
++                 table.insert(files_to_checkout, {filename = filename, hash = 
+blob_hash})                                                                    
++            end                                                               
++        elseif line == "files:" then                                          
++            in_files_section = true                                           
++        end                                                                   
++    end                                                                       
++                                                                              
++    for _, file_info in ipairs(files_to_checkout) do                          
++        local blob_path = ".minigit/objects/" .. file_info.hash               
++        local content = fs.read(blob_path)                                    
++        if content then                                                       
++            fs.write(file_info.filename, content)                             
++        end                                                                   
++    end                                                                       
++                                                                              
++    fs.write(".minigit/HEAD", commit_hash)                                    
++    fs.write(".minigit/index", "")                                            
++                                                                              
++    print("Checked out " .. commit_hash)                                      
++end                                                                           
++                                                                              
++function cmd_reset(commit_hash)                                               
++    local commit_path = ".minigit/commits/" .. commit_hash                    
++    if not fs.exists(commit_path) then                                        
++        print("Invalid commit")                                               
++        os.exit(1)                                                            
++    end                                                                       
++                                                                              
++    fs.write(".minigit/HEAD", commit_hash)                                    
++    fs.write(".minigit/index", "")                                            
++                                                                              
++    print("Reset to " .. commit_hash)                                         
++end                                                                           
++                                                                              
++function cmd_rm(filename_to_remove)                                           
++    local index_content = fs.read(".minigit/index") or ""                     
++    local files = {}                                                          
++    local found = false                                                       
++    for file in index_content:gmatch("[^\r\n]+") do                           
++        if file == filename_to_remove then                                    
++            found = true                                                      
++        else                                                                  
++            table.insert(files, file)                                         
++        end                                                                   
++    end                                                                       
++                                                                              
++    if not found then                                                         
++        print("File not in index")                                            
++        os.exit(1)                                                            
++    end                                                                       
++                                                                              
++    if #files > 0 then                                                        
++        fs.write(".minigit/index", table.concat(files, "\n") .. "\n")         
++    else                                                                      
++        fs.write(".minigit/index", "")                                        
++    end                                                                       
++end                                                                           
++                                                                              
++function cmd_show(commit_hash)                                                
++    local commit_path = ".minigit/commits/" .. commit_hash                    
++    if not fs.exists(commit_path) then                                        
++        print("Invalid commit")                                               
++        os.exit(1)                                                            
++    end                                                                       
++                                                                              
++    local commit_content = fs.read(commit_path)                               
++    local timestamp, message                                                  
++    local files = {}                                                          
++    local in_files_section = false                                            
++                                                                              
++    for line in commit_content:gmatch("[^\r\n]+") do                          
++        if in_files_section then                                              
++            local filename, hash = line:match("^(.-) (%S+)$")                 
++            if filename and hash then                                         
++                table.insert(files, { filename = filename, hash = hash })     
++            end                                                               
++        elseif line:match("^timestamp: ") then                                
++            timestamp = line:sub(12)                                          
++        elseif line:match("^message: ") then                                  
++            message = line:sub(10)                                            
++        elseif line == "files:" then                                          
++            in_files_section = true                                           
++        end                                                                   
++    end                                                                       
++                                                                              
++    print("commit " .. commit_hash)                                           
++    print("Date: " .. timestamp)                                              
++    print("Message: " .. message)                                             
++    print("Files:")                                                           
+     cmd_log()                                                                 
++elseif command == "status" then                                               
++    cmd_status()                                                              
++elseif command == "diff" and arg[2] and arg[3] then                           
++    cmd_diff(arg[2], arg[3])                                                  
++elseif command == "checkout" and arg[2] then                                  
++    cmd_checkout(arg[2])                                                      
++elseif command == "reset" and arg[2] then                                     
++    cmd_reset(arg[2])                                                         
++elseif command == "rm" and arg[2] then                                        
++    cmd_rm(arg[2])                                                            
++elseif command == "show" and arg[2] then                                      
++    cmd_show(arg[2])                                                          
+ else                                                                          
+     -- Spesifikasyonda belirtilmemiş davranış, çıkış yap.                     
+     os.exit(1)                                                                
+ end                                                                           
+                                                                               
+
+SPEC-v2.txt                                                                    
+
+                                                                               
+@@ -13,5 +13,6 @@                                                              
+                                                                               
+
+SPEC-v1.txt                                                                    
+
+                                                                               
+@@ -5,5 +5,6 @@                                                                
+ Standard library: Allowed                                                     
+
+test-v1.sh                                                                     
+
+                                                                               
+@@ -4,5 +4,6 @@                                                                
+ PASS_COUNT=0                                                                  
+ # Test 1: init creates directory                                              
+test-v2.sh                                                                     
+
+                                                                               
+@@ -9,5 +9,6 @@                                                                
+   FAIL_COUNT=$((FAIL_COUNT+1))                                                
+ if [ "$OBJ_COUNT_AFTER1" -gt "$OBJ_COUNT_BEFORE" ] && [ "$OBJ_COUNT_AFTER2" = 
+"$OBJ_COUNT_AFTER1" ]; then                                                    
+   pass "hash consistency: same content produces same blob"                    
+ else                                                                          
+   fail "hash consistency: same content produces same blob"                    
++ 235 / 500 lines [██████████████░░░░░░░░░░░░░░░░]  47%                        
+                                                                               
+Tokens: 9.1k sent, 9.9k received. Cost: $0.11 message, $0.11 session.
+Applied edit to SPEC-v2.txt
+Applied edit to SPEC-v1.txt
+Applied edit to test-v2.sh
+Applied edit to minigit
+Applied edit to test-v1.sh
+Summarization failed for model gemini/gemini-2.5-flash: cannot schedule new futures after shutdown
+Summarization failed for model gemini/gemini-2.5-pro: cannot schedule new futures after shutdown
+summarizer unexpectedly failed for all models

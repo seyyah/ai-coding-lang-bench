@@ -1,0 +1,143 @@
+Can't initialize prompt toolkit: Found xterm, while expecting a Windows 
+console. Maybe try to run this program using "winpty" or run it in cmd.exe 
+instead. Or otherwise, in case of Cygwin, use the Python executable that is 
+compiled for Cygwin.
+───────────────────────────────────────────────────────────────────────────────
+Aider v0.86.2
+Main model: gemini/gemini-2.5-pro with whole edit format
+Weak model: gemini/gemini-2.5-flash
+Git repo: none
+Repo-map: disabled
+Added SPEC-v1.txt to the chat.
+Added SPEC-v2.txt to the chat.
+Added minigit to the chat.
+Added test-v1.sh to the chat.
+Added test-v2.sh to the chat.
+Note: in-chat filenames are always relative to the git working dir, not the 
+current working dir.
+Cur working dir: 
+C:\Users\ahmet\Desktop\WL\which-language-ahmettngz\artifacts\aider\minigit\gene
+rated\minigit-ruby-3-v2
+Git working dir: C:\Users\ahmet\Desktop\WL\which-language-ahmettngz
+
+Merhaba, isteğiniz üzerine SPEC-v2.txt dosyasını okudum ve minigit betiğine    
+checkout ve reset komutlarını ekledim.                                         
+
+İşte yapılan değişikliklerin bir özeti:                                        
+
+ 1 minigit:                                                                    
+    • Komutları işlemek için run metoduna checkout ve reset için yeni          
+      dallanmalar eklendi.                                                     
+    • checkout <commit_hash> komutunu uygulamak için yeni bir checkout metodu  
+      eklendi. Bu metod, belirtilen committeki dosyaları çalışma dizinine geri 
+      yükler, HEAD'i günceller ve index dosyasını temizler.                    
+    • reset <commit_hash> komutunu uygulamak için yeni bir reset metodu        
+      eklendi. Bu metod, HEAD'i belirtilen commite taşır ve index dosyasını    
+      temizler, ancak çalışma dizinindeki dosyaları değiştirmez.               
+
+İsteğiniz uyarınca, değişiklik yapılmamış olsalar bile tüm dosyaların tam      
+içeriğini aşağıda sunuyorum.                                                   
+
+test-v2.sh                                                                     
+
+                                                                               
+@@ -2,5 +2,6 @@                                                                
+ set -e                                                                        
+ ######################################                                        
+SPEC-v1.txt                                                                    
+
+                                                                               
+@@ -1,4 +1,5 @@                                                                
+                                                                               
+
+SPEC-v2.txt                                                                    
+
+                                                                               
+@@ -3,5 +3,6 @@                                                                
+ Command name: minigit                                                         
+
+test-v1.sh                                                                     
+
+                                                                               
+@@ -3,5 +3,6 @@                                                                
+                                                                               
+                                                                               
+minigit                                                                        
+
+                                                                               
+@@ -1,5 +1,6 @@                                                                
+ #!/usr/bin/env ruby                                                           
+         exit 1                                                                
+       end                                                                     
+     when 'log'                                                                
+       log                                                                     
++    when 'checkout'                                                           
++      checkout(args[1])                                                       
++    when 'reset'                                                              
++      reset(args[1])                                                          
+     else                                                                      
+       exit 1                                                                  
+     end                                                                       
+   end                                                                         
+                                                                               
+@@ -35,5 +39,6 @@                                                              
+     h = 1469598103934665603                                                   
+     File.write(File.join(OBJECTS_DIR, hash), content)                         
+       current_hash = parent                                                   
+     end                                                                       
+   end                                                                         
+-end                                                                           
+                                                                               
++  def self.checkout(commit_hash)                                              
++    commit_path = File.join(COMMITS_DIR, commit_hash)                         
++    unless commit_hash && File.exist?(commit_path)                            
++      puts "Invalid commit"                                                   
++      exit 1                                                                  
++    end                                                                       
++                                                                              
++    commit_content = File.read(commit_path)                                   
++    _header, files_section = commit_content.split("files:\n", 2)              
++                                                                              
++    if files_section                                                          
++      files_section.lines.each do |line|                                      
++        filename, blob_hash = line.strip.split(' ', 2)                        
++        next if filename.nil? || filename.empty?                              
++        blob_path = File.join(OBJECTS_DIR, blob_hash)                         
++        content = File.binread(blob_path)                                     
++        File.binwrite(filename, content)                                      
++      end                                                                     
++    end                                                                       
++                                                                              
++    File.write(HEAD_FILE, commit_hash)                                        
++    File.write(INDEX_FILE, '')                                                
++                                                                              
++    puts "Checked out #{commit_hash}"                                         
++  end                                                                         
++                                                                              
++  def self.reset(commit_hash)                                                 
++    commit_path = File.join(COMMITS_DIR, commit_hash)                         
++    unless commit_hash && File.exist?(commit_path)                            
++      exit 1                                                                  
++    end                                                                       
++                                                                              
++    File.write(HEAD_FILE, commit_hash)                                        
++    File.write(INDEX_FILE, '')                                                
++                                                                              
++    puts "Reset to #{commit_hash}"                                            
++  end                                                                         
+ end                                                                           
+                                                                               
+ if __FILE__ == $0                                                             
+   MiniGit.run(ARGV)                                                           
+ end                                                                           
+                                                                               
+
+Tokens: 8.4k sent, 8.1k received. Cost: $0.09 message, $0.09 session.
+Applied edit to test-v2.sh
+Applied edit to SPEC-v1.txt
+Applied edit to test-v1.sh
+Applied edit to minigit
+Applied edit to SPEC-v2.txt
+Summarization failed for model gemini/gemini-2.5-flash: cannot schedule new futures after shutdown
+Summarization failed for model gemini/gemini-2.5-pro: cannot schedule new futures after shutdown
+summarizer unexpectedly failed for all models

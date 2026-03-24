@@ -1,0 +1,168 @@
+MiniGit Specification
+Version: 1.0
+Command name: minigit
+External libraries: NOT allowed
+Standard library: Allowed
+Persistent storage: Local filesystem only
+
+========================================
+1. Overview
+========================================
+
+MiniGit is a minimal version control system.
+
+The executable must be called:
+
+    minigit
+
+All repository data must be stored in:
+
+    .minigit/
+
+All commands operate relative to current directory.
+
+----------------------------------------
+
+Supported commands:
+
+    minigit init
+    minigit add <file>
+    minigit commit -m "<message>"
+    minigit log
+
+========================================
+2. Repository Structure
+========================================
+
+After init:
+
+    .minigit/
+        objects/
+        commits/
+        index
+        HEAD
+
+HEAD:
+    latest commit hash or empty.
+
+index:
+    staged filenames (one per line).
+
+objects/:
+    blob storage.
+
+commits/:
+    commit files.
+
+========================================
+3. Custom Hash Algorithm (MANDATORY)
+========================================
+
+You MUST implement the following custom hash function.
+
+Name: MiniHash
+
+Input: raw bytes of file
+Output: 16-character lowercase hexadecimal string
+
+Algorithm:
+
+1. Initialize:
+    h = 1469598103934665603  (64-bit unsigned integer)
+
+2. For each byte b:
+    h = h XOR b
+    h = (h * 1099511628211) mod 2^64
+
+3. After processing all bytes:
+    return lower 64 bits of h
+    formatted as 16-character zero-padded lowercase hex
+
+This is NOT SHA.
+No crypto libraries allowed.
+
+The exact algorithm must match this definition.
+
+========================================
+4. Command Specifications
+========================================
+
+----------------------------------------
+4.1 init
+----------------------------------------
+
+Create .minigit structure.
+
+If already exists:
+    print "Repository already initialized"
+Exit 0.
+
+----------------------------------------
+4.2 add <file>
+----------------------------------------
+
+If file missing:
+    print "File not found"
+    exit 1
+
+Compute MiniHash on file content.
+
+Store blob at:
+    .minigit/objects/<hash>
+
+Append filename to index if not already present.
+
+----------------------------------------
+4.3 commit -m "<message>"
+----------------------------------------
+
+If index empty:
+    print "Nothing to commit"
+    exit 1
+
+Commit format (exact text):
+
+parent: <parent_hash or NONE>
+timestamp: <unix_epoch_integer>
+message: <message>
+files:
+<filename> <blobhash>
+<filename> <blobhash>
+
+Rules:
+- filenames sorted lexicographically
+- parent = HEAD or NONE
+- commit hash = MiniHash of full commit content
+- write commit file:
+      .minigit/commits/<commit_hash>
+- update HEAD
+- clear index
+
+Print:
+    Committed <commit_hash>
+
+----------------------------------------
+4.4 log
+----------------------------------------
+
+If no commits:
+    print "No commits"
+
+Else traverse parents:
+
+commit <hash>
+Date: <timestamp>
+Message: <message>
+
+========================================
+5. Determinism Rules
+========================================
+
+- Sort filenames
+- No extra spaces
+- No debug output
+- Exact string matching required
+
+========================================
+END
+========================================

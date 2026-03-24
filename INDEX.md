@@ -86,7 +86,7 @@ problems/<problem>/
 ### Output layout
 
 ```text
-artifacts/<codex>/<problem>/
+artifacts/<codex>/<model>/<problem>/
   generated/
   logs/
   results/
@@ -125,4 +125,4 @@ for secrets and local enablement.
 
 - The repo originated as a Claude/MiniGit benchmark, but the codebase is now organized as a broader benchmark harness.
 - The most user-friendly entrypoint is usually `bash scripts/run-all.sh <codex> <problem> ...`.
-- Dry runs intentionally write under `artifacts/<codex>/<problem>/dry-run/` so canonical results stay clean.
+- Dry runs intentionally write under `artifacts/<codex>/<model>/<problem>/dry-run/` so canonical results stay clean.

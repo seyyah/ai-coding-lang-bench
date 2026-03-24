@@ -1,0 +1,125 @@
+Can't initialize prompt toolkit: Found xterm, while expecting a Windows 
+console. Maybe try to run this program using "winpty" or run it in cmd.exe 
+instead. Or otherwise, in case of Cygwin, use the Python executable that is 
+compiled for Cygwin.
+───────────────────────────────────────────────────────────────────────────────
+Aider v0.86.2
+Main model: gemini/gemini-2.5-pro with whole edit format
+Weak model: gemini/gemini-2.5-flash
+Git repo: none
+Repo-map: disabled
+Added MiniGit.java to the chat.
+Added SPEC-v1.txt to the chat.
+Added SPEC-v2.txt to the chat.
+Added build.sh to the chat.
+Added minigit to the chat.
+Added test-v1.sh to the chat.
+Added test-v2.sh to the chat.
+Note: in-chat filenames are always relative to the git working dir, not the 
+current working dir.
+Cur working dir: 
+C:\Users\ahmet\Desktop\WL\which-language-ahmettngz\artifacts\aider\minigit\gene
+rated\minigit-java-1-v2
+Git working dir: C:\Users\ahmet\Desktop\WL\which-language-ahmettngz
+
+Elbette, isteğinizi anladım. SPEC-v2.txt dosyasındaki checkout ve reset        
+komutlarının gereksinimlerini karşılamak için MiniGit.java dosyasını           
+güncelleyeceğim.                                                               
+
+Değişiklikler şunları içerecektir:                                             
+
+ 1 MiniGit.java'daki main metoduna checkout ve reset komutlarını işlemek için  
+   yeni case blokları eklenecektir.                                            
+ 2 checkout komutunun işlevselliğini uygulamak için yeni bir checkout(String   
+   commitHash) metodu eklenecektir. Bu metod, belirtilen commit'in dosyalarını 
+   çalışma dizinine geri yükleyecek, HEAD'i güncelleyecek ve index'i           
+   temizleyecektir.                                                            
+ 3 reset komutunun işlevselliğini uygulamak için yeni bir reset(String         
+   commitHash) metodu eklenecektir. Bu metod, çalışma dizinindeki dosyaları    
+   değiştirmeden HEAD'i güncelleyecek ve index'i temizleyecektir.              
+
+İşte güncellenmiş dosya:                                                       
+
+MiniGit.java                                                                   
+
+                                                                               
+@@ -2,5 +2,6 @@                                                                
+ import java.nio.charset.StandardCharsets;                                     
+                     break;                                                    
+                 case "log":                                                   
+                     log();                                                    
+                     break;                                                    
++                case "checkout":                                              
++                    if (args.length < 2) {                                    
++                        System.exit(1);                                       
++                    }                                                         
++                    checkout(args[1]);                                        
++                    break;                                                    
++                case "reset":                                                 
++                    if (args.length < 2) {                                    
++                        System.exit(1);                                       
++                    }                                                         
++                    reset(args[1]);                                           
++                    break;                                                    
+                 default:                                                      
+                     System.exit(1);                                           
+             }                                                                 
+         } catch (IOException e) {                                             
+             System.exit(1);                                                   
+@@ -52,5 +64,6 @@                                                              
+                                                                               
+         List<String> indexEntries;                                            
+             currentCommitHash = parentHash;                                   
+         }                                                                     
+     }                                                                         
++                                                                              
++    private static void checkout(String commitHash) throws IOException {      
++        Path commitPath = COMMITS_DIR.resolve(commitHash);                    
++        if (!Files.exists(commitPath)) {                                      
++            System.out.println("Invalid commit");                             
++            System.exit(1);                                                   
++        }                                                                     
++                                                                              
++        List<String> commitLines = Files.readAllLines(commitPath,             
+StandardCharsets.UTF_8);                                                       
++        boolean filesSection = false;                                         
++        for (String line : commitLines) {                                     
++            if (line.equals("files:")) {                                      
++                filesSection = true;                                          
++                continue;                                                     
++            }                                                                 
++            if (filesSection) {                                               
++                String[] parts = line.split(" ", 2);                          
++                if (parts.length == 2) {                                      
++                    String filename = parts[0];                               
++                    String blobHash = parts[1];                               
++                    Path objectPath = OBJECTS_DIR.resolve(blobHash);          
++                    byte[] content = Files.readAllBytes(objectPath);          
++                    Files.write(Paths.get(filename), content);                
++                }                                                             
++            }                                                                 
++        }                                                                     
++                                                                              
++        Files.writeString(HEAD_FILE, commitHash, StandardCharsets.UTF_8);     
++        Files.writeString(INDEX_FILE, "", StandardCharsets.UTF_8);            
++                                                                              
++        System.out.println("Checked out " + commitHash);                      
++    }                                                                         
++                                                                              
++    private static void reset(String commitHash) throws IOException {         
++        Path commitPath = COMMITS_DIR.resolve(commitHash);                    
++        if (!Files.exists(commitPath)) {                                      
++            System.out.println("Invalid commit");                             
++            System.exit(1);                                                   
++        }                                                                     
++                                                                              
++        Files.writeString(HEAD_FILE, commitHash, StandardCharsets.UTF_8);     
++        Files.writeString(INDEX_FILE, "", StandardCharsets.UTF_8);            
++                                                                              
++        System.out.println("Reset to " + commitHash);                         
++    }                                                                         
+ }                                                                             
+                                                                               
+
+Tokens: 8.8k sent, 2.0k received. Cost: $0.03 message, $0.03 session.
+Applied edit to MiniGit.java

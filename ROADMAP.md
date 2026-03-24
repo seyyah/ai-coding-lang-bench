@@ -120,7 +120,7 @@ your_codex:
   class: YourCodex
   config:
     api_key: "${YOUR_API_KEY}"
-    model_name: "model-name"
+    model: "model-name"
     # ... other config
 ```
 

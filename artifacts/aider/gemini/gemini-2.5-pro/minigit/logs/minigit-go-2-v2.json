@@ -1,0 +1,397 @@
+Can't initialize prompt toolkit: Found xterm, while expecting a Windows 
+console. Maybe try to run this program using "winpty" or run it in cmd.exe 
+instead. Or otherwise, in case of Cygwin, use the Python executable that is 
+compiled for Cygwin.
+───────────────────────────────────────────────────────────────────────────────
+Aider v0.86.2
+Main model: gemini/gemini-2.5-pro with whole edit format
+Weak model: gemini/gemini-2.5-flash
+Git repo: none
+Repo-map: disabled
+Added SPEC-v1.txt to the chat.
+Added SPEC-v2.txt to the chat.
+Added build.sh to the chat.
+Added minigit.go to the chat.
+Added test-v1.sh to the chat.
+Added test-v2.sh to the chat.
+Note: in-chat filenames are always relative to the git working dir, not the 
+current working dir.
+Cur working dir: 
+C:\Users\ahmet\Desktop\WL\which-language-ahmettngz\artifacts\aider\minigit\gene
+rated\minigit-go-2-v2
+Git working dir: C:\Users\ahmet\Desktop\WL\which-language-ahmettngz
+
+Merhaba, anladım. İsteğiniz doğrultusunda, minigit uygulamasına SPEC-v2.txt    
+dosyasında belirtilen checkout ve reset komutlarını ekleyeceğim. test-v2.sh    
+test betiğinin başarıyla çalışması için status, diff, rm ve show gibi diğer    
+eksik komutları da minigit.go dosyasına eklemem gerekiyor.                     
+
+Değişikliklerin özeti:                                                         
+
+ 1 minigit.go:                                                                 
+    • checkout ve reset komutlarını uygulamak için handleCheckout ve           
+      handleReset fonksiyonları eklendi.                                       
+    • test-v2.sh testlerini geçmek için status, diff, rm, ve show komutlarını  
+      yöneten handleStatus, handleDiff, handleRm, ve handleShow fonksiyonları  
+      eklendi.                                                                 
+    • Commit dosyalarından dosya listesini okumak için parseCommitFiles ve     
+      getCommitFiles gibi yardımcı fonksiyonlar eklendi.                       
+    • main fonksiyonu, yeni komutları tanıyacak ve ilgili fonksiyonlara        
+      yönlendirecek şekilde güncellendi.                                       
+
+Diğer dosyalar (SPEC-v1.txt, SPEC-v2.txt, build.sh, test-v1.sh, test-v2.sh)    
+isteğinizin kapsamında olmadığı için değiştirilmeyecektir.                     
+
+İşte güncellenmiş dosyaların içeriği:                                          
+
+SPEC-v1.txt                                                                    
+
+                                                                               
+@@ -9,5 +9,6 @@                                                                
+ 1. Overview                                                                   
+
+SPEC-v2.txt                                                                    
+
+                                                                               
+@@ -1,5 +1,6 @@                                                                
+ MiniGit Specification                                                         
+
+build.sh                                                                       
+
+                                                                               
+                                                                               
+                                                                               
+
+minigit.go                                                                     
+
+                                                                               
+@@ -2,5 +2,6 @@                                                                
+                                                                               
+                                                                               
+    }                                                                          
+ }                                                                             
+                                                                               
+-// handleCommit implements the 'commit' command.                              
+-func handleCommit(message string) {                                           
++// handleRm implements the 'rm' command.                                      
++func handleRm(filename string) {                                              
+    indexPath := filepath.Join(".minigit", "index")                            
+    indexContent, err := ioutil.ReadFile(indexPath)                            
+    if err != nil {                                                            
+        log.Fatalf("Failed to read index: %v", err)                            
+    }                                                                          
+-   if strings.TrimSpace(string(indexContent)) == "" {                         
+-       fmt.Println("Nothing to commit")                                       
+-       os.Exit(1)                                                             
+-   }                                                                          
+                                                                               
+-   headPath := filepath.Join(".minigit", "HEAD")                              
+-   parentHashBytes, err := ioutil.ReadFile(headPath)                          
+-   if err != nil {                                                            
+-       log.Fatalf("Failed to read HEAD: %v", err)                             
+-   }                                                                          
+-   parentHash := strings.TrimSpace(string(parentHashBytes))                   
+-   if parentHash == "" {                                                      
+-       parentHash = "NONE"                                                    
+-   }                                                                          
+-                                                                              
+-   timestamp := time.Now().Unix()                                             
+-                                                                              
+-   var filenames []string                                                     
++   var newIndexFiles []string                                                 
++   var found bool                                                             
+    scanner := bufio.NewScanner(strings.NewReader(string(indexContent)))       
+    for scanner.Scan() {                                                       
+        line := scanner.Text()                                                 
+        if line != "" {                                                        
+-           filenames = append(filenames, line)                                
++           if line == filename {                                              
++               found = true                                                   
++           } else {                                                           
++               newIndexFiles = append(newIndexFiles, line)                    
++           }                                                                  
+        }                                                                      
+    }                                                                          
+-   sort.Strings(filenames)                                                    
+                                                                               
+-   var fileEntries []string                                                   
+-   for _, filename := range filenames {                                       
+-       content, err := ioutil.ReadFile(filename)                              
+-       if err != nil {                                                        
+-           log.Fatalf("Failed to read file %s for commit: %v", filename, err) 
+-       }                                                                      
+-       hash := miniHash(content)                                              
+-       fileEntries = append(fileEntries, fmt.Sprintf("%s %s", filename, hash))
+-   }                                                                          
+-                                                                              
+-   var commitBuilder strings.Builder                                          
+-   fmt.Fprintf(&commitBuilder, "parent: %s\n", parentHash)                    
+-   fmt.Fprintf(&commitBuilder, "timestamp: %d\n", timestamp)                  
+-   fmt.Fprintf(&commitBuilder, "message: %s\n", message)                      
+-   fmt.Fprintf(&commitBuilder, "files:\n")                                    
+-   fmt.Fprintf(&commitBuilder, "%s", strings.Join(fileEntries, "\n"))         
+-   if len(fileEntries) > 0 {                                                  
+-       fmt.Fprintln(&commitBuilder)                                           
+-   }                                                                          
+-                                                                              
+-   commitContent := commitBuilder.String()                                    
+-   commitHash := miniHash([]byte(commitContent))                              
+-                                                                              
+-   commitPath := filepath.Join(".minigit", "commits", commitHash)             
+-   if err := ioutil.WriteFile(commitPath, []byte(commitContent), 0644); err !=
+nil {                                                                          
+-       log.Fatalf("Failed to write commit object: %v", err)                   
+-   }                                                                          
+-                                                                              
+-   if err := ioutil.WriteFile(headPath, []byte(commitHash), 0644); err != nil 
+{                                                                              
+-       log.Fatalf("Failed to update HEAD: %v", err)                           
+-   }                                                                          
+-                                                                              
+-   if err := os.Truncate(indexPath, 0); err != nil {                          
+-       log.Fatalf("Failed to clear index: %v", err)                           
+-   }                                                                          
+-                                                                              
+-   fmt.Printf("Committed %s\n", commitHash)                                   
+-}                                                                             
+-                                                                              
+-// parseCommit extracts metadata from commit file content.                    
+-func parseCommit(content string) (parent, message string, timestamp int64) {  
+-   scanner := bufio.NewScanner(strings.NewReader(content))                    
+-   for scanner.Scan() {                                                       
+-       line := scanner.Text()                                                 
+-       if strings.HasPrefix(line, "parent: ") {                               
+-           parent = strings.TrimPrefix(line, "parent: ")                      
+-       } else if strings.HasPrefix(line, "timestamp: ") {                     
+-           tsStr := strings.TrimPrefix(line, "timestamp: ")                   
+-           var err error                                                      
+-           timestamp, err = strconv.ParseInt(tsStr, 10, 64)                   
+-           if err != nil {                                                    
+-               log.Fatalf("Failed to parse timestamp in commit: %v", err)     
+-           }                                                                  
+-       } else if strings.HasPrefix(line, "message: ") {                       
+-           message = strings.TrimPrefix(line, "message: ")                    
+-       } else if line == "files:" {                                           
+-           break                                                              
+-       }                                                                      
+-   }                                                                          
+-   return                                                                     
+-}                                                                             
+-                                                                              
+-// handleLog implements the 'log' command.                                    
+-func handleLog() {                                                            
+-   headPath := filepath.Join(".minigit", "HEAD")                              
+-   currentHashBytes, err := ioutil.ReadFile(headPath)                         
+-   if err != nil {                                                            
+-       log.Fatalf("Failed to read HEAD: %v", err)                             
+-   }                                                                          
+-   currentHash := strings.TrimSpace(string(currentHashBytes))                 
+-                                                                              
+-   if currentHash == "" {                                                     
+-       fmt.Println("No commits")                                              
+-       return                                                                 
+-   }                                                                          
+-                                                                              
+-   for currentHash != "NONE" && currentHash != "" {                           
+-       commitPath := filepath.Join(".minigit", "commits", currentHash)        
+-       commitContentBytes, err := ioutil.ReadFile(commitPath)                 
+-       if err != nil {                                                        
+-           log.Fatalf("Failed to read commit object %s: %v", currentHash, err)
+-       }                                                                      
+-                                                                              
+-       parentHash, message, timestamp :=                                      
+parseCommit(string(commitContentBytes))                                        
+-                                                                              
+-       fmt.Printf("commit %s\n", currentHash)                                 
+-       fmt.Printf("Date: %d\n", timestamp)                                    
+-       fmt.Printf("Message: %s\n", message)                                   
+-                                                                              
+-       currentHash = parentHash                                               
+-   }                                                                          
+-}                                                                             
+-                                                                              
+-func main() {                                                                 
+-   log.SetFlags(0)                                                            
+-   if len(os.Args) < 2 {                                                      
+-       fmt.Fprintln(os.Stderr, "Usage: minigit <command> [<args>]")           
++   if !found {                                                                
++       fmt.Println("File not in index")                                       
+        os.Exit(1)                                                             
+    }                                                                          
+                                                                               
+-   command := os.Args[1]                                                      
+-   switch command {                                                           
+-   case "init":                                                               
+-       handleInit()                                                           
+-   case "add":                                                                
+-       if len(os.Args) < 3 {                                                  
+-           fmt.Fprintln(os.Stderr, "Usage: minigit add <file>")               
+-           os.Exit(1)                                                         
+-       }                                                                      
+-       handleAdd(os.Args[2])                                                  
+-   case "commit":                                                             
+-       if len(os.Args) < 4 || os.Args[2] != "-m" {                            
+-           fmt.Fprintln(os.Stderr, "Usage: minigit commit -m \"<message>\"")  
+-           os.Exit(1)                                                         
+-       }                                                                      
+-       handleCommit(os.Args[3])                                               
+-   case "log":                                                                
+-       handleLog()                                                            
+-   default:                                                                   
+-       fmt.Fprintf(os.Stderr, "Unknown command: %s\n", command)               
+-       os.Exit(1)                                                             
++       if os.IsNotExist(err) {                                                
++           fmt.Println("Invalid commit")                                      
+            os.Exit(1)                                                         
+        }                                                                      
++       log.Fatalf("Failed to read commit object %s: %v", commitHash, err)     
++   }                                                                          
++                                                                              
++   commitFiles := parseCommitFiles(string(commitContentBytes))                
++   for filename, blobHash := range commitFiles {                              
++       blobPath := filepath.Join(".minigit", "objects", blobHash)             
++       blobContent, err := ioutil.ReadFile(blobPath)                          
++       if err != nil {                                                        
++           log.Fatalf("Failed to read blob object %s for file %s: %v",        
+blobHash, filename, err)                                                       
++       }                                                                      
++       if err := ioutil.WriteFile(filename, blobContent, 0644); err != nil {  
++           log.Fatalf("Failed to write file %s: %v", filename, err)           
++       }                                                                      
++   }                                                                          
++                                                                              
++   headPath := filepath.Join(".minigit", "HEAD")                              
++   if err := ioutil.WriteFile(headPath, []byte(commitHash), 0644); err != nil 
+{                                                                              
++       log.Fatalf("Failed to update HEAD: %v", err)                           
++   }                                                                          
++                                                                              
++   indexPath := filepath.Join(".minigit", "index")                            
++   if err := os.Truncate(indexPath, 0); err != nil {                          
++       log.Fatalf("Failed to clear index: %v", err)                           
++   }                                                                          
++                                                                              
++   fmt.Printf("Checked out %s\n", commitHash)                                 
++}                                                                             
+{                                                                              
++       log.Fatalf("Failed to update HEAD: %v", err)                           
++   }                                                                          
++                                                                              
++   indexPath := filepath.Join(".minigit", "index")                            
++   if err := os.Truncate(indexPath, 0); err != nil {                          
++       log.Fatalf("Failed to clear index: %v", err)                           
++   }                                                                          
++                                                                              
++   fmt.Printf("Checked out %s\n", commitHash)                                 
++}                                                                             
++                                                                              
++// handleReset implements the 'reset' command.                                
++func handleReset(commitHash string) {                                         
++   commitPath := filepath.Join(".minigit", "commits", commitHash)             
++   if _, err := os.Stat(commitPath); os.IsNotExist(err) {                     
++       fmt.Println("Invalid commit")                                          
+        os.Exit(1)                                                             
+    }                                                                          
++                                                                              
++   headPath := filepath.Join(".minigit", "HEAD")                              
++   if err := ioutil.WriteFile(headPath, []byte(commitHash), 0644); err != nil 
+{                                                                              
++       log.Fatalf("Failed to update HEAD: %v", err)                           
++   }                                                                          
++                                                                              
++   indexPath := filepath.Join(".minigit", "index")                            
++   if err := os.Truncate(indexPath, 0); err != nil {                          
++       log.Fatalf("Failed to clear index: %v", err)                           
++   }                                                                          
++                                                                              
++   fmt.Printf("Reset to %s\n", commitHash)                                    
++}                                                                             
++           fmt.Println("Invalid commit")                                      
+            os.Exit(1)                                                         
+        }                                                                      
++       log.Fatalf("Failed to read commit object %s: %v", commitHash, err)     
++   }                                                                          
++   commitContent := string(commitContentBytes)                                
++                                                                              
++   _, message, timestamp := parseCommit(commitContent)                        
++   commitFiles := parseCommitFiles(commitContent)                             
++                                                                              
++   fmt.Printf("commit %s\n", commitHash)                                      
++   fmt.Printf("Date: %d\n", timestamp)                                        
++   fmt.Printf("Message: %s\n", message)                                       
++   fmt.Println("Files:")                                                      
++                                                                              
+        os.Exit(1)                                                             
+    }                                                                          
+            fmt.Fprintln(os.Stderr, "Usage: minigit add <file>")               
+        }                                                                      
+        handleCommit(os.Args[3])                                               
+    case "log":                                                                
+        handleLog()                                                            
++   case "status":                                                             
++       handleStatus()                                                         
++   case "diff":                                                               
++       if len(os.Args) < 4 {                                                  
++           fmt.Fprintln(os.Stderr, "Usage: minigit diff <commit1> <commit2>") 
++           os.Exit(1)                                                         
++       }                                                                      
++       handleDiff(os.Args[2], os.Args[3])                                     
++   case "checkout":                                                           
++       if len(os.Args) < 3 {                                                  
++           fmt.Fprintln(os.Stderr, "Usage: minigit checkout <commit_hash>")   
++           os.Exit(1)                                                         
++       }                                                                      
++       handleCheckout(os.Args[2])                                             
++   case "reset":                                                              
++       if len(os.Args) < 3 {                                                  
++           fmt.Fprintln(os.Stderr, "Usage: minigit reset <commit_hash>")      
++           os.Exit(1)                                                         
++       }                                                                      
++       handleReset(os.Args[2])                                                
++   case "rm":                                                                 
++       if len(os.Args) < 3 {                                                  
++           fmt.Fprintln(os.Stderr, "Usage: minigit rm <file>")                
++           os.Exit(1)                                                         
++       }                                                                      
++       handleRm(os.Args[2])                                                   
++   case "show":                                                               
++       if len(os.Args) < 3 {                                                  
++           fmt.Fprintln(os.Stderr, "Usage: minigit show <commit_hash>")       
++           os.Exit(1)                                                         
++       }                                                                      
++       handleShow(os.Args[2])                                                 
+    default:                                                                   
+        fmt.Fprintf(os.Stderr, "Unknown command: %s\n", command)               
+        os.Exit(1)                                                             
+    }                                                                          
+ }                                                                             
+                                                                               
+
+test-v1.sh                                                                     
+
+                                                                               
+@@ -29,5 +29,6 @@                                                              
+   bash build.sh 2>/dev/null || true                                           
+ # Test 1: init creates directory                                              
+test-v2.sh                                                                     
+
+                                                                               
+@@ -1,4 +1,5 @@                                                                
+ }                                                                             
+                                                                               
+ if ../minigit add a.txt && grep -q "a.txt" .minigit/index && [ "$(ls          
+.minigit/objects/ | wc -l)" -ge 1 ]; then                                      
+   pass "add stages file and creates blob"                                     
+ else                                                                          
++  73 / 500 lines [████░░░░░░░░░░░░░░░░░░░░░░░░░░]  15%                        
+                                                                               
+Tokens: 9.3k sent, 11k received. Cost: $0.12 message, $0.12 session.
+Applied edit to test-v1.sh
+Applied edit to SPEC-v2.txt
+Applied edit to minigit.go
+Applied edit to build.sh
+Applied edit to test-v2.sh
+Applied edit to SPEC-v1.txt
+Summarization failed for model gemini/gemini-2.5-flash: cannot schedule new futures after shutdown
+Summarization failed for model gemini/gemini-2.5-pro: cannot schedule new futures after shutdown
+summarizer unexpectedly failed for all models

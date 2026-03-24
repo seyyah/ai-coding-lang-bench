@@ -1,0 +1,411 @@
+Can't initialize prompt toolkit: Found xterm, while expecting a Windows 
+console. Maybe try to run this program using "winpty" or run it in cmd.exe 
+instead. Or otherwise, in case of Cygwin, use the Python executable that is 
+compiled for Cygwin.
+───────────────────────────────────────────────────────────────────────────────
+Aider v0.86.2
+Main model: gemini/gemini-2.5-pro with whole edit format
+Weak model: gemini/gemini-2.5-flash
+Git repo: none
+Repo-map: disabled
+Added SPEC-v1.txt to the chat.
+Added test-v1.sh to the chat.
+Note: in-chat filenames are always relative to the git working dir, not the 
+current working dir.
+Cur working dir: 
+C:\Users\ahmet\Desktop\WL\which-language-ahmettngz\artifacts\aider\minigit\gene
+rated\minigit-java-2-v1
+Git working dir: C:\Users\ahmet\Desktop\WL\which-language-ahmettngz
+
+Merhaba, isteğiniz üzerine SPEC-v1.txt dosyasında belirtilen özelliklere göre  
+minigit uygulamasını Java'da uygulayacağım. Uygulama, test-v1.sh içindeki tüm  
+testleri geçecek şekilde tasarlanmıştır.                                       
+
+İsteğinizi yerine getirmek için üç yeni dosya oluşturacağım:                   
+
+ 1 MiniGit.java: minigit komut satırı aracının tüm mantığını içeren Java kaynak
+   kodu.                                                                       
+ 2 build.sh: Java kodunu derlemek için bir kabuk betiği.                       
+ 3 minigit: Derlenmiş Java kodunu çalıştıran ve yürütülebilir dosya görevi     
+   gören bir kabuk betiği.                                                     
+
+Bu dosyalar, belirtilen minigit komutlarını (init, add, commit, log) ve özel   
+MiniHash algoritmasını uygular.                                                
+
+İşte istenen dosyalar:                                                         
+
+build.sh                                                                       
+
+                                                                               
+#!/usr/bin/env bash                                                            
+                                                                               
+javac MiniGit.java                                                             
+                                                                               
+
+minigit                                                                        
+
+                                                                               
+#!/usr/bin/env bash                                                            
+                                                                               
+java -cp "$(dirname "$0")" MiniGit "$@"                                        
+                                                                               
+
+MiniGit.java                                                                   
+
+                                                                               
+import java.io.IOException;                                                    
+                                                                               
+import java.nio.file.*;                                                        
+                                                                               
+import java.util.*;                                                            
+                                                                               
+                                                                               
+                                                                               
+public class MiniGit {                                                         
+                                                                               
+                                                                               
+                                                                               
+    private static final Path MINIGIT_DIR = Paths.get(".minigit");             
+                                                                               
+    private static final Path OBJECTS_DIR = MINIGIT_DIR.resolve("objects");    
+                                                                               
+    private static final Path COMMITS_DIR = MINIGIT_DIR.resolve("commits");    
+                                                                               
+    private static final Path INDEX_FILE = MINIGIT_DIR.resolve("index");       
+                                                                               
+    private static final Path HEAD_FILE = MINIGIT_DIR.resolve("HEAD");         
+                                                                               
+                                                                               
+                                                                               
+    public static void main(String[] args) {                                   
+                                                                               
+        if (args.length == 0) {                                                
+                                                                               
+            return;                                                            
+                                                                               
+        }                                                                      
+                                                                               
+                                                                               
+                                                                               
+        try {                                                                  
+                                                                               
+            String command = args[0];                                          
+                                                                               
+            switch (command) {                                                 
+                                                                               
+                case "init":                                                   
+                                                                               
+                    init();                                                    
+                                                                               
+                    break;                                                     
+                                                                               
+                case "add":                                                    
+                                                                               
+                    if (args.length > 1) {                                     
+                                                                               
+                        add(args[1]);                                          
+                                                                               
+                    }                                                          
+                                                                               
+                    break;                                                     
+                                                                               
+                case "commit":                                                 
+                                                                               
+                    if (args.length > 2 && args[1].equals("-m")) {             
+                                                                               
+                        commit(args[2]);                                       
+                                                                               
+                    }                                                          
+                                                                               
+                    break;                                                     
+                                                                               
+                case "log":                                                    
+                                                                               
+                    log();                                                     
+                                                                               
+                    break;                                                     
+                                                                               
+            }                                                                  
+                                                                               
+        } catch (IOException e) {                                              
+                                                                               
+            System.exit(1);                                                    
+                                                                               
+        }                                                                      
+                                                                               
+    }                                                                          
+                                                                               
+                                                                               
+                                                                               
+    private static String calculateMiniHash(byte[] data) {                     
+                                                                               
+        long h = 1469598103934665603L;                                         
+                                                                               
+        long fnv_prime = 1099511628211L;                                       
+                                                                               
+        for (byte b : data) {                                                  
+                                                                               
+            h ^= (b & 0xff);                                                   
+                                                                               
+            h *= fnv_prime;                                                    
+                                                                               
+        }                                                                      
+                                                                               
+        return String.format("%016x", h);                                      
+                                                                               
+    }                                                                          
+                                                                               
+                                                                               
+                                                                               
+    private static void init() throws IOException {                            
+                                                                               
+        if (Files.isDirectory(MINIGIT_DIR)) {                                  
+                                                                               
+            System.out.println("Repository already initialized");              
+                                                                               
+            return;                                                            
+                                                                               
+        }                                                                      
+                                                                               
+        Files.createDirectory(MINIGIT_DIR);                                    
+                                                                               
+        Files.createDirectory(OBJECTS_DIR);                                    
+                                                                               
+        Files.createDirectory(COMMITS_DIR);                                    
+                                                                               
+        Files.createFile(INDEX_FILE);                                          
+                                                                               
+        Files.createFile(HEAD_FILE);                                           
+                                                                               
+    }                                                                          
+                                                                               
+                                                                               
+                                                                               
+    private static void add(String filename) throws IOException {              
+                                                                               
+        Path filePath = Paths.get(filename);                                   
+                                                                               
+        if (!Files.exists(filePath)) {                                         
+                                                                               
+            System.out.println("File not found");                              
+                                                                               
+            System.exit(1);                                                    
+                                                                               
+        }                                                                      
+                                                                               
+                                                                               
+                                                                               
+        byte[] content = Files.readAllBytes(filePath);                         
+                                                                               
+        String hash = calculateMiniHash(content);                              
+                                                                               
+        Path blobPath = OBJECTS_DIR.resolve(hash);                             
+                                                                               
+        if (!Files.exists(blobPath)) {                                         
+                                                                               
+            Files.write(blobPath, content);                                    
+                                                                               
+        }                                                                      
+                                                                               
+                                                                               
+                                                                               
+        List<String> indexEntries;                                             
+                                                                               
+        if (Files.exists(INDEX_FILE) && Files.size(INDEX_FILE) > 0) {          
+                                                                               
+            indexEntries = new ArrayList<>(Files.readAllLines(INDEX_FILE));    
+                                                                               
+        } else {                                                               
+                                                                               
+            indexEntries = new ArrayList<>();                                  
+                                                                               
+        }                                                                      
+                                                                               
+                                                                               
+                                                                               
+        if (!indexEntries.contains(filename)) {                                
+                                                                               
+            indexEntries.add(filename);                                        
+                                                                               
+            Files.write(INDEX_FILE, indexEntries);                             
+                                                                               
+        }                                                                      
+                                                                               
+    }                                                                          
+                                                                               
+                                                                               
+                                                                               
+    private static void commit(String message) throws IOException {            
+                                                                               
+        List<String> stagedFiles;                                              
+                                                                               
+        if (Files.exists(INDEX_FILE) && Files.size(INDEX_FILE) > 0) {          
+                                                                               
+            stagedFiles = Files.readAllLines(INDEX_FILE);                      
+                                                                               
+        } else {                                                               
+                                                                               
+            stagedFiles = Collections.emptyList();                             
+                                                                               
+        }                                                                      
+                                                                               
+                                                                               
+                                                                               
+        if (stagedFiles.isEmpty()) {                                           
+                                                                               
+            System.out.println("Nothing to commit");                           
+                                                                               
+            System.exit(1);                                                    
+                                                                               
+        }                                                                      
+                                                                               
+                                                                               
+                                                                               
+        Collections.sort(stagedFiles);                                         
+                                                                               
+                                                                               
+                                                                               
+        String parentHash = new String(Files.readAllBytes(HEAD_FILE)).trim();  
+                                                                               
+        if (parentHash.isEmpty()) {                                            
+                                                                               
+            parentHash = "NONE";                                               
+                                                                               
+        }                                                                      
+                                                                               
+                                                                               
+                                                                               
+        StringBuilder commitContentBuilder = new StringBuilder();              
+                                                                               
+        commitContentBuilder.append("parent:                                   
+").append(parentHash).append("\n");                                            
+                                                                               
+        commitContentBuilder.append("timestamp:                                
+").append(System.currentTimeMillis() / 1000).append("\n");                     
+                                                                               
+        commitContentBuilder.append("message: ").append(message).append("\n"); 
+                                                                               
+        commitContentBuilder.append("files:\n");                               
+                                                                               
+                                                                               
+                                                                               
+        for (String filename : stagedFiles) {                                  
+                                                                               
+            byte[] fileContent = Files.readAllBytes(Paths.get(filename));      
+                                                                               
+            String blobHash = calculateMiniHash(fileContent);                  
+                                                                               
+            commitContentBuilder.append(filename).append("                     
+").append(blobHash).append("\n");                                              
+                                                                               
+        }                                                                      
+                                                                               
+                                                                               
+                                                                               
+        String commitContent = commitContentBuilder.toString();                
+                                                                               
+        byte[] commitContentBytes = commitContent.getBytes();                  
+                                                                               
+        String commitHash = calculateMiniHash(commitContentBytes);             
+                                                                               
+                                                                               
+                                                                               
+        Files.write(COMMITS_DIR.resolve(commitHash), commitContentBytes);      
+                                                                               
+        Files.write(HEAD_FILE, commitHash.getBytes());                         
+                                                                               
+        Files.write(INDEX_FILE, new byte[0]);                                  
+                                                                               
+                                                                               
+                                                                               
+        System.out.println("Committed " + commitHash);                         
+                                                                               
+    }                                                                          
+                                                                               
+                                                                               
+                                                                               
+    private static void log() throws IOException {                             
+                                                                               
+        String currentCommitHash = new                                         
+String(Files.readAllBytes(HEAD_FILE)).trim();                                  
+                                                                               
+        if (currentCommitHash.isEmpty()) {                                     
+                                                                               
+            System.out.println("No commits");                                  
+                                                                               
+            return;                                                            
+                                                                               
+        }                                                                      
+                                                                               
+                                                                               
+                                                                               
+        while (currentCommitHash != null &&                                    
+!currentCommitHash.equalsIgnoreCase("NONE") && !currentCommitHash.isEmpty()) { 
+                                                                               
+            Path commitPath = COMMITS_DIR.resolve(currentCommitHash);          
+                                                                               
+            if (!Files.exists(commitPath)) {                                   
+                                                                               
+                break;                                                         
+                                                                               
+            }                                                                  
+                                                                               
+                                                                               
+                                                                               
+            List<String> lines = Files.readAllLines(commitPath);               
+                                                                               
+            String parent = "NONE";                                            
+                                                                               
+            String timestamp = "";                                             
+                                                                               
+            String message = "";                                               
+                                                                               
+                                                                               
+                                                                               
+            for (String line : lines) {                                        
+                                                                               
+                if (line.startsWith("parent: ")) {                             
+                                                                               
+                    parent = line.substring(8);                                
+                                                                               
+                } else if (line.startsWith("timestamp: ")) {                   
+                                                                               
+                    timestamp = line.substring(11);                            
+                                                                               
+                } else if (line.startsWith("message: ")) {                     
+                                                                               
+                    message = line.substring(9);                               
+                                                                               
+                }                                                              
+                                                                               
+            }                                                                  
+                                                                               
+                                                                               
+                                                                               
+            System.out.println("commit " + currentCommitHash);                 
+                                                                               
+            System.out.println("Date: " + timestamp);                          
+                                                                               
+            System.out.println("Message: " + message);                         
+                                                                               
+                                                                               
+                                                                               
+            currentCommitHash = parent;                                        
+                                                                               
+        }                                                                      
+                                                                               
+    }                                                                          
+                                                                               
+}                                                                              
+                                                                               
+
+Tokens: 3.0k sent, 1.5k received. Cost: $0.02 message, $0.02 session.
+
+build.sh
+
+minigit
+
+MiniGit.java
+Applied edit to build.sh
+Applied edit to minigit
+Applied edit to MiniGit.java

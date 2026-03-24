@@ -19,7 +19,8 @@ report.rb            # Report generator (results.json -> report.md)
 plot.py              # Graph generator (results.json -> figures/*.png)
 artifacts/
   <codex>/
-    <problem>/
+    <model>/
+      <problem>/
       generated/     # Generated source/build artifacts
       logs/          # Codex logs
       results/       # Raw result data + meta + report
@@ -29,7 +30,7 @@ artifacts/
 The `data` branch (orphan) contains:
 ```
 artifacts/
-  <codex>/<problem>/
+  <codex>/<model>/<problem>/
     generated/
     logs/
 ```
@@ -38,7 +39,7 @@ artifacts/
 
 1. Run `ruby benchmark.rb`
 2. For each language x trial:
-   - v1: Create `artifacts/<codex>/<problem>/generated/<problem>-{lang}-{trial}-v1/`, copy problem assets from `problems/<problem>/`, invoke the selected codex
+   - v1: Create `artifacts/<codex>/<model>/<problem>/generated/<problem>-{lang}-{trial}-v1/`, copy problem assets from `problems/<problem>/`, invoke the selected codex
    - v2: Copy v1 result to `<problem>-{lang}-{trial}-v2/`, invoke the selected codex to extend
 3. Run test scripts independently to verify
 4. Measure wall-clock time, LOC, token usage, and cost
@@ -51,7 +52,7 @@ artifacts/
 ruby benchmark.rb                                    # All languages x 3 trials (default: claude)
 ruby benchmark.rb --lang python --trials 1           # Single language test
 ruby benchmark.rb --codex gemini --lang ruby         # Use Gemini instead of Claude
-ruby benchmark.rb --codex gemini --problem minigit   # Writes to artifacts/gemini/minigit/
+ruby benchmark.rb --codex gemini --problem minigit   # Writes to artifacts/gemini/gemini-3.1-flash-lite-preview/minigit/
 ruby benchmark.rb --trials 10 --start 11             # Trials 11-20
 ruby benchmark.rb --dry-run                          # Dry run
 ruby benchmark.rb --help                             # Show all options
@@ -102,7 +103,7 @@ Problems are loaded from `problems/<problem>/problem.json` and currently assume 
 - `v1_spec`, `v1_test`, `v1_prompt`
 - `v2_spec`, `v2_test`, `v2_prompt`
 
-Each run writes outputs under `artifacts/<codex>/<problem>/`, while dry-runs are isolated under `artifacts/<codex>/<problem>/dry-run/`.
+Each run writes outputs under `artifacts/<codex>/<model>/<problem>/`, while dry-runs are isolated under `artifacts/<codex>/<model>/<problem>/dry-run/`.
 
 ## MiniGit Technical Notes
 
@@ -151,6 +152,6 @@ We welcome contributions of:
 
 ## Notes
 
-- This is not a git repository for MiniGit itself; individual implementations under `artifacts/<codex>/<problem>/generated/` may use `git init` as part of their build process
+- This is not a git repository for MiniGit itself; individual implementations under `artifacts/<codex>/<model>/<problem>/generated/` may use `git init` as part of their build process
 - The `data` branch is an orphan branch with no common history with `main`
 - Originally focused on Claude Code, now a **multi-codex benchmark platform**

@@ -1,0 +1,830 @@
+[
+  {
+    "language": "rust",
+    "trial": 1,
+    "codex": "aider",
+    "v1_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-rust-1-v1",
+    "v2_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-rust-1-v2",
+    "v1_time": 76.7,
+    "v1_pass": false,
+    "v1_loc": 152,
+    "v1_metrics": {
+      "input_tokens": 3000,
+      "output_tokens": 1600,
+      "total_cost": 0.02
+    },
+    "v2_time": 102.3,
+    "v2_pass": false,
+    "v2_loc": 302,
+    "v2_metrics": {
+      "input_tokens": 7600,
+      "output_tokens": 3200,
+      "total_cost": 0.04
+    }
+  },
+  {
+    "language": "go",
+    "trial": 1,
+    "codex": "aider",
+    "v1_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-go-1-v1",
+    "v2_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-go-1-v2",
+    "v1_time": 73.7,
+    "v1_pass": false,
+    "v1_loc": 211,
+    "v1_metrics": {
+      "input_tokens": 3000,
+      "output_tokens": 2400,
+      "total_cost": 0.03
+    },
+    "v2_time": 120.2,
+    "v2_pass": false,
+    "v2_loc": 276,
+    "v2_metrics": {
+      "input_tokens": 9200,
+      "output_tokens": 9300,
+      "total_cost": 0.1
+    }
+  },
+  {
+    "language": "c",
+    "trial": 1,
+    "codex": "aider",
+    "v1_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-c-1-v1",
+    "v2_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-c-1-v2",
+    "v1_time": 99.3,
+    "v1_pass": false,
+    "v1_loc": 261,
+    "v1_metrics": {
+      "input_tokens": 3000,
+      "output_tokens": 2500,
+      "total_cost": 0.03
+    },
+    "v2_time": 72.9,
+    "v2_pass": false,
+    "v2_loc": 323,
+    "v2_metrics": {
+      "input_tokens": 9800,
+      "output_tokens": 3100,
+      "total_cost": 0.04
+    }
+  },
+  {
+    "language": "typescript",
+    "trial": 1,
+    "codex": "aider",
+    "v1_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-typescript-1-v1",
+    "v2_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-typescript-1-v2",
+    "v1_time": 81.6,
+    "v1_pass": false,
+    "v1_loc": 128,
+    "v1_metrics": {
+      "input_tokens": 3000,
+      "output_tokens": 4000,
+      "total_cost": 0.04
+    },
+    "v2_time": 151.6,
+    "v2_pass": false,
+    "v2_loc": 278,
+    "v2_metrics": {
+      "input_tokens": 9100,
+      "output_tokens": 10000,
+      "total_cost": 0.11
+    }
+  },
+  {
+    "language": "javascript",
+    "trial": 1,
+    "codex": "aider",
+    "v1_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-javascript-1-v1",
+    "v2_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-javascript-1-v2",
+    "v1_time": 84.2,
+    "v1_pass": false,
+    "v1_loc": 129,
+    "v1_metrics": {
+      "input_tokens": 3000,
+      "output_tokens": 1200,
+      "total_cost": 0.02
+    },
+    "v2_time": 29.5,
+    "v2_pass": false,
+    "v2_loc": 175,
+    "v2_metrics": {
+      "input_tokens": 8500,
+      "output_tokens": 1900,
+      "total_cost": 0.03
+    }
+  },
+  {
+    "language": "java",
+    "trial": 1,
+    "codex": "aider",
+    "v1_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-java-1-v1",
+    "v2_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-java-1-v2",
+    "v1_time": 72.1,
+    "v1_pass": false,
+    "v1_loc": 152,
+    "v1_metrics": {
+      "input_tokens": 3000,
+      "output_tokens": 1700,
+      "total_cost": 0.02
+    },
+    "v2_time": 35.4,
+    "v2_pass": false,
+    "v2_loc": 202,
+    "v2_metrics": {
+      "input_tokens": 8800,
+      "output_tokens": 2000,
+      "total_cost": 0.03
+    }
+  },
+  {
+    "language": "perl",
+    "trial": 1,
+    "codex": "aider",
+    "v1_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-perl-1-v1",
+    "v2_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-perl-1-v2",
+    "v1_time": 122.8,
+    "v1_pass": false,
+    "v1_loc": 163,
+    "v1_metrics": {
+      "input_tokens": 3000,
+      "output_tokens": 1800,
+      "total_cost": 0.02
+    },
+    "v2_time": 1948.6,
+    "v2_pass": false,
+    "v2_loc": 342,
+    "v2_metrics": {
+      "input_tokens": 9100,
+      "output_tokens": 10000,
+      "total_cost": 0.11
+    }
+  },
+  {
+    "language": "python",
+    "trial": 1,
+    "codex": "aider",
+    "v1_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-python-1-v1",
+    "v2_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-python-1-v2",
+    "v1_time": 69.7,
+    "v1_pass": false,
+    "v1_loc": 132,
+    "v1_metrics": {
+      "input_tokens": 3000,
+      "output_tokens": 1500,
+      "total_cost": 0.02
+    },
+    "v2_time": 166.4,
+    "v2_pass": false,
+    "v2_loc": 273,
+    "v2_metrics": {
+      "input_tokens": 8700,
+      "output_tokens": 9500,
+      "total_cost": 0.11
+    }
+  },
+  {
+    "language": "ruby",
+    "trial": 1,
+    "codex": "aider",
+    "v1_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-ruby-1-v1",
+    "v2_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-ruby-1-v2",
+    "v1_time": 97.9,
+    "v1_pass": false,
+    "v1_loc": 110,
+    "v1_metrics": {
+      "input_tokens": 3000,
+      "output_tokens": 1100,
+      "total_cost": 0.01
+    },
+    "v2_time": 78.2,
+    "v2_pass": false,
+    "v2_loc": 234,
+    "v2_metrics": {
+      "input_tokens": 8400,
+      "output_tokens": 2100,
+      "total_cost": 0.03
+    }
+  },
+  {
+    "language": "ruby/steep",
+    "trial": 1,
+    "codex": "aider",
+    "v1_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-ruby-steep-1-v1",
+    "v2_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-ruby-steep-1-v2",
+    "v1_time": 75.3,
+    "v1_pass": false,
+    "v1_loc": 128,
+    "v1_metrics": {
+      "input_tokens": 3000,
+      "output_tokens": 1200,
+      "total_cost": 0.02
+    },
+    "v2_time": 166.2,
+    "v2_pass": false,
+    "v2_loc": 244,
+    "v2_metrics": {
+      "input_tokens": 8500,
+      "output_tokens": 9000,
+      "total_cost": 0.1
+    }
+  },
+  {
+    "language": "lua",
+    "trial": 1,
+    "codex": "aider",
+    "v1_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-lua-1-v1",
+    "v2_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-lua-1-v2",
+    "v1_time": 158.7,
+    "v1_pass": false,
+    "v1_loc": 195,
+    "v1_metrics": {
+      "input_tokens": 3000,
+      "output_tokens": 4200,
+      "total_cost": 0.05
+    },
+    "v2_time": 188.4,
+    "v2_pass": false,
+    "v2_loc": 236,
+    "v2_metrics": {
+      "input_tokens": 9100,
+      "output_tokens": 8900,
+      "total_cost": 0.1
+    }
+  },
+  {
+    "language": "ocaml",
+    "trial": 1,
+    "codex": "aider",
+    "v1_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-ocaml-1-v1",
+    "v2_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-ocaml-1-v2",
+    "v1_time": 76.8,
+    "v1_pass": false,
+    "v1_loc": 126,
+    "v1_metrics": {
+      "input_tokens": 3000,
+      "output_tokens": 1500,
+      "total_cost": 0.02
+    },
+    "v2_time": 145.8,
+    "v2_pass": false,
+    "v2_loc": 165,
+    "v2_metrics": {
+      "input_tokens": 8700,
+      "output_tokens": 8700,
+      "total_cost": 0.1
+    }
+  },
+  {
+    "language": "rust",
+    "trial": 2,
+    "codex": "aider",
+    "v1_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-rust-2-v1",
+    "v2_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-rust-2-v2",
+    "v1_time": 100.1,
+    "v1_pass": false,
+    "v1_loc": 160,
+    "v1_metrics": {
+      "input_tokens": 3000,
+      "output_tokens": 1800,
+      "total_cost": 0.02
+    },
+    "v2_time": 139.2,
+    "v2_pass": false,
+    "v2_loc": 326,
+    "v2_metrics": {
+      "input_tokens": 7600,
+      "output_tokens": 3100,
+      "total_cost": 0.04
+    }
+  },
+  {
+    "language": "go",
+    "trial": 2,
+    "codex": "aider",
+    "v1_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-go-2-v1",
+    "v2_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-go-2-v2",
+    "v1_time": 150.4,
+    "v1_pass": false,
+    "v1_loc": 221,
+    "v1_metrics": {
+      "input_tokens": 3000,
+      "output_tokens": 4400,
+      "total_cost": 0.05
+    },
+    "v2_time": 240.2,
+    "v2_pass": false,
+    "v2_loc": 445,
+    "v2_metrics": {
+      "input_tokens": 9300,
+      "output_tokens": 11000,
+      "total_cost": 0.12
+    }
+  },
+  {
+    "language": "c",
+    "trial": 2,
+    "codex": "aider",
+    "v1_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-c-2-v1",
+    "v2_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-c-2-v2",
+    "v1_time": 109.2,
+    "v1_pass": false,
+    "v1_loc": 252,
+    "v1_metrics": {
+      "input_tokens": 3000,
+      "output_tokens": 2600,
+      "total_cost": 0.03
+    },
+    "v2_time": 85.5,
+    "v2_pass": false,
+    "v2_loc": 313,
+    "v2_metrics": {
+      "input_tokens": 9800,
+      "output_tokens": 3200,
+      "total_cost": 0.04
+    }
+  },
+  {
+    "language": "typescript",
+    "trial": 2,
+    "codex": "aider",
+    "v1_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-typescript-2-v1",
+    "v2_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-typescript-2-v2",
+    "v1_time": 82.4,
+    "v1_pass": false,
+    "v1_loc": 127,
+    "v1_metrics": {
+      "input_tokens": 3000,
+      "output_tokens": 1800,
+      "total_cost": 0.02
+    },
+    "v2_time": 110.9,
+    "v2_pass": false,
+    "v2_loc": 277,
+    "v2_metrics": {
+      "input_tokens": 8900,
+      "output_tokens": 3000,
+      "total_cost": 0.04
+    }
+  },
+  {
+    "language": "javascript",
+    "trial": 2,
+    "codex": "aider",
+    "v1_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-javascript-2-v1",
+    "v2_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-javascript-2-v2",
+    "v1_time": 91.3,
+    "v1_pass": false,
+    "v1_loc": 115,
+    "v1_metrics": {
+      "input_tokens": 3000,
+      "output_tokens": 1100,
+      "total_cost": 0.01
+    },
+    "v2_time": 134.1,
+    "v2_pass": false,
+    "v2_loc": 243,
+    "v2_metrics": {
+      "input_tokens": 8400,
+      "output_tokens": 9100,
+      "total_cost": 0.1
+    }
+  },
+  {
+    "language": "java",
+    "trial": 2,
+    "codex": "aider",
+    "v1_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-java-2-v1",
+    "v2_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-java-2-v2",
+    "v1_time": 82.3,
+    "v1_pass": false,
+    "v1_loc": 147,
+    "v1_metrics": {
+      "input_tokens": 3000,
+      "output_tokens": 1500,
+      "total_cost": 0.02
+    },
+    "v2_time": 118.8,
+    "v2_pass": false,
+    "v2_loc": 316,
+    "v2_metrics": {
+      "input_tokens": 8700,
+      "output_tokens": 2900,
+      "total_cost": 0.04
+    }
+  },
+  {
+    "language": "perl",
+    "trial": 2,
+    "codex": "aider",
+    "v1_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-perl-2-v1",
+    "v2_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-perl-2-v2",
+    "v1_time": 96.2,
+    "v1_pass": false,
+    "v1_loc": 162,
+    "v1_metrics": {
+      "input_tokens": 3000,
+      "output_tokens": 1600,
+      "total_cost": 0.02
+    },
+    "v2_time": 138.3,
+    "v2_pass": false,
+    "v2_loc": 214,
+    "v2_metrics": {
+      "input_tokens": 8900,
+      "output_tokens": 8900,
+      "total_cost": 0.1
+    }
+  },
+  {
+    "language": "python",
+    "trial": 2,
+    "codex": "aider",
+    "v1_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-python-2-v1",
+    "v2_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-python-2-v2",
+    "v1_time": 70.0,
+    "v1_pass": false,
+    "v1_loc": 131,
+    "v1_metrics": {
+      "input_tokens": 3000,
+      "output_tokens": 1300,
+      "total_cost": 0.02
+    },
+    "v2_time": 89.9,
+    "v2_pass": false,
+    "v2_loc": 270,
+    "v2_metrics": {
+      "input_tokens": 8600,
+      "output_tokens": 2700,
+      "total_cost": 0.04
+    }
+  },
+  {
+    "language": "ruby",
+    "trial": 2,
+    "codex": "aider",
+    "v1_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-ruby-2-v1",
+    "v2_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-ruby-2-v2",
+    "v1_time": 78.7,
+    "v1_pass": false,
+    "v1_loc": 119,
+    "v1_metrics": {
+      "input_tokens": 3000,
+      "output_tokens": 1200,
+      "total_cost": 0.02
+    },
+    "v2_time": 105.0,
+    "v2_pass": false,
+    "v2_loc": 261,
+    "v2_metrics": {
+      "input_tokens": 8400,
+      "output_tokens": 2200,
+      "total_cost": 0.03
+    }
+  },
+  {
+    "language": "ruby/steep",
+    "trial": 2,
+    "codex": "aider",
+    "v1_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-ruby-steep-2-v1",
+    "v2_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-ruby-steep-2-v2",
+    "v1_time": 92.0,
+    "v1_pass": false,
+    "v1_loc": 122,
+    "v1_metrics": {
+      "input_tokens": 3000,
+      "output_tokens": 1400,
+      "total_cost": 0.02
+    },
+    "v2_time": 65.7,
+    "v2_pass": false,
+    "v2_loc": 160,
+    "v2_metrics": {
+      "input_tokens": 8500,
+      "output_tokens": 1500,
+      "total_cost": 0.03
+    }
+  },
+  {
+    "language": "lua",
+    "trial": 2,
+    "codex": "aider",
+    "v1_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-lua-2-v1",
+    "v2_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-lua-2-v2",
+    "v1_time": 123.4,
+    "v1_pass": false,
+    "v1_loc": 186,
+    "v1_metrics": {
+      "input_tokens": 3000,
+      "output_tokens": 1900,
+      "total_cost": 0.02
+    },
+    "v2_time": 139.9,
+    "v2_pass": false,
+    "v2_loc": 355,
+    "v2_metrics": {
+      "input_tokens": 9100,
+      "output_tokens": 9900,
+      "total_cost": 0.11
+    }
+  },
+  {
+    "language": "ocaml",
+    "trial": 2,
+    "codex": "aider",
+    "v1_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-ocaml-2-v1",
+    "v2_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-ocaml-2-v2",
+    "v1_time": 100.5,
+    "v1_pass": false,
+    "v1_loc": 149,
+    "v1_metrics": {
+      "input_tokens": 3000,
+      "output_tokens": 1600,
+      "total_cost": 0.02
+    },
+    "v2_time": 140.4,
+    "v2_pass": false,
+    "v2_loc": 189,
+    "v2_metrics": {
+      "input_tokens": 9000,
+      "output_tokens": 8900,
+      "total_cost": 0.1
+    }
+  },
+  {
+    "language": "rust",
+    "trial": 3,
+    "codex": "aider",
+    "v1_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-rust-3-v1",
+    "v2_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-rust-3-v2",
+    "v1_time": 69.5,
+    "v1_pass": false,
+    "v1_loc": 150,
+    "v1_metrics": {
+      "input_tokens": 3000,
+      "output_tokens": 1800,
+      "total_cost": 0.02
+    },
+    "v2_time": 111.3,
+    "v2_pass": false,
+    "v2_loc": 304,
+    "v2_metrics": {
+      "input_tokens": 7600,
+      "output_tokens": 2500,
+      "total_cost": 0.03
+    }
+  },
+  {
+    "language": "go",
+    "trial": 3,
+    "codex": "aider",
+    "v1_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-go-3-v1",
+    "v2_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-go-3-v2",
+    "v1_time": 98.3,
+    "v1_pass": false,
+    "v1_loc": 153,
+    "v1_metrics": {
+      "input_tokens": 3000,
+      "output_tokens": 1400,
+      "total_cost": 0.02
+    },
+    "v2_time": 127.0,
+    "v2_pass": false,
+    "v2_loc": 210,
+    "v2_metrics": {
+      "input_tokens": 8700,
+      "output_tokens": 8600,
+      "total_cost": 0.1
+    }
+  },
+  {
+    "language": "c",
+    "trial": 3,
+    "codex": "aider",
+    "v1_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-c-3-v1",
+    "v2_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-c-3-v2",
+    "v1_time": 94.7,
+    "v1_pass": false,
+    "v1_loc": 253,
+    "v1_metrics": {
+      "input_tokens": 3000,
+      "output_tokens": 2700,
+      "total_cost": 0.03
+    },
+    "v2_time": 143.8,
+    "v2_pass": false,
+    "v2_loc": 312,
+    "v2_metrics": {
+      "input_tokens": 9800,
+      "output_tokens": 9800,
+      "total_cost": 0.11
+    }
+  },
+  {
+    "language": "typescript",
+    "trial": 3,
+    "codex": "aider",
+    "v1_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-typescript-3-v1",
+    "v2_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-typescript-3-v2",
+    "v1_time": 94.6,
+    "v1_pass": false,
+    "v1_loc": 127,
+    "v1_metrics": {
+      "input_tokens": 3000,
+      "output_tokens": 3600,
+      "total_cost": 0.04
+    },
+    "v2_time": 153.4,
+    "v2_pass": false,
+    "v2_loc": 175,
+    "v2_metrics": {
+      "input_tokens": 8800,
+      "output_tokens": 8800,
+      "total_cost": 0.1
+    }
+  },
+  {
+    "language": "javascript",
+    "trial": 3,
+    "codex": "aider",
+    "v1_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-javascript-3-v1",
+    "v2_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-javascript-3-v2",
+    "v1_time": 85.1,
+    "v1_pass": false,
+    "v1_loc": 152,
+    "v1_metrics": {
+      "input_tokens": 3000,
+      "output_tokens": 1400,
+      "total_cost": 0.02
+    },
+    "v2_time": 97.7,
+    "v2_pass": false,
+    "v2_loc": 310,
+    "v2_metrics": {
+      "input_tokens": 8600,
+      "output_tokens": 2800,
+      "total_cost": 0.04
+    }
+  },
+  {
+    "language": "java",
+    "trial": 3,
+    "codex": "aider",
+    "v1_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-java-3-v1",
+    "v2_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-java-3-v2",
+    "v1_time": 92.3,
+    "v1_pass": false,
+    "v1_loc": 168,
+    "v1_metrics": {
+      "input_tokens": 3000,
+      "output_tokens": 1600,
+      "total_cost": 0.02
+    },
+    "v2_time": 148.6,
+    "v2_pass": false,
+    "v2_loc": 222,
+    "v2_metrics": {
+      "input_tokens": 8900,
+      "output_tokens": 8800,
+      "total_cost": 0.1
+    }
+  },
+  {
+    "language": "perl",
+    "trial": 3,
+    "codex": "aider",
+    "v1_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-perl-3-v1",
+    "v2_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-perl-3-v2",
+    "v1_time": 126.0,
+    "v1_pass": false,
+    "v1_loc": 171,
+    "v1_metrics": {
+      "input_tokens": 3000,
+      "output_tokens": 1700,
+      "total_cost": 0.02
+    },
+    "v2_time": 55.1,
+    "v2_pass": false,
+    "v2_loc": 223,
+    "v2_metrics": {
+      "input_tokens": 8900,
+      "output_tokens": 2300,
+      "total_cost": 0.03
+    }
+  },
+  {
+    "language": "python",
+    "trial": 3,
+    "codex": "aider",
+    "v1_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-python-3-v1",
+    "v2_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-python-3-v2",
+    "v1_time": 101.2,
+    "v1_pass": false,
+    "v1_loc": 149,
+    "v1_metrics": {
+      "input_tokens": 3000,
+      "output_tokens": 1400,
+      "total_cost": 0.02
+    },
+    "v2_time": 119.5,
+    "v2_pass": false,
+    "v2_loc": 203,
+    "v2_metrics": {
+      "input_tokens": 8700,
+      "output_tokens": 8700,
+      "total_cost": 0.1
+    }
+  },
+  {
+    "language": "ruby",
+    "trial": 3,
+    "codex": "aider",
+    "v1_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-ruby-3-v1",
+    "v2_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-ruby-3-v2",
+    "v1_time": 67.5,
+    "v1_pass": false,
+    "v1_loc": 108,
+    "v1_metrics": {
+      "input_tokens": 3000,
+      "output_tokens": 1100,
+      "total_cost": 0.01
+    },
+    "v2_time": 125.8,
+    "v2_pass": false,
+    "v2_loc": 143,
+    "v2_metrics": {
+      "input_tokens": 8400,
+      "output_tokens": 8100,
+      "total_cost": 0.09
+    }
+  },
+  {
+    "language": "ruby/steep",
+    "trial": 3,
+    "codex": "aider",
+    "v1_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-ruby-steep-3-v1",
+    "v2_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-ruby-steep-3-v2",
+    "v1_time": 76.1,
+    "v1_pass": false,
+    "v1_loc": 108,
+    "v1_metrics": {
+      "input_tokens": 3000,
+      "output_tokens": 1200,
+      "total_cost": 0.02
+    },
+    "v2_time": 98.5,
+    "v2_pass": false,
+    "v2_loc": 240,
+    "v2_metrics": {
+      "input_tokens": 8400,
+      "output_tokens": 2200,
+      "total_cost": 0.03
+    }
+  },
+  {
+    "language": "lua",
+    "trial": 3,
+    "codex": "aider",
+    "v1_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-lua-3-v1",
+    "v2_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-lua-3-v2",
+    "v1_time": 121.4,
+    "v1_pass": false,
+    "v1_loc": 181,
+    "v1_metrics": {
+      "input_tokens": 3000,
+      "output_tokens": 1700,
+      "total_cost": 0.02
+    },
+    "v2_time": 53.9,
+    "v2_pass": false,
+    "v2_loc": 218,
+    "v2_metrics": {
+      "input_tokens": 9000,
+      "output_tokens": 2000,
+      "total_cost": 0.03
+    }
+  },
+  {
+    "language": "ocaml",
+    "trial": 3,
+    "codex": "aider",
+    "v1_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-ocaml-3-v1",
+    "v2_dir": "C:/Users/ahmet/Desktop/WL/which-language-ahmettngz/artifacts/aider/minigit/generated/minigit-ocaml-3-v2",
+    "v1_time": 102.3,
+    "v1_pass": false,
+    "v1_loc": 136,
+    "v1_metrics": {
+      "input_tokens": 3000,
+      "output_tokens": 1500,
+      "total_cost": 0.02
+    },
+    "v2_time": 150.8,
+    "v2_pass": false,
+    "v2_loc": 172,
+    "v2_metrics": {
+      "input_tokens": 8800,
+      "output_tokens": 8600,
+      "total_cost": 0.1
+    }
+  }
+]

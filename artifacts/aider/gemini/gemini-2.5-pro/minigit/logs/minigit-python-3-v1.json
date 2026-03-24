@@ -1,0 +1,413 @@
+Can't initialize prompt toolkit: Found xterm, while expecting a Windows 
+console. Maybe try to run this program using "winpty" or run it in cmd.exe 
+instead. Or otherwise, in case of Cygwin, use the Python executable that is 
+compiled for Cygwin.
+───────────────────────────────────────────────────────────────────────────────
+Aider v0.86.2
+Main model: gemini/gemini-2.5-pro with whole edit format
+Weak model: gemini/gemini-2.5-flash
+Git repo: none
+Repo-map: disabled
+Added SPEC-v1.txt to the chat.
+Added test-v1.sh to the chat.
+Note: in-chat filenames are always relative to the git working dir, not the 
+current working dir.
+Cur working dir: 
+C:\Users\ahmet\Desktop\WL\which-language-ahmettngz\artifacts\aider\minigit\gene
+rated\minigit-python-3-v1
+Git working dir: C:\Users\ahmet\Desktop\WL\which-language-ahmettngz
+
+Merhaba, isteğiniz üzerine SPEC-v1.txt dosyasında belirtilen özelliklere uygun 
+olarak minigit aracını Python ile yazdım. Bu betik, test-v1.sh dosyasındaki tüm
+testleri geçecek şekilde tasarlanmıştır.                                       
+
+İsteğiniz doğrultusunda minigit adında çalıştırılabilir bir dosya oluşturdum.  
+
+İşte istenen dosya:                                                            
+
+minigit                                                                        
+
+                                                                               
+#!/usr/bin/env python3                                                         
+                                                                               
+                                                                               
+                                                                               
+import sys                                                                     
+                                                                               
+import os                                                                      
+                                                                               
+import time                                                                    
+                                                                               
+                                                                               
+                                                                               
+# --- Constants ---                                                            
+                                                                               
+MINIGIT_DIR = ".minigit"                                                       
+                                                                               
+OBJECTS_DIR = os.path.join(MINIGIT_DIR, "objects")                             
+                                                                               
+COMMITS_DIR = os.path.join(MINIGIT_DIR, "commits")                             
+                                                                               
+INDEX_FILE = os.path.join(MINIGIT_DIR, "index")                                
+                                                                               
+HEAD_FILE = os.path.join(MINIGIT_DIR, "HEAD")                                  
+                                                                               
+                                                                               
+                                                                               
+# --- Hash Function ---                                                        
+                                                                               
+def minihash(data):                                                            
+                                                                               
+    """                                                                        
+                                                                               
+    Computes the MiniHash of the given data (bytes).                           
+                                                                               
+    """                                                                        
+                                                                               
+    h = 1469598103934665603                                                    
+                                                                               
+    for b in data:                                                             
+                                                                               
+        h ^= b                                                                 
+                                                                               
+        h = (h * 1099511628211) & 0xFFFFFFFFFFFFFFFF  # mod 2^64               
+                                                                               
+    return format(h, '016x')                                                   
+                                                                               
+                                                                               
+                                                                               
+# --- Commands ---                                                             
+                                                                               
+def init():                                                                    
+                                                                               
+    """                                                                        
+                                                                               
+    Initializes a new MiniGit repository.                                      
+                                                                               
+    """                                                                        
+                                                                               
+    if os.path.isdir(MINIGIT_DIR):                                             
+                                                                               
+        print("Repository already initialized")                                
+                                                                               
+        sys.exit(0)                                                            
+                                                                               
+                                                                               
+                                                                               
+    os.makedirs(OBJECTS_DIR)                                                   
+                                                                               
+    os.makedirs(COMMITS_DIR)                                                   
+                                                                               
+                                                                               
+                                                                               
+    open(INDEX_FILE, 'w').close()                                              
+                                                                               
+    open(HEAD_FILE, 'w').close()                                               
+                                                                               
+    sys.exit(0)                                                                
+                                                                               
+                                                                               
+                                                                               
+def add(filename):                                                             
+                                                                               
+    """                                                                        
+                                                                               
+    Stages a file for the next commit.                                         
+                                                                               
+    """                                                                        
+                                                                               
+    if not os.path.isfile(filename):                                           
+                                                                               
+        print("File not found")                                                
+                                                                               
+        sys.exit(1)                                                            
+                                                                               
+                                                                               
+                                                                               
+    with open(filename, 'rb') as f:                                            
+                                                                               
+        content = f.read()                                                     
+                                                                               
+                                                                               
+                                                                               
+    blob_hash = minihash(content)                                              
+                                                                               
+                                                                               
+                                                                               
+    object_path = os.path.join(OBJECTS_DIR, blob_hash)                         
+                                                                               
+    with open(object_path, 'wb') as f:                                         
+                                                                               
+        f.write(content)                                                       
+                                                                               
+                                                                               
+                                                                               
+    with open(INDEX_FILE, 'r') as f:                                           
+                                                                               
+        staged_files = [line.strip() for line in f.readlines()]                
+                                                                               
+                                                                               
+                                                                               
+    if filename not in staged_files:                                           
+                                                                               
+        with open(INDEX_FILE, 'a') as f:                                       
+                                                                               
+            f.write(filename + '\n')                                           
+                                                                               
+                                                                               
+                                                                               
+    sys.exit(0)                                                                
+                                                                               
+                                                                               
+                                                                               
+def commit(message):                                                           
+                                                                               
+    """                                                                        
+                                                                               
+    Creates a new commit.                                                      
+                                                                               
+    """                                                                        
+                                                                               
+    if not os.path.exists(INDEX_FILE) or os.path.getsize(INDEX_FILE) == 0:     
+                                                                               
+        print("Nothing to commit")                                             
+                                                                               
+        sys.exit(1)                                                            
+                                                                               
+                                                                               
+                                                                               
+    with open(INDEX_FILE, 'r') as f:                                           
+                                                                               
+        staged_files = sorted([line.strip() for line in f if line.strip()])    
+                                                                               
+                                                                               
+                                                                               
+    if not staged_files:                                                       
+                                                                               
+        print("Nothing to commit")                                             
+                                                                               
+        sys.exit(1)                                                            
+                                                                               
+                                                                               
+                                                                               
+    with open(HEAD_FILE, 'r') as f:                                            
+                                                                               
+        parent_hash = f.read().strip() or "NONE"                               
+                                                                               
+                                                                               
+                                                                               
+    timestamp = int(time.time())                                               
+                                                                               
+                                                                               
+                                                                               
+    commit_lines = [                                                           
+                                                                               
+        f"parent: {parent_hash}",                                              
+                                                                               
+        f"timestamp: {timestamp}",                                             
+                                                                               
+        f"message: {message}",                                                 
+                                                                               
+        "files:"                                                               
+                                                                               
+    ]                                                                          
+                                                                               
+                                                                               
+                                                                               
+    for filename in staged_files:                                              
+                                                                               
+        with open(filename, 'rb') as f:                                        
+                                                                               
+            content = f.read()                                                 
+                                                                               
+        blob_hash = minihash(content)                                          
+                                                                               
+        commit_lines.append(f"{filename} {blob_hash}")                         
+                                                                               
+                                                                               
+                                                                               
+    commit_content = "\n".join(commit_lines)                                   
+                                                                               
+                                                                               
+                                                                               
+    commit_hash = minihash(commit_content.encode('utf-8'))                     
+                                                                               
+                                                                               
+                                                                               
+    commit_path = os.path.join(COMMITS_DIR, commit_hash)                       
+                                                                               
+    with open(commit_path, 'w', encoding='utf-8') as f:                        
+                                                                               
+        f.write(commit_content)                                                
+                                                                               
+                                                                               
+                                                                               
+    with open(HEAD_FILE, 'w', encoding='utf-8') as f:                          
+                                                                               
+        f.write(commit_hash)                                                   
+                                                                               
+                                                                               
+                                                                               
+    open(INDEX_FILE, 'w').close()                                              
+                                                                               
+                                                                               
+                                                                               
+    print(f"Committed {commit_hash}")                                          
+                                                                               
+    sys.exit(0)                                                                
+                                                                               
+                                                                               
+                                                                               
+def log():                                                                     
+                                                                               
+    """                                                                        
+                                                                               
+    Shows the commit history.                                                  
+                                                                               
+    """                                                                        
+                                                                               
+    if not os.path.exists(HEAD_FILE) or os.path.getsize(HEAD_FILE) == 0:       
+                                                                               
+        print("No commits")                                                    
+                                                                               
+        sys.exit(0)                                                            
+                                                                               
+                                                                               
+                                                                               
+    with open(HEAD_FILE, 'r') as f:                                            
+                                                                               
+        current_hash = f.read().strip()                                        
+                                                                               
+                                                                               
+                                                                               
+    if not current_hash:                                                       
+                                                                               
+        print("No commits")                                                    
+                                                                               
+        sys.exit(0)                                                            
+                                                                               
+                                                                               
+                                                                               
+    while current_hash and current_hash != "NONE":                             
+                                                                               
+        commit_path = os.path.join(COMMITS_DIR, current_hash)                  
+                                                                               
+        if not os.path.exists(commit_path):                                    
+                                                                               
+            break                                                              
+                                                                               
+                                                                               
+                                                                               
+        with open(commit_path, 'r', encoding='utf-8') as f:                    
+                                                                               
+            lines = f.readlines()                                              
+                                                                               
+                                                                               
+                                                                               
+        parent_hash_from_file = None                                           
+                                                                               
+        timestamp = None                                                       
+                                                                               
+        message = None                                                         
+                                                                               
+                                                                               
+                                                                               
+        for line in lines:                                                     
+                                                                               
+            if line.startswith("parent: "):                                    
+                                                                               
+                parent_hash_from_file = line.split(":", 1)[1].strip()          
+                                                                               
+            elif line.startswith("timestamp: "):                               
+                                                                               
+                timestamp = line.split(":", 1)[1].strip()                      
+                                                                               
+            elif line.startswith("message: "):                                 
+                                                                               
+                message = line.split(":", 1)[1].strip()                        
+                                                                               
+            elif line.strip() == "files:":                                     
+                                                                               
+                break                                                          
+                                                                               
+                                                                               
+                                                                               
+        print(f"commit {current_hash}")                                        
+                                                                               
+        if timestamp is not None:                                              
+                                                                               
+            print(f"Date: {timestamp}")                                        
+                                                                               
+        if message is not None:                                                
+                                                                               
+            print(f"Message: {message}")                                       
+                                                                               
+                                                                               
+                                                                               
+        current_hash = parent_hash_from_file                                   
+                                                                               
+                                                                               
+                                                                               
+    sys.exit(0)                                                                
+                                                                               
+                                                                               
+                                                                               
+def main():                                                                    
+                                                                               
+    """                                                                        
+                                                                               
+    Main entry point for the minigit script.                                   
+                                                                               
+    """                                                                        
+                                                                               
+    args = sys.argv[1:]                                                        
+                                                                               
+    if not args:                                                               
+                                                                               
+        sys.exit(1)                                                            
+                                                                               
+                                                                               
+                                                                               
+    command = args[0]                                                          
+                                                                               
+                                                                               
+                                                                               
+    if command == "init":                                                      
+                                                                               
+        init()                                                                 
+                                                                               
+    elif command == "add":                                                     
+                                                                               
+        if len(args) < 2:                                                      
+                                                                               
+            sys.exit(1)                                                        
+                                                                               
+        add(args[1])                                                           
+                                                                               
+    elif command == "commit":                                                  
+                                                                               
+        if len(args) < 3 or args[1] != '-m':                                   
+                                                                               
+            sys.exit(1)                                                        
+                                                                               
+        commit(args[2])                                                        
+                                                                               
+    elif command == "log":                                                     
+                                                                               
+        log()                                                                  
+                                                                               
+    else:                                                                      
+                                                                               
+        sys.exit(1)                                                            
+                                                                               
+                                                                               
+                                                                               
+if __name__ == "__main__":                                                     
+                                                                               
+    main()                                                                     
+                                                                               
+
+Tokens: 3.0k sent, 1.4k received. Cost: $0.02 message, $0.02 session.
+
+minigit
+Applied edit to minigit

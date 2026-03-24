@@ -45,6 +45,28 @@ class CodexLoader
     config['default'] || 'claude'
   end
 
+  def self.model_for(name)
+    config = load_config
+    codex_config = config.fetch('codexes', {}).fetch(name, {})
+    adapter_config = codex_config['config'] || {}
+    model = adapter_config['model'] || adapter_config['model_name']
+    model = model.to_s.strip
+    model.empty? ? 'default' : model
+  end
+
+  def self.model_path_parts(name)
+    parts = model_for(name).split('/').reject(&:empty?).map do |part|
+      sanitized = part.gsub(/[^A-Za-z0-9._-]+/, '-')
+      sanitized.empty? ? 'default' : sanitized
+    end
+    parts.empty? ? ['default'] : parts
+  end
+
+  def self.default_output_root(name, problem:, base_dir:, dry_run: false)
+    path = File.join(base_dir, 'artifacts', name, *model_path_parts(name), problem)
+    dry_run ? File.join(path, 'dry-run') : path
+  end
+
   def self.create_codex(name)
     config = load_config
     codex_config = config['codexes'][name]

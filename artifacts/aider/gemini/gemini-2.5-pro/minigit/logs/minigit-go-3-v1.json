@@ -1,0 +1,420 @@
+Can't initialize prompt toolkit: Found xterm, while expecting a Windows 
+console. Maybe try to run this program using "winpty" or run it in cmd.exe 
+instead. Or otherwise, in case of Cygwin, use the Python executable that is 
+compiled for Cygwin.
+───────────────────────────────────────────────────────────────────────────────
+Aider v0.86.2
+Main model: gemini/gemini-2.5-pro with whole edit format
+Weak model: gemini/gemini-2.5-flash
+Git repo: none
+Repo-map: disabled
+Added SPEC-v1.txt to the chat.
+Added test-v1.sh to the chat.
+Note: in-chat filenames are always relative to the git working dir, not the 
+current working dir.
+Cur working dir: 
+C:\Users\ahmet\Desktop\WL\which-language-ahmettngz\artifacts\aider\minigit\gene
+rated\minigit-go-3-v1
+Git working dir: C:\Users\ahmet\Desktop\WL\which-language-ahmettngz
+
+Elbette, minigit aracını SPEC-v1.txt dosyasındaki belirtimlere göre Go dilinde 
+uygulayacağım. Derlemeyi kolaylaştırmak için bir Makefile ve Go kaynak kodunu  
+içeren minigit.go adında iki yeni dosya oluşturacağım. Bu dosyalar, test-v1.sh 
+betiğindeki tüm testleri geçecek şekilde tasarlanmıştır.                       
+
+İşte gerekli dosyalar:                                                         
+
+Makefile                                                                       
+
+                                                                               
+minigit: minigit.go                                                            
+                                                                               
+    go build -o minigit minigit.go                                             
+                                                                               
+                                                                               
+                                                                               
+.PHONY: clean                                                                  
+                                                                               
+clean:                                                                         
+                                                                               
+    rm -f minigit                                                              
+                                                                               
+
+minigit.go                                                                     
+
+                                                                               
+package main                                                                   
+                                                                               
+                                                                               
+                                                                               
+import (                                                                       
+                                                                               
+    "fmt"                                                                      
+                                                                               
+    "os"                                                                       
+                                                                               
+    "path/filepath"                                                            
+                                                                               
+    "sort"                                                                     
+                                                                               
+    "strings"                                                                  
+                                                                               
+    "time"                                                                     
+                                                                               
+)                                                                              
+                                                                               
+                                                                               
+                                                                               
+const (                                                                        
+                                                                               
+    minigitDir     = ".minigit"                                                
+                                                                               
+    objectsDir     = ".minigit/objects"                                        
+                                                                               
+    commitsDir     = ".minigit/commits"                                        
+                                                                               
+    indexFile      = ".minigit/index"                                          
+                                                                               
+    headFile       = ".minigit/HEAD"                                           
+                                                                               
+    fnvOffsetBasis = uint64(1469598103934665603)                               
+                                                                               
+    fnvPrime       = uint64(1099511628211)                                     
+                                                                               
+)                                                                              
+                                                                               
+                                                                               
+                                                                               
+func miniHash(data []byte) string {                                            
+                                                                               
+    var h uint64 = fnvOffsetBasis                                              
+                                                                               
+    for _, b := range data {                                                   
+                                                                               
+        h ^= uint64(b)                                                         
+                                                                               
+        h *= fnvPrime                                                          
+                                                                               
+    }                                                                          
+                                                                               
+    return fmt.Sprintf("%016x", h)                                             
+                                                                               
+}                                                                              
+                                                                               
+                                                                               
+                                                                               
+func handleInit() {                                                            
+                                                                               
+    if _, err := os.Stat(minigitDir); !os.IsNotExist(err) {                    
+                                                                               
+        fmt.Println("Repository already initialized")                          
+                                                                               
+        os.Exit(0)                                                             
+                                                                               
+    }                                                                          
+                                                                               
+                                                                               
+                                                                               
+    _ = os.Mkdir(minigitDir, 0755)                                             
+                                                                               
+    _ = os.Mkdir(objectsDir, 0755)                                             
+                                                                               
+    _ = os.Mkdir(commitsDir, 0755)                                             
+                                                                               
+    f, _ := os.Create(indexFile)                                               
+                                                                               
+    f.Close()                                                                  
+                                                                               
+    f, _ = os.Create(headFile)                                                 
+                                                                               
+    f.Close()                                                                  
+                                                                               
+}                                                                              
+                                                                               
+                                                                               
+                                                                               
+func handleAdd(filename string) {                                              
+                                                                               
+    content, err := os.ReadFile(filename)                                      
+                                                                               
+    if err != nil {                                                            
+                                                                               
+        fmt.Println("File not found")                                          
+                                                                               
+        os.Exit(1)                                                             
+                                                                               
+    }                                                                          
+                                                                               
+                                                                               
+                                                                               
+    hash := miniHash(content)                                                  
+                                                                               
+    objectPath := filepath.Join(objectsDir, hash)                              
+                                                                               
+    _ = os.WriteFile(objectPath, content, 0644)                                
+                                                                               
+                                                                               
+                                                                               
+    indexContent, _ := os.ReadFile(indexFile)                                  
+                                                                               
+    lines := strings.Split(string(indexContent), "\n")                         
+                                                                               
+                                                                               
+                                                                               
+    for _, line := range lines {                                               
+                                                                               
+        if line == filename {                                                  
+                                                                               
+            return                                                             
+                                                                               
+        }                                                                      
+                                                                               
+    }                                                                          
+                                                                               
+                                                                               
+                                                                               
+    f, _ := os.OpenFile(indexFile, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)  
+                                                                               
+    defer f.Close()                                                            
+                                                                               
+    _, _ = f.WriteString(filename + "\n")                                      
+                                                                               
+}                                                                              
+                                                                               
+                                                                               
+                                                                               
+func handleCommit(message string) {                                            
+                                                                               
+    indexInfo, err := os.Stat(indexFile)                                       
+                                                                               
+    if err != nil || indexInfo.Size() == 0 {                                   
+                                                                               
+        fmt.Println("Nothing to commit")                                       
+                                                                               
+        os.Exit(1)                                                             
+                                                                               
+    }                                                                          
+                                                                               
+                                                                               
+                                                                               
+    parentHashBytes, _ := os.ReadFile(headFile)                                
+                                                                               
+    parentHash := strings.TrimSpace(string(parentHashBytes))                   
+                                                                               
+    if parentHash == "" {                                                      
+                                                                               
+        parentHash = "NONE"                                                    
+                                                                               
+    }                                                                          
+                                                                               
+                                                                               
+                                                                               
+    timestamp := time.Now().Unix()                                             
+                                                                               
+                                                                               
+                                                                               
+    indexContent, _ := os.ReadFile(indexFile)                                  
+                                                                               
+                                                                               
+                                                                               
+    var stagedFiles []string                                                   
+                                                                               
+    for _, f := range strings.Split(string(indexContent), "\n") {              
+                                                                               
+        if f != "" {                                                           
+                                                                               
+            stagedFiles = append(stagedFiles, f)                               
+                                                                               
+        }                                                                      
+                                                                               
+    }                                                                          
+                                                                               
+    sort.Strings(stagedFiles)                                                  
+                                                                               
+                                                                               
+                                                                               
+    var commitContentBuilder strings.Builder                                   
+                                                                               
+    commitContentBuilder.WriteString(fmt.Sprintf("parent: %s\n", parentHash))  
+                                                                               
+    commitContentBuilder.WriteString(fmt.Sprintf("timestamp: %d\n", timestamp))
+                                                                               
+    commitContentBuilder.WriteString(fmt.Sprintf("message: %s\n", message))    
+                                                                               
+    commitContentBuilder.WriteString("files:\n")                               
+                                                                               
+                                                                               
+                                                                               
+    for _, filename := range stagedFiles {                                     
+                                                                               
+        fileContent, _ := os.ReadFile(filename)                                
+                                                                               
+        blobHash := miniHash(fileContent)                                      
+                                                                               
+        commitContentBuilder.WriteString(fmt.Sprintf("%s %s\n", filename,      
+blobHash))                                                                     
+                                                                               
+    }                                                                          
+                                                                               
+                                                                               
+                                                                               
+    commitContent := commitContentBuilder.String()                             
+                                                                               
+    commitHash := miniHash([]byte(commitContent))                              
+                                                                               
+                                                                               
+                                                                               
+    commitPath := filepath.Join(commitsDir, commitHash)                        
+                                                                               
+    _ = os.WriteFile(commitPath, []byte(commitContent), 0644)                  
+                                                                               
+                                                                               
+                                                                               
+    _ = os.WriteFile(headFile, []byte(commitHash), 0644)                       
+                                                                               
+    _ = os.Truncate(indexFile, 0)                                              
+                                                                               
+                                                                               
+                                                                               
+    fmt.Printf("Committed %s\n", commitHash)                                   
+                                                                               
+}                                                                              
+                                                                               
+                                                                               
+                                                                               
+func handleLog() {                                                             
+                                                                               
+    currentHashBytes, err := os.ReadFile(headFile)                             
+                                                                               
+    if err != nil || len(strings.TrimSpace(string(currentHashBytes))) == 0 {   
+                                                                               
+        fmt.Println("No commits")                                              
+                                                                               
+        return                                                                 
+                                                                               
+    }                                                                          
+                                                                               
+    currentHash := strings.TrimSpace(string(currentHashBytes))                 
+                                                                               
+                                                                               
+                                                                               
+    for currentHash != "NONE" && currentHash != "" {                           
+                                                                               
+        commitPath := filepath.Join(commitsDir, currentHash)                   
+                                                                               
+        commitContentBytes, err := os.ReadFile(commitPath)                     
+                                                                               
+        if err != nil {                                                        
+                                                                               
+            os.Exit(1)                                                         
+                                                                               
+        }                                                                      
+                                                                               
+                                                                               
+                                                                               
+        commitContent := string(commitContentBytes)                            
+                                                                               
+        lines := strings.Split(commitContent, "\n")                            
+                                                                               
+        var parentHash, timestamp, message string                              
+                                                                               
+                                                                               
+                                                                               
+        for _, line := range lines {                                           
+                                                                               
+            if strings.HasPrefix(line, "parent: ") {                           
+                                                                               
+                parentHash = strings.TrimPrefix(line, "parent: ")              
+                                                                               
+            } else if strings.HasPrefix(line, "timestamp: ") {                 
+                                                                               
+                timestamp = strings.TrimPrefix(line, "timestamp: ")            
+                                                                               
+            } else if strings.HasPrefix(line, "message: ") {                   
+                                                                               
+                message = strings.TrimPrefix(line, "message: ")                
+                                                                               
+                break                                                          
+                                                                               
+            }                                                                  
+                                                                               
+        }                                                                      
+                                                                               
+                                                                               
+                                                                               
+        fmt.Printf("commit %s\n", currentHash)                                 
+                                                                               
+        fmt.Printf("Date: %s\n", timestamp)                                    
+                                                                               
+        fmt.Printf("Message: %s\n", message)                                   
+                                                                               
+                                                                               
+                                                                               
+        currentHash = parentHash                                               
+                                                                               
+    }                                                                          
+                                                                               
+}                                                                              
+                                                                               
+                                                                               
+                                                                               
+func main() {                                                                  
+                                                                               
+    if len(os.Args) < 2 {                                                      
+                                                                               
+        os.Exit(1)                                                             
+                                                                               
+    }                                                                          
+                                                                               
+                                                                               
+                                                                               
+    command := os.Args[1]                                                      
+                                                                               
+                                                                               
+                                                                               
+    switch command {                                                           
+                                                                               
+    case "init":                                                               
+                                                                               
+        handleInit()                                                           
+                                                                               
+    case "add":                                                                
+                                                                               
+        if len(os.Args) < 3 {                                                  
+                                                                               
+            os.Exit(1)                                                         
+                                                                               
+        }                                                                      
+                                                                               
+        handleAdd(os.Args[2])                                                  
+                                                                               
+    case "commit":                                                             
+                                                                               
+        if len(os.Args) < 4 || os.Args[2] != "-m" {                            
+                                                                               
+            os.Exit(1)                                                         
+                                                                               
+        }                                                                      
+                                                                               
+        handleCommit(os.Args[3])                                               
+                                                                               
+    case "log":                                                                
+                                                                               
+        handleLog()                                                            
+                                                                               
+    default:                                                                   
+                                                                               
+        os.Exit(1)                                                             
+                                                                               
+    }                                                                          
+                                                                               
+}                                                                              
+                                                                               
+
+Tokens: 3.0k sent, 1.4k received. Cost: $0.02 message, $0.02 session.
+
+Makefile
+
+minigit.go
+Applied edit to Makefile
+Applied edit to minigit.go

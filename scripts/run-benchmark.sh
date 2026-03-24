@@ -31,10 +31,8 @@ done
 
 if [[ -n "$explicit_output_root" ]]; then
   output_root="$explicit_output_root"
-elif [[ "$dry_run" == true ]]; then
-  output_root="$repo_root/artifacts/$codex/$problem/dry-run"
 else
-  output_root="$repo_root/artifacts/$codex/$problem"
+  output_root="$(bash "$script_dir/resolve-output-root.sh" "$codex" "$problem" "$dry_run")"
 fi
 
 mkdir -p "$output_root"

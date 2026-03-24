@@ -19,7 +19,7 @@ class GeminiCodex < BaseCodex
   def initialize(config = {})
     super('gemini', config)
     @api_key = config[:api_key] || ENV['GOOGLE_API_KEY']
-    @model_name = config[:model_name] || 'gemini-3.1-flash-lite-preview'
+    @model_name = config[:model] || config[:model_name] || 'gemini-3.1-flash-lite-preview'
     @cooldown_seconds = config[:cooldown_seconds] || 1.2
 
     raise CodexError, 'GOOGLE_API_KEY not configured' unless @api_key

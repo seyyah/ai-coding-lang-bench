@@ -1,0 +1,101 @@
+[
+  {
+    "language": "python",
+    "trial": 1,
+    "codex": "groq",
+    "v1_dir": "/home/berkevnl/which-language/artifacts/groq/llama-3.3-70b-versatile/minigit/generated/minigit-python-1-v1",
+    "v2_dir": "/home/berkevnl/which-language/artifacts/groq/llama-3.3-70b-versatile/minigit/generated/minigit-python-1-v2",
+    "v1_time": 3.6,
+    "v1_pass": false,
+    "v1_passed_count": 0,
+    "v1_failed_count": 6,
+    "v1_total_count": 6,
+    "v1_loc": 105,
+    "v2_time": 2.7,
+    "v2_pass": false,
+    "v2_passed_count": 4,
+    "v2_failed_count": 26,
+    "v2_total_count": 30,
+    "v2_loc": 80,
+    "v1_metrics": {
+      "input_tokens": 159,
+      "output_tokens": 1040,
+      "cost_usd": 0.00091541,
+      "model": "llama-3.3-70b-versatile",
+      "duration_ms": 3574
+    },
+    "v2_metrics": {
+      "input_tokens": 116,
+      "output_tokens": 735,
+      "cost_usd": 0.00064909,
+      "model": "llama-3.3-70b-versatile",
+      "duration_ms": 2716
+    }
+  },
+  {
+    "language": "python",
+    "trial": 2,
+    "codex": "groq",
+    "v1_dir": "/home/berkevnl/which-language/artifacts/groq/llama-3.3-70b-versatile/minigit/generated/minigit-python-2-v1",
+    "v2_dir": "/home/berkevnl/which-language/artifacts/groq/llama-3.3-70b-versatile/minigit/generated/minigit-python-2-v2",
+    "v1_time": 2.5,
+    "v1_pass": false,
+    "v1_passed_count": 0,
+    "v1_failed_count": 6,
+    "v1_total_count": 6,
+    "v1_loc": 88,
+    "v2_time": 3.2,
+    "v2_pass": false,
+    "v2_passed_count": 1,
+    "v2_failed_count": 6,
+    "v2_total_count": 7,
+    "v2_loc": 117,
+    "v1_metrics": {
+      "input_tokens": 159,
+      "output_tokens": 832,
+      "cost_usd": 0.00075109,
+      "model": "llama-3.3-70b-versatile",
+      "duration_ms": 2507
+    },
+    "v2_metrics": {
+      "input_tokens": 116,
+      "output_tokens": 1057,
+      "cost_usd": 0.00090347,
+      "model": "llama-3.3-70b-versatile",
+      "duration_ms": 3197
+    }
+  },
+  {
+    "language": "python",
+    "trial": 3,
+    "codex": "groq",
+    "v1_dir": "/home/berkevnl/which-language/artifacts/groq/llama-3.3-70b-versatile/minigit/generated/minigit-python-3-v1",
+    "v2_dir": "/home/berkevnl/which-language/artifacts/groq/llama-3.3-70b-versatile/minigit/generated/minigit-python-3-v2",
+    "v1_time": 2.5,
+    "v1_pass": false,
+    "v1_passed_count": 0,
+    "v1_failed_count": 6,
+    "v1_total_count": 6,
+    "v1_loc": 98,
+    "v2_time": 3.4,
+    "v2_pass": false,
+    "v2_passed_count": 1,
+    "v2_failed_count": 4,
+    "v2_total_count": 5,
+    "v2_loc": 151,
+    "v1_metrics": {
+      "input_tokens": 159,
+      "output_tokens": 852,
+      "cost_usd": 0.00076689,
+      "model": "llama-3.3-70b-versatile",
+      "duration_ms": 2463
+    },
+    "v2_metrics": {
+      "input_tokens": 116,
+      "output_tokens": 1328,
+      "cost_usd": 0.00111756,
+      "model": "llama-3.3-70b-versatile",
+      "duration_ms": 3350
+    }
+  }
+]
