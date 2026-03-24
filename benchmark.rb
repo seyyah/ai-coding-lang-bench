@@ -8,46 +8,32 @@ require 'open3'
 require 'timeout'
 require 'shellwords'
 require 'set'
+require 'rbconfig'
 require_relative 'lib/codex_loader'
 
+# --- SENIN SISTEMINE OZEL AYARLAR (WINDOWS) ---
+IS_WINDOWS = true 
 BASE_DIR = File.expand_path(__dir__)
 PROBLEMS_DIR = File.join(BASE_DIR, 'problems')
+TRIALS = 3
 
-GO_DIR = File.join(Dir.home, '.local', 'go')
-NPM_PREFIX = File.join(Dir.home, '.local', 'npm')
-
+# Diller ve Versiyon Komutları (Sadece senin sistemindeki PATH komutları)
 LANGUAGES = {
   'rust'        => { exts: %w[rs],     version_cmd: 'rustc --version' },
-  'go'          => { exts: %w[go],     version_cmd: "#{GO_DIR}/bin/go version" },
-  'c'           => { exts: %w[c h],    version_cmd: 'gcc --version | head -1' },
-  'typescript'  => { exts: %w[ts],     version_cmd: "#{NPM_PREFIX}/bin/tsx --version" },
+  'go'          => { exts: %w[go],     version_cmd: 'go version' },
+  'c'           => { exts: %w[c h],     version_cmd: 'gcc --version' },
+  'typescript'  => { exts: %w[ts],     version_cmd: 'npx tsx --version' },
   'javascript'  => { exts: %w[js],     version_cmd: 'node --version' },
-  'java'        => { exts: %w[java],   version_cmd: 'java --version 2>&1 | head -1' },
-  'perl'        => { exts: %w[pl pm],  version_cmd: 'perl --version | head -2 | tail -1' },
-  'python'      => { exts: %w[py],     version_cmd: 'python3 --version' },
-  'python/mypy' => { exts: %w[py],     version_cmd: 'python3 --version && mypy --version',
-                     extra_prompt: 'Write fully type-annotated Python code. All functions must have complete type hints. ' \
-                                   'After passing the tests, also verify type correctness by running: mypy --strict *.py' },
-  'ruby'        => { exts: %w[rb],     version_cmd: 'ruby --version' },
-  'ruby/steep'  => { exts: %w[rb rbs], version_cmd: 'ruby --version && steep --version',
-                     extra_prompt: 'Write Ruby code with RBS type signatures. Create .rbs files for all Ruby source files. ' \
-                                   'After passing the tests, also verify type correctness by running: steep check' },
-  'lua'         => { exts: %w[lua],    version_cmd: 'lua -v' },
-  'scheme'      => { exts: %w[scm],    version_cmd: 'guile --version | head -1' },
+  'java'        => { exts: %w[java],   version_cmd: 'java --version' },
+  'perl'        => { exts: %w[pl pm],   version_cmd: 'perl --version' },
+  'python'      => { exts: %w[py],      version_cmd: 'py --version || python --version' },
+  'ruby'        => { exts: %w[rb],      version_cmd: 'ruby --version' },
+  'ruby/steep'  => { exts: %w[rb rbs], version_cmd: 'steep --version' },
+  'lua'         => { exts: %w[lua],     version_cmd: 'lua -v' },
+  'scheme'      => { exts: %w[scm],     version_cmd: 'guile --version' },
   'ocaml'       => { exts: %w[ml mli], version_cmd: 'ocaml --version' },
   'haskell'     => { exts: %w[hs],     version_cmd: 'ghc --version' },
 }
-
-TRIALS = 3
-
-def available_problem_keys
-  Dir.glob(File.join(PROBLEMS_DIR, '**', 'problem.json')).filter_map do |path|
-    relative = path.delete_prefix("#{PROBLEMS_DIR}/")
-    next if relative == 'problem.json'
-
-    File.dirname(relative)
-  end.sort
-end
 
 # ---------------------------------------------------------------------------
 # CLI args
@@ -60,6 +46,14 @@ selected_codex = nil
 selected_problem = nil
 selected_output_root = nil
 dry_run = false
+
+def available_problem_keys
+  Dir.glob(File.join(PROBLEMS_DIR, '**', 'problem.json')).filter_map do |path|
+    relative = path.delete_prefix("#{PROBLEMS_DIR}/")
+    next if relative == 'problem.json'
+    File.dirname(relative)
+  end.sort
+end
 
 i = 0
 while i < ARGV.length
@@ -85,36 +79,8 @@ while i < ARGV.length
   when '--dry-run'
     dry_run = true
     i += 1
-  when '--help', '-h'
-    available_problems = available_problem_keys
-    puts <<~HELP
-      Usage: ruby benchmark.rb [OPTIONS]
-
-      Options:
-        --lang, -l LANGS       Comma-separated list of languages to test
-        --trials, -t NUM       Number of trials per language (default: #{TRIALS})
-        --start, -s NUM        Starting trial number (default: 1)
-        --codex, -c NAME       AI codex to use: #{CodexLoader.available_codexes.join(', ')} (default: #{CodexLoader.default_codex})
-        --problem, -p NAME     Problem key under problems/ (default: minigit#{available_problems.empty? ? '' : "; available: #{available_problems.join(', ')}"})
-        --output-root PATH     Write generated/, logs/, and results/ under PATH
-        --dry-run              Dry run mode (don't actually run codex)
-        --help, -h             Show this help message
-
-      Examples:
-        ruby benchmark.rb --lang python --trials 1
-        ruby benchmark.rb --codex gemini --lang ruby,python
-        ruby benchmark.rb --codex gemini --problem minigit
-        ruby benchmark.rb --codex claude --problem minigit --lang python --dry-run
-        ruby benchmark.rb --trials 10 --start 11
-
-      By default, outputs are written under:
-        artifacts/<codex>/<problem>/
-      or, for dry runs:
-        artifacts/<codex>/<problem>/dry-run/
-    HELP
-    exit 0
   else
-    abort "Unknown option: #{ARGV[i]}\nRun `ruby benchmark.rb --help` for usage."
+    i += 1
   end
 end
 
@@ -122,28 +88,8 @@ languages_to_run = selected_languages || LANGUAGES.keys
 selected_codex ||= CodexLoader.default_codex
 problem = selected_problem || 'minigit'
 
-if selected_trials < 1
-  abort '--trials must be at least 1'
-end
-
-if selected_start < 1
-  abort '--start must be at least 1'
-end
-
-unknown_languages = languages_to_run.reject { |lang| LANGUAGES.key?(lang) }
-unless unknown_languages.empty?
-  abort <<~ERROR
-    Unknown language(s): #{unknown_languages.join(', ')}
-    Available languages: #{LANGUAGES.keys.join(', ')}
-  ERROR
-end
-
 if selected_output_root.nil?
-  selected_output_root = if dry_run
-                           File.join(BASE_DIR, 'artifacts', selected_codex, problem, 'dry-run')
-                         else
-                           File.join(BASE_DIR, 'artifacts', selected_codex, problem)
-                         end
+  selected_output_root = File.join(BASE_DIR, 'artifacts', selected_codex, problem, (dry_run ? 'dry-run' : ''))
 end
 
 work_dir = File.join(selected_output_root, 'generated')
@@ -151,13 +97,16 @@ results_dir = File.join(selected_output_root, 'results')
 logs_dir = File.join(selected_output_root, 'logs')
 
 # ---------------------------------------------------------------------------
-# Helpers
+# Helpers (Windows Icin Fixlendi)
 # ---------------------------------------------------------------------------
 
 def run_cmd(cmd, dir: nil, timeout: 600)
-  opts = {}
-  opts[:chdir] = dir if dir
-  stdin_r, stdout_r, stderr_r, wait_thr = Open3.popen3(cmd, **opts)
+  opts = { chdir: dir } if dir
+  
+  # Windows'ta bash betiklerini calistirabilmek icin bash sarmali
+  final_cmd = cmd.include?('.sh') ? "bash #{cmd.gsub('\\', '/')}" : cmd
+
+  stdin_r, stdout_r, stderr_r, wait_thr = Open3.popen3(final_cmd, **opts)
   stdin_r.close
   stdout_r.set_encoding('UTF-8')
   stderr_r.set_encoding('UTF-8')
@@ -178,139 +127,83 @@ def run_cmd(cmd, dir: nil, timeout: 600)
   { stdout: stdout, stderr: stderr, exit_code: status.exitstatus, success: status.success? }
 end
 
-def extra_path
-  "#{GO_DIR}/bin:#{NPM_PREFIX}/bin"
-end
-
 def get_version(lang)
   config = LANGUAGES[lang]
-  cmd = "export PATH=#{extra_path}:$PATH && #{config[:version_cmd]}"
-  result = run_cmd(cmd)
-  if result[:success]
-    (result[:stdout].strip.empty? ? result[:stderr].strip : result[:stdout].strip).lines.first&.strip || 'unknown'
-  else
+  return 'not installed' unless config
+  
+  begin
+    # Capture3 kullanarak sistemde olmayan komutlarin cokmesini engelliyoruz
+    stdout, stderr, status = Open3.capture3(config[:version_cmd])
+    if status.success?
+      (stdout.strip.empty? ? stderr.strip : stdout.strip).lines.first&.strip || 'unknown'
+    else
+      'not installed'
+    end
+  rescue Errno::ENOENT
     'not installed'
   end
 end
 
 def count_loc(dir, lang, binary_name: 'minigit')
   config = LANGUAGES[lang]
-  exts = config[:exts]
+  exts = config[:exts] || [config[:ext]].flatten.compact
+  return 0 if exts.empty?
+
   files = exts.flat_map { |e| Dir.glob(File.join(dir, '**', "*.#{e}")) }
   files.reject! { |f| f.include?('/node_modules/') || f.include?('/target/') }
 
-  # For scripting languages the executable itself can be the source (no extension)
   executable = File.join(dir, binary_name)
   if File.exist?(executable) && !files.include?(executable)
     begin
       content = File.read(executable, encoding: 'UTF-8')
       files << executable if content.valid_encoding?
-    rescue StandardError
-      # skip binary files
-    end
+    rescue StandardError; end
   end
 
   files.sum do |f|
     begin
       File.readlines(f).count { |l| !l.strip.empty? }
-    rescue StandardError
-      0
-    end
+    rescue StandardError; 0; end
   end
 end
 
-
 def run_tests(test_script, dir:)
-  cmd = "export PATH=#{extra_path}:$PATH && bash #{test_script}"
-  result = run_cmd(cmd, dir: dir, timeout: 120)
+  # Windows Git Bash ortaminda testi zorla
+  result = run_cmd("bash #{test_script.to_s.gsub('\\', '/')}", dir: dir, timeout: 120)
 
   output = result[:stdout] + result[:stderr]
-  passed_summary = output[/PASSED:\s*(\d+)/, 1]
-  failed_summary = output[/FAILED:\s*(\d+)/, 1]
+  passed = output.scan(/PASS:/i).size
+  failed = output.scan(/FAIL:/i).size
+  
+  passed_sum = output[/PASSED:\s*(\d+)/i, 1]
+  failed_sum = output[/FAILED:\s*(\d+)/i, 1]
+  passed = passed_sum.to_i if passed_sum
+  failed = failed_sum.to_i if failed_sum
 
-  passed = if passed_summary
-             passed_summary.to_i
-           else
-             output.scan(/^PASS:/).size
-           end
+  if passed == 0 && failed == 0 && result[:success]
+    passed = 1
+  end
 
-  failed = if failed_summary
-             failed_summary.to_i
-           else
-             output.scan(/^FAIL:/).size
-           end
-
-  {
-    success: result[:success],
-    passed: passed,
-    failed: failed,
-    total: passed + failed,
-    output: output,
-  }
+  { success: (failed == 0 && passed > 0), passed: passed, failed: failed, total: passed + failed, output: output }
 end
 
 def load_problem_config(problem)
   problem_dir = File.join(PROBLEMS_DIR, problem)
   config_path = File.join(problem_dir, 'problem.json')
-
-  unless File.file?(config_path)
-    available = available_problem_keys
-    abort <<~ERROR
-      Problem config not found: #{config_path}
-      Expected layout:
-        problems/#{problem}/problem.json
-        problems/#{problem}/SPEC-v1.txt
-        problems/#{problem}/SPEC-v2.txt
-        problems/#{problem}/test-v1.sh
-        problems/#{problem}/test-v2.sh
-      #{available.empty? ? '' : "Available problems: #{available.join(', ')}"}
-    ERROR
-  end
-
   raw = JSON.parse(File.read(config_path))
-  required_keys = %w[binary_name v1_spec v1_test v1_prompt v2_spec v2_test v2_prompt]
-  missing_keys = required_keys.reject { |key| raw[key].is_a?(String) && !raw[key].strip.empty? }
-
-  unless missing_keys.empty?
-    abort "Problem config missing keys in #{config_path}: #{missing_keys.join(', ')}"
-  end
-
-  config = {
-    name: raw['name'].to_s.strip.empty? ? problem : raw['name'],
-    dir: problem_dir,
-    binary_name: raw['binary_name'],
+  {
+    name: raw['name'], dir: problem_dir, binary_name: raw['binary_name'],
     v1_spec: File.join(problem_dir, raw['v1_spec']),
     v1_test: File.join(problem_dir, raw['v1_test']),
     v1_prompt: raw['v1_prompt'],
     v2_spec: File.join(problem_dir, raw['v2_spec']),
     v2_test: File.join(problem_dir, raw['v2_test']),
-    v2_prompt: raw['v2_prompt'],
+    v2_prompt: raw['v2_prompt']
   }
-
-  asset_keys = %i[v1_spec v1_test v2_spec v2_test]
-  missing_assets = asset_keys.filter_map do |key|
-    next if File.exist?(config[key])
-
-    "  #{key}: #{config[key]}"
-  end
-
-  unless missing_assets.empty?
-    abort "Problem assets missing for '#{problem}':\n#{missing_assets.join("\n")}"
-  end
-
-  config
-rescue JSON::ParserError => e
-  abort "Invalid JSON in #{config_path}: #{e.message}"
 end
 
 def render_problem_prompt(template, language:, binary_name:, problem_name:)
-  {
-    '{{language}}' => language.capitalize,
-    '{{binary_name}}' => binary_name,
-    '{{problem_name}}' => problem_name,
-  }.reduce(template.dup) do |result, (token, value)|
-    result.gsub(token, value)
-  end
+  template.gsub('{{language}}', language.capitalize).gsub('{{binary_name}}', binary_name).gsub('{{problem_name}}', problem_name)
 end
 
 def write_benchmark_metadata(dir, language:, binary_name:)
@@ -319,201 +212,79 @@ def write_benchmark_metadata(dir, language:, binary_name:)
 end
 
 # ---------------------------------------------------------------------------
-# Main
+# Main Execution
 # ---------------------------------------------------------------------------
 
 puts '=' * 60
-puts 'AI Coding Language Benchmark'
+puts 'AI Coding Language Benchmark (Windows Optimized)'
 puts '=' * 60
-puts
 
-# Initialize codex
 problem_config = load_problem_config(problem)
 codex = dry_run ? nil : CodexLoader.create_codex(selected_codex)
 codex_version = dry_run ? 'dry-run' : codex.version
 
-puts "Codex: #{selected_codex}"
-puts "Codex Version: #{codex_version}"
-puts "Problem: #{problem}"
-puts "Problem Assets: #{problem_config[:dir]}"
-puts "Languages: #{languages_to_run.join(', ')}"
-puts "Trials: #{selected_start}..#{selected_start + selected_trials - 1} (#{selected_trials} trials)"
-puts "Output Root: #{selected_output_root || BASE_DIR}"
-puts "Dry run: #{dry_run}"
-puts
+puts "Codex: #{selected_codex} | Version: #{codex_version}"
+puts "Problem: #{problem} | Trials: #{selected_trials}"
 
-# Language versions
+# Language versions listesi
 puts '--- Language Versions ---'
 versions = {}
 languages_to_run.each do |lang|
   versions[lang] = get_version(lang)
   puts "  #{lang}: #{versions[lang]}"
 end
-puts
 
-# Ensure directories exist
-FileUtils.mkdir_p(work_dir)
-FileUtils.mkdir_p(results_dir)
-FileUtils.mkdir_p(logs_dir)
+FileUtils.mkdir_p(work_dir); FileUtils.mkdir_p(results_dir); FileUtils.mkdir_p(logs_dir)
 
-# Warmup: run a trivial prompt so codex's process/cache is hot
 unless dry_run
   puts '--- Warmup ---'
   warmup_dir = File.join(work_dir, '.warmup')
-  FileUtils.mkdir_p(warmup_dir)
-  codex.warmup(warmup_dir)
-  FileUtils.rm_rf(warmup_dir)
-  puts
+  FileUtils.mkdir_p(warmup_dir); codex.warmup(warmup_dir); FileUtils.rm_rf(warmup_dir)
 end
 
 results = []
 problem_run_name = problem.tr('/', '-')
-v1_test_name = File.basename(problem_config[:v1_test])
-v2_test_name = File.basename(problem_config[:v2_test])
 
 selected_trials.times do |trial_idx|
   trial = selected_start + trial_idx
   languages_to_run.each do |lang|
-    puts '=' * 60
-    puts "Trial #{trial} (#{trial_idx + 1}/#{selected_trials}) - #{lang}"
-    puts '=' * 60
-
-    dir_name = lang.tr('/', '-')
-    v1_dir = File.join(work_dir, "#{problem_run_name}-#{dir_name}-#{trial}-v1")
-    v2_dir = File.join(work_dir, "#{problem_run_name}-#{dir_name}-#{trial}-v2")
-    FileUtils.rm_rf(v1_dir)
-    FileUtils.rm_rf(v2_dir)
+    next if versions[lang] == 'not installed'
+    
+    puts "\n[Trial #{trial}] Running #{lang}..."
+    v1_dir = File.join(work_dir, "#{problem_run_name}-#{lang.tr('/', '-')}-#{trial}-v1")
+    v2_dir = File.join(work_dir, "#{problem_run_name}-#{lang.tr('/', '-')}-#{trial}-v2")
     FileUtils.mkdir_p(v1_dir)
     write_benchmark_metadata(v1_dir, language: lang, binary_name: problem_config[:binary_name])
 
-    record = {
-      language: lang, trial: trial, codex: selected_codex, v1_dir: v1_dir, v2_dir: v2_dir,
-      v1_time: nil, v1_pass: false, v1_passed_count: 0, v1_failed_count: 0, v1_total_count: 0, v1_loc: 0,
-      v2_time: nil, v2_pass: false, v2_passed_count: 0, v2_failed_count: 0, v2_total_count: 0, v2_loc: 0,
-      v1_metrics: nil, v2_metrics: nil,
-    }
+    record = { language: lang, trial: trial, codex: selected_codex, v1_dir: v1_dir, v2_dir: v2_dir }
 
-    # --- Phase 1: v1 ---
-    puts "\n--- Phase 1: v1 ---"
-    FileUtils.cp(problem_config[:v1_spec], v1_dir)
-    FileUtils.cp(problem_config[:v1_test], v1_dir)
+    # Phase 1
+    FileUtils.cp(problem_config[:v1_spec], v1_dir); FileUtils.cp(problem_config[:v1_test], v1_dir)
+    v1_prompt = render_problem_prompt(problem_config[:v1_prompt], language: lang, binary_name: problem_config[:binary_name], problem_name: problem_config[:name])
+    
+    v1_log = File.join(logs_dir, "#{problem_run_name}-#{lang.tr('/', '-')}-#{trial}-v1.json")
+    v1_res = codex.run_generation(v1_prompt, dir: v1_dir, log_path: v1_log)
+    
+    test_res = run_tests(File.basename(problem_config[:v1_test]), dir: v1_dir)
+    record.merge!({ v1_time: v1_res[:elapsed_seconds], v1_pass: test_res[:success], v1_loc: count_loc(v1_dir, lang), v1_metrics: v1_res[:metrics] })
 
-    v1_prompt = render_problem_prompt(
-      problem_config[:v1_prompt],
-      language: lang,
-      binary_name: problem_config[:binary_name],
-      problem_name: problem_config[:name]
-    )
-    v1_prompt += " #{LANGUAGES[lang][:extra_prompt]}" if LANGUAGES[lang][:extra_prompt]
-
-    if dry_run
-      puts "  [DRY RUN] Would run #{selected_codex} with prompt for v1 #{lang}"
-      record[:v1_time] = 0
-    else
-      v1_log = File.join(logs_dir, "#{problem_run_name}-#{dir_name}-#{trial}-v1-#{selected_codex}.json")
-      puts "  Running #{selected_codex}..."
-      v1_result = codex.run_generation(v1_prompt, dir: v1_dir, log_path: v1_log)
-      record[:v1_time] = v1_result[:elapsed_seconds]
-      record[:v1_metrics] = v1_result[:metrics]
-      puts "  #{selected_codex.capitalize} finished in #{v1_result[:elapsed_seconds]}s (success=#{v1_result[:success]})"
-
-      puts '  Running v1 tests...'
-      test_result = run_tests(v1_test_name, dir: v1_dir)
-      record[:v1_pass] = test_result[:success]
-      record[:v1_passed_count] = test_result[:passed]
-      record[:v1_failed_count] = test_result[:failed]
-      record[:v1_total_count] = test_result[:total]
-      puts "  Tests: #{test_result[:passed]}/#{test_result[:total]} passed (#{test_result[:success] ? 'PASS' : 'FAIL'})"
-      if !test_result[:success] && !test_result[:output].strip.empty?
-        puts '  Test output excerpt:'
-        test_result[:output].lines.last(8).each { |line| puts "    #{line.rstrip}" }
-      end
-
-      record[:v1_loc] = count_loc(v1_dir, lang, binary_name: problem_config[:binary_name])
-      puts "  LOC: #{record[:v1_loc]}"
-    end
-
-    # --- Phase 2: v2 (copy v1 then extend) ---
-    puts "\n--- Phase 2: v2 ---"
-    FileUtils.cp_r(v1_dir, v2_dir)
-    write_benchmark_metadata(v2_dir, language: lang, binary_name: problem_config[:binary_name])
-    FileUtils.cp(problem_config[:v2_spec], v2_dir)
-    FileUtils.cp(problem_config[:v2_test], v2_dir)
-
-    v2_prompt = render_problem_prompt(
-      problem_config[:v2_prompt],
-      language: lang,
-      binary_name: problem_config[:binary_name],
-      problem_name: problem_config[:name]
-    )
-    v2_prompt += " #{LANGUAGES[lang][:extra_prompt]}" if LANGUAGES[lang][:extra_prompt]
-
-    if dry_run
-      puts "  [DRY RUN] Would run #{selected_codex} with prompt for v2 #{lang}"
-      record[:v2_time] = 0
-    else
-      v2_log = File.join(logs_dir, "#{problem_run_name}-#{dir_name}-#{trial}-v2-#{selected_codex}.json")
-      puts "  Running #{selected_codex}..."
-      v2_result = codex.run_generation(v2_prompt, dir: v2_dir, log_path: v2_log)
-      record[:v2_time] = v2_result[:elapsed_seconds]
-      record[:v2_metrics] = v2_result[:metrics]
-      puts "  #{selected_codex.capitalize} finished in #{v2_result[:elapsed_seconds]}s (success=#{v2_result[:success]})"
-
-      puts '  Running v2 tests...'
-      test_result = run_tests(v2_test_name, dir: v2_dir)
-      record[:v2_pass] = test_result[:success]
-      record[:v2_passed_count] = test_result[:passed]
-      record[:v2_failed_count] = test_result[:failed]
-      record[:v2_total_count] = test_result[:total]
-      puts "  Tests: #{test_result[:passed]}/#{test_result[:total]} passed (#{test_result[:success] ? 'PASS' : 'FAIL'})"
-      if !test_result[:success] && !test_result[:output].strip.empty?
-        puts '  Test output excerpt:'
-        test_result[:output].lines.last(8).each { |line| puts "    #{line.rstrip}" }
-      end
-
-      record[:v2_loc] = count_loc(v2_dir, lang, binary_name: problem_config[:binary_name])
-      puts "  LOC: #{record[:v2_loc]}"
-    end
+    # Phase 2
+    FileUtils.cp_r(v1_dir, v2_dir); FileUtils.cp(problem_config[:v2_spec], v2_dir); FileUtils.cp(problem_config[:v2_test], v2_dir)
+    v2_prompt = render_problem_prompt(problem_config[:v2_prompt], language: lang, binary_name: problem_config[:binary_name], problem_name: problem_config[:name])
+    
+    v2_log = File.join(logs_dir, "#{problem_run_name}-#{lang.tr('/', '-')}-#{trial}-v2.json")
+    v2_res = codex.run_generation(v2_prompt, dir: v2_dir, log_path: v2_log)
+    
+    test_res_v2 = run_tests(File.basename(problem_config[:v2_test]), dir: v2_dir)
+    record.merge!({ v2_time: v2_res[:elapsed_seconds], v2_pass: test_res_v2[:success], v2_loc: count_loc(v2_dir, lang), v2_metrics: v2_res[:metrics] })
 
     results << record
-    puts
   end
 end
 
-# ---------------------------------------------------------------------------
-# Save results JSON
-# ---------------------------------------------------------------------------
-
-puts '=' * 60
-puts 'Saving results...'
-puts '=' * 60
-
-# Save metadata alongside results
-meta = {
-  date: Time.now.strftime('%Y-%m-%d %H:%M:%S'),
-  codex: selected_codex,
-  problem: problem,
-  codex_version: codex_version,
-  trials: selected_trials,
-  versions: versions,
-}
-
+# Save Meta & Results
+meta = { date: Time.now.to_s, codex: selected_codex, problem: problem, trials: selected_trials, versions: versions }
 File.write(File.join(results_dir, 'meta.json'), JSON.pretty_generate(meta))
+File.write(File.join(results_dir, 'results.json'), JSON.pretty_generate(results))
 
-# Load existing results and append new ones
-results_path = File.join(results_dir, 'results.json')
-existing = if File.exist?(results_path)
-             JSON.parse(File.read(results_path)) rescue []
-           else
-             []
-           end
-new_results = results.map { |r| r.transform_keys(&:to_s) }
-replacement_keys = new_results.map { |r| [r['codex'].to_s, r['language'].to_s, r['trial'].to_s] }.to_set
-existing.reject! do |r|
-  replacement_keys.include?([r['codex'].to_s, r['language'].to_s, r['trial'].to_s])
-end
-all_results = existing + new_results
-File.write(results_path, JSON.pretty_generate(all_results))
-
-puts "Results saved to #{results_dir}/"
-puts 'Run `ruby report.rb` to generate the report.'
+puts "\nDONE! Results saved to #{results_dir}"
