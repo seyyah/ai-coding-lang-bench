@@ -280,3 +280,18 @@ Treat that write-up as **historical benchmark context**, not as the entire ident
 ## Similar projects
 - https://autocodebench.github.io
 - https://livecodebench.github.io
+
+
+   ## Requirements
+### Functional Requirements
+FR1: Sistem kullanıcıdan bir programlama dili tercihi almalıdır.
+FR2: Sistem kullanıcıya uygun dil önerisi sunmalıdır.
+FR3: Hatalı girişlerde Türkçe hata mesajı verilmelidir.
+FR4: Kullanıcı girişleri kontrol edilmelidir.
+FR5: Sonuçlar düzenli gösterilmelidir.
+
+### Non-Functional Requirements
+NFR1: Sistem kullanıcı dostu olmalıdır.
+NFR2: Sistem hızlı çalışmalıdır.
+NFR3: Hata mesajları anlaşılır olmalıdır.
+NFR4: Kod okunabilir olmalıdır.
