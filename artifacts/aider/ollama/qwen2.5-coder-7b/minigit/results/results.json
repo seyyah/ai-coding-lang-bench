@@ -1,0 +1,41 @@
+[
+  {
+    "language": "python",
+    "trial": 1,
+    "codex": "aider",
+    "v1_dir": "/mnt/c/Users/Ceren/Desktop/which-l/which-language/artifacts/aider/ollama/qwen2.5-coder-7b/minigit/generated/minigit-python-1-v1",
+    "v2_dir": "/mnt/c/Users/Ceren/Desktop/which-l/which-language/artifacts/aider/ollama/qwen2.5-coder-7b/minigit/generated/minigit-python-1-v2",
+    "v1_time": 66.4,
+    "v1_pass": false,
+    "v1_passed_count": 0,
+    "v1_failed_count": 5,
+    "v1_total_count": 5,
+    "v1_loc": 2,
+    "v2_time": 67.2,
+    "v2_pass": false,
+    "v2_passed_count": 0,
+    "v2_failed_count": 5,
+    "v2_total_count": 5,
+    "v2_loc": 2,
+    "v1_metrics": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "cache_creation_tokens": 0,
+      "cache_read_tokens": 0,
+      "num_turns": 1,
+      "cost_usd": 0.0,
+      "model": "ollama/qwen2.5-coder:7b with whole edit format",
+      "duration_ms": 66413
+    },
+    "v2_metrics": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "cache_creation_tokens": 0,
+      "cache_read_tokens": 0,
+      "num_turns": 1,
+      "cost_usd": 0.0,
+      "model": "ollama/qwen2.5-coder:7b with whole edit format",
+      "duration_ms": 67203
+    }
+  }
+]

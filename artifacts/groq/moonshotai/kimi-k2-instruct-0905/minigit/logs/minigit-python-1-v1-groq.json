@@ -1,0 +1,9 @@
+{
+  "model": "moonshotai/kimi-k2-instruct-0905",
+  "prompt": "Implement minigit as described in SPEC-v1.txt using Python. The executable must be named 'minigit' and be runnable as ./minigit. For compiled languages, include a Makefile or build script. For interpreted languages, ensure the minigit file has a proper shebang line and is executable. Verify your implementation passes all tests by running: bash test-v1.sh",
+  "response": "```python\n#!/usr\n```",
+  "input_tokens": 140,
+  "output_tokens": 8,
+  "cost_usd": 0.00001312,
+  "elapsed_seconds": 0.7
+}

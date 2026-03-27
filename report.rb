@@ -27,6 +27,19 @@ OptionParser.new do |opts|
   opts.on('--output PATH', 'Where to write the markdown report') { |v| options[:output_path] = v }
 end.parse!(ARGV)
 
+# --- KRİTİK DÜZELTME: DOSYA YOLU BULMA ---
+# Eğer varsayılan results/results.json yoksa artifacts içini tara
+if !File.exist?(options[:results_path])
+  pattern = File.join(BASE_DIR, 'artifacts', '**', 'results', 'results.json')
+  all_files = Dir.glob(pattern)
+  # En güncel dosyayı seç (Hata payını sıfıra indirir)
+  latest = all_files.max_by { |f| File.mtime(f) }
+  options[:results_path] = latest if latest
+end
+
+abort 'Error: results.json not found. Please run a benchmark first.' unless options[:results_path] && File.exist?(options[:results_path])
+# -----------------------------------------
+
 results_dir = File.dirname(options[:results_path])
 options[:meta_path] ||= File.join(results_dir, 'meta.json')
 options[:output_path] ||= File.join(results_dir, 'report.md')
@@ -44,6 +57,8 @@ end
 
 def record_codex(record)
   return record['codex'] if record['codex']
+  # Groq/Qwen desteği için küçük bir ekleme (orijinal yapıyı bozmaz)
+  return record['model'] if record['model'] 
   return 'claude' if record.key?('v1_claude') || record.key?('v2_claude')
 
   'unknown'
@@ -78,7 +93,7 @@ meta = File.exist?(options[:meta_path]) ? JSON.parse(File.read(options[:meta_pat
 
 selected_codex = options[:codex] || meta['codex']
 if selected_codex && selected_codex != 'all'
-  results = results.select { |r| record_codex(r) == selected_codex }
+  results = results.select { |r| record_codex(r).to_s.include?(selected_codex) }
 end
 
 abort 'No matching results found.' if results.empty?
@@ -101,7 +116,7 @@ report << '## Environment'
 report << "- Date: #{meta['date']}" if meta['date']
 report << "- Codex filter: #{report_codex}"
 report << "- Problem: #{meta['problem']}" if meta['problem']
-report << "- Codex version: #{meta['codex_version']}" if meta['codex_version'] && meta['codex'] == selected_codex
+report << "- Codex version: #{meta['codex_version']}" if meta['codex_version']
 report << "- Trials per language: #{meta['trials']}" if meta['trials']
 report << "- Records in report: #{results.size}"
 report << ''
@@ -112,9 +127,7 @@ report << '|----------|---------|'
 languages.each { |l| report << "| #{l.capitalize} | #{versions[l] || 'unknown'} |" }
 report << ''
 
-# ---------------------------------------------------------------------------
-# Results Summary (per-language averages)
-# ---------------------------------------------------------------------------
+# --- RESULTS SUMMARY ---
 report << '## Results Summary'
 report << '| Language | v1 Time | v1 Turns | v1 LOC | v1 Tests | v2 Time | v2 Turns | v2 LOC | v2 Tests | Total Time | Avg Cost |'
 report << '|----------|---------|----------|--------|----------|---------|----------|--------|----------|------------|----------|'
@@ -139,17 +152,15 @@ languages.each do |lang|
   v1_turns = (lr.sum { |r| metric_field(r, 'v1', 'num_turns') } / n).round(1)
   v2_turns = (lr.sum { |r| metric_field(r, 'v2', 'num_turns') } / n).round(1)
 
-  v1_loc = (lr.sum { |r| r['v1_loc'] } / n).round(0)
-  v2_loc = (lr.sum { |r| r['v2_loc'] } / n).round(0)
+  v1_loc = (lr.sum { |r| r['v1_loc'] || 0 } / n).round(0)
+  v2_loc = (lr.sum { |r| r['v2_loc'] || 0 } / n).round(0)
 
   v1_pass = lr.count { |r| r['v1_pass'] }
   v2_pass = lr.count { |r| r['v2_pass'] }
   v1_tests = "#{v1_pass}/#{lr.size}"
   v2_tests = "#{v2_pass}/#{lr.size}"
 
-  total_cost = lr.sum do |r|
-    %w[v1 v2].sum { |ph| metric_field(r, ph, 'cost_usd') }
-  end
+  total_cost = lr.sum { |r| %w[v1 v2].sum { |ph| metric_field(r, ph, 'cost_usd') } }
   avg_cost = total_cost / n
 
   report << "| #{lang.capitalize} " \
@@ -166,9 +177,7 @@ languages.each do |lang|
 end
 report << ''
 
-# ---------------------------------------------------------------------------
-# Token Summary (per-language averages)
-# ---------------------------------------------------------------------------
+# --- TOKEN SUMMARY ---
 report << '## Token Summary'
 report << '| Language | Avg Input | Avg Output | Avg Cache Create | Avg Cache Read | Avg Total | Avg Cost |'
 report << '|----------|-----------|------------|------------------|----------------|-----------|----------|'
@@ -203,9 +212,7 @@ languages.each do |lang|
 end
 report << ''
 
-# ---------------------------------------------------------------------------
-# Full Results (all trials)
-# ---------------------------------------------------------------------------
+# --- FULL RESULTS ---
 report << '## Full Results'
 report << '| Codex | Language | Trial | v1 Time | v1 Turns | v1 LOC | v1 Tests | v2 Time | v2 Turns | v2 LOC | v2 Tests | Total Time | Cost |'
 report << '|-------|----------|-------|---------|----------|--------|----------|---------|----------|--------|----------|------------|------|'
@@ -229,9 +236,7 @@ results.each do |r|
 end
 report << ''
 
-# ---------------------------------------------------------------------------
-# Full Tokens (all trials)
-# ---------------------------------------------------------------------------
+# --- FULL TOKENS ---
 report << '## Full Tokens'
 report << '| Codex | Language | Trial | Phase | Input | Output | Cache Create | Cache Read | Total | Cost USD |'
 report << '|-------|----------|-------|-------|-------|--------|--------------|------------|-------|----------|'
@@ -252,13 +257,7 @@ results.each do |r|
 end
 report << ''
 
-# ---------------------------------------------------------------------------
-# Write
-# ---------------------------------------------------------------------------
-
 report_path = options[:output_path]
 FileUtils.mkdir_p(File.dirname(report_path))
 File.write(report_path, report.join("\n") + "\n")
 puts "Report written to: #{report_path}"
-puts
-puts report.join("\n")

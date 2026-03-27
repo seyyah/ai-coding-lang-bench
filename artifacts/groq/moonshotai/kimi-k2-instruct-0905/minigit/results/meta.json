@@ -1,0 +1,22 @@
+{
+  "date": "2026-03-24 20:05:53",
+  "codex": "groq",
+  "problem": "minigit",
+  "codex_version": "moonshotai/kimi-k2-instruct-0905",
+  "trials": 3,
+  "versions": {
+    "perl": "This is perl 5, version 42, subversion 1 (v5.42.1) built for x86_64-linux-thread-multi",
+    "ruby": "ruby 3.4.8 (2025-12-17 revision 995b59f666) +PRISM [x86_64-linux]",
+    "go": "go version go1.25.8 X:nodwarf5 linux/amd64",
+    "rust": "rustc 1.94.0 (4a4ef493e 2026-03-02)",
+    "javascript": "v22.22.0",
+    "typescript": "Version 6.0.2",
+    "java": "openjdk 25.0.2 2026-01-20",
+    "python": "Python 3.14.3",
+    "c": "gcc (GCC) 15.2.1 20260123 (Red Hat 15.2.1-7)",
+    "ocaml": "The OCaml toplevel, version 5.3.0",
+    "haskell": "The Glorious Glasgow Haskell Compilation System, version 9.8.4",
+    "scheme": "guile (GNU Guile) 3.0.9",
+    "lua": "Lua 5.4.8  Copyright (C) 1994-2025 Lua.org, PUC-Rio"
+  }
+}

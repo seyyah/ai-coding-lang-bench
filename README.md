@@ -140,7 +140,14 @@ Ensure you have [Homebrew](https://brew.sh/) installed before running the script
 
 ## What is already generalized
 
-### Multiple problems
+### Available Problems
+
+Currently, the repository supports the following problems:
+
+- **minigit**: A minimal version control system implementation.
+- **mini-playlist**: A command-line music playlist manager to add, show, remove, and search songs.
+
+*To add a new problem, simply create a new folder under `problems/` following the structure above.*
 
 Each problem lives in its own folder:
 

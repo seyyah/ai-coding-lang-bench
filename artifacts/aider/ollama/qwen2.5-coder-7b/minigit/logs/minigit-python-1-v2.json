@@ -1,0 +1,20 @@
+{
+  "model": "ollama/qwen2.5-coder:7b",
+  "lang": "python",
+  "source_file": "minigit",
+  "prompt": "Read SPEC-v2.txt and extend the existing minigit implementation with checkout and reset commands. Verify your implementation passes all tests by running: bash test-v2.sh",
+  "stdout": "────────────────────────────────────────────────────────────────────────────────\nOllamaError: Error getting model info for qwen2.5-coder:7b. Set Ollama API Base via `OLLAMA_API_BASE` environment variable. Error: [Errno 111] Connection refused\nWarning: ollama/qwen2.5-coder:7b expects these environment variables\n- OLLAMA_API_BASE: Not set\nWarning for ollama/qwen2.5-coder:7b: Unknown context window size and costs, \nusing sane defaults.\nDid you mean one of these?\n- llamagate/qwen2.5-coder-7b\nYou can skip this check with --no-show-model-warnings\n\nhttps://aider.chat/docs/llms/warnings.html\n\nAider v0.86.2\nModel: ollama/qwen2.5-coder:7b with whole edit format\nGit repo: none\nRepo-map: disabled\nAdded minigit to the chat.\nNote: in-chat filenames are always relative to the git working dir, not the \ncurrent working dir.\nCur working dir: \n/mnt/c/Users/Ceren/Desktop/which-l/which-language/artifacts/aider/minigit/genera\nted/minigit-python-1-v2\nGit working dir: /mnt/c/Users/Ceren/Desktop/which-l/which-language\n\nlitellm.APIConnectionError: OllamaException - [Errno 111] Connection refused\nRetrying in 0.2 seconds...\nlitellm.APIConnectionError: OllamaException - [Errno 111] Connection refused\nRetrying in 0.5 seconds...\nlitellm.APIConnectionError: OllamaException - [Errno 111] Connection refused\nRetrying in 1.0 seconds...\nlitellm.APIConnectionError: OllamaException - [Errno 111] Connection refused\nRetrying in 2.0 seconds...\nlitellm.APIConnectionError: OllamaException - [Errno 111] Connection refused\nRetrying in 4.0 seconds...\nlitellm.APIConnectionError: OllamaException - [Errno 111] Connection refused\nRetrying in 8.0 seconds...\nlitellm.APIConnectionError: OllamaException - [Errno 111] Connection refused\nRetrying in 16.0 seconds...\nlitellm.APIConnectionError: OllamaException - [Errno 111] Connection refused\nRetrying in 32.0 seconds...\nlitellm.APIConnectionError: OllamaException - [Errno 111] Connection refused\n\n",
+  "stderr": "Warning: Input is not a terminal (fd=0).\ngio: https://aider.chat/docs/llms/warnings.html: Operation not supported\n",
+  "exit_code": 0,
+  "elapsed_seconds": 67.2,
+  "metrics": {
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 0,
+    "num_turns": 1,
+    "cost_usd": 0.0,
+    "model": "ollama/qwen2.5-coder:7b with whole edit format",
+    "duration_ms": 67203
+  }
+}

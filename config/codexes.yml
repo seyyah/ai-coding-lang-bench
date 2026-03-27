@@ -5,52 +5,121 @@ codexes:
   claude:
     enabled: true
     class: ClaudeCodex
+    description: >
+      Claude Code CLI adapter. Orchestrates Anthropic's agentic 
+      command-line tool with advanced JSON output parsing and 
+      automatic environment path management.
     config:
-      # Path additions for Go, npm, etc.
-      # This will be expanded to actual home directory path
+      # Path additions for local toolchains (Go, npm, etc.)
       extra_path: "$HOME/.local/go/bin:$HOME/.local/npm/bin"
+      
+      # Execution constraints
+      timeout_seconds: 1200
+      cooldown_seconds: 1.0
 
   gemini:
-    enabled: false
-    class: GeminiCodex
-    config:
-      # Get your API key from https://ai.google.dev/
-      api_key: "${GOOGLE_API_KEY}"  # Or set directly: "your-api-key-here"
-      model: "gemini-3.1-flash-lite-preview"
-      cooldown_seconds: 1.2
-
-  aider:
     enabled: true
-    class: AiderCodex
+    class: GeminiCodex
+    description: >
+      Google's Gemini 3.1 Flash-Lite model optimized for extreme speed 
+      and efficient code generation at a low cost ($0.25/1M input).
     config:
-      # Get your API key from https://ai.google.dev/
-      gemini_api_key: "[Your API key here]"
-      model: gemini/gemini-2.5-pro
+      # API Credentials (Loaded from environment variables for security)
+      api_key: "${GOOGLE_API_KEY}"
+      api_endpoint: "https://generativelanguage.googleapis.com/v1beta/models"
+      
+      # Model Identifiers (Maintained as requested)
+      model: "gemini-3.1-flash-lite-preview"
+      model_name: "gemini-3.1-flash-lite-preview"
+      
+      # Runtime and Performance Settings
+      cooldown_seconds: 1.2
+      timeout_seconds: 600
+
+      # Explicit pricing for cost accounting (USD per 1M tokens)
+      # These values are picked up by the calculate_cost method in GeminiCodex
+      price_input_1m: 0.25
+      price_output_1m: 1.50
+
+ aider:
+    enabled: false
+    class: AiderCodex
+    description: >
+      CLI-based autonomous coding agent. Uses local 'aider' installation 
+      to perform multi-file edits via command-line orchestration.
+    config:
+      # API Credentials
+      gemini_api_key: "${GOOGLE_API_KEY}"
+      
+      # Model and Execution Metadata
+      model: "gemini/gemini-2.0-flash" # Updated to a stable version
+      python_bin: "py -3.12"           # Configurable python path
+      
+      # Runtime Behavior
+      edit_format: "whole"
+      cooldown_seconds: 2.0
+      timeout_seconds: 600
 
   openai:
-    enabled: false
+    enabled: true
     class: OpenAICodex
+    description: "OpenAI API adapter (OpenAI Compatible) - Multi-Language Production Grade"
     config:
-      # Get your API key from https://platform.openai.com/
+      # API Credentials (Loaded from environment variables for security)
       api_key: "${OPENAI_API_KEY}"
-      model: "gpt-4.1"
-      organization: "${OPENAI_ORG_ID}"  # Optional
-      project: "${OPENAI_PROJECT_ID}"  # Optional
+      api_endpoint: "https://api.openai.com/v1/chat/completions"
+      organization: "${OPENAI_ORG_ID}" 
+      project: "${OPENAI_PROJECT_ID}"
+      
+      # Model Identifiers
+      model: "gpt-4o-mini"
+      model_name: "gpt-4o-mini"
+      
+      # Runtime and Performance Settings
       cooldown_seconds: 0.5
       timeout_seconds: 1200
-      # Optional explicit pricing for cost accounting (USD / 1M tokens):
-      # price_input_1m: 0.0
-      # price_cached_input_1m: 0.0
-      # price_output_1m: 0.0
+      max_output_tokens: 4096
+
+      # Explicit pricing for cost accounting (USD per 1M tokens)
+      # Based on your provided rates for GPT-4o-mini:
+      price_input_1m: 0.15
+      price_cached_input_1m: 0.075
+      price_output_1m: 0.60
   
   groq:
     enabled: true
     class: GroqCodex
+    description: "Groq API adapter (OpenAI Compatible) - Multi-Language Production Grade"
     config:
-      # Get your API key from https://console.groq.com/
+      api_url: "https://api.groq.com/openai/v1/chat/completions"
       api_key: "${GROQ_API_KEY}"
-      model: "llama-3.3-70b-versatile"
+      model: "moonshotai/kimi-k2-instruct-0905"
       cooldown_seconds: 1.5
+      price_input_1m: 0.08
+      price_output_1m: 0.24
+      supported_extensions: ["rb", "py", "go", "rs", "c", "h", "ts", "js", "java", "pl", "lua", "scm", "ml", "hs", "pm", "sh", "php", "cs", "cpp", "hpp"]
+      language_mapping:
+        python: ["python", "py"]
+        ruby: ["ruby", "rb"]
+        go: ["go"]
+        rust: ["rust", "rs"]
+        c: ["c", "cpp"]
+        lua: ["lua"]
+        scheme: ["scheme", "scm", "lisp", "racket"]
+        ocaml: ["ocaml", "ml"]
+        haskell: ["haskell", "hs"]
+        perl: ["perl", "pl", "pm"]
+        java: ["java"]
+        javascript: ["javascript", "js"]
+        typescript: ["typescript", "ts"]
+        php: ["php"]
+        csharp: ["csharp", "cs"]
+      shebangs:
+        python: "#!/usr/bin/env python3"
+        ruby: "#!/usr/bin/env ruby"
+        perl: "#!/usr/bin/env perl"
+        lua: "#!/usr/bin/env lua"
+        javascript: "#!/usr/bin/env node"
 
   # =========================================================================
   # PLANNED CODEXES (Templates - uncomment and configure to enable)
