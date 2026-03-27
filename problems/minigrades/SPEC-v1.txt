@@ -1,0 +1,75 @@
+PROJECT: mini-grades
+AUTHOR: berkevnl
+VERSION: v1
+DATE: 2026-03-14
+
+========================================
+OVERVIEW
+========================================
+
+mini-grades is a command-line student management
+and performance tracking tool.
+It focuses on maintaining student grades and persists
+all data in a structured local environment.
+
+All data is persisted in a directory called .minigrades/
+in the current working directory.
+
+========================================
+FUNCTIONS
+========================================
+
+--- add_student ---
+Usage: User provides a Unique ID and a Name.
+Checks if the ID already exists in the system using the "ID |" pattern.
+Output: "Student added successfully." or "Error: Student with ID <id> already exists."
+
+--- add_grade ---
+Usage: User provides the Student ID and grade.
+Validates that the input is numeric and within 0-100.
+Output: "Grades added successfully for student <id>." or "Error: No student found with ID <id>."
+
+--- delete_student ---
+Usage: User provides the ID of the student to be removed.
+Finds the student by ID using the "ID |" pattern.
+Output: "Student and all grades deleted successfully." or "Error: No student found with ID <id>."
+
+--- calculate_average ---
+Usage: User provides the ID of the student.
+Output: Displays "Average calculation will be implemented in future weeks." or "Error: No student found with ID <id>."
+
+--- list_students ---
+Usage: Select "list" command.
+Displays all students currently in the system from data.txt.
+Output: A list showing "ID | Name" or "Error: No students found in the system. Operation aborted."
+
+--- generate_report ---
+Usage: Select "report" command.
+Saves all current records into .minigrades/report.txt with a header.
+Output: "Report saved to .minigrades/report.txt" or "Error: No data available to generate a report."
+
+========================================
+DATA FORMAT (v1)
+========================================
+
+File: .minigrades/report.txt
+Format: One student per line, fields separated by |
+(Note: Grades and Average columns are placeholders in this version)
+
+Example: 
+ID | NAME
+-----------
+101 | Berke
+102 | Efe
+
+========================================
+ERROR HANDLING
+========================================
+
+- Invalid command: "Unknown command: <command>. Please select from the menu."
+- Duplicate ID: "Error: Student with ID <id> already exists."
+- Non-numeric input: "Invalid input: Please enter a numeric value."
+- Student not found: "Error: No student found with ID <id>."
+- Empty database: "Error: No students found in the system. Operation aborted."
+- Grade range error: "Invalid grade: Grades must be between 0 and 100."
+- No path exists: "Not initialized. Run: python solution.py init"

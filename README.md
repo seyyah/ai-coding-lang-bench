@@ -2,8 +2,8 @@
 
 Benchmark platform for comparing **AI coding systems** across three axes:
 
-- **problem** — e.g. MiniGit today, more tomorrow
-- **codex** — Claude, Gemini, OpenAI, and future adapters
+- **problem** — e.g. MiniGit, MiniPlaylist, MiniGrades today, more tomorrow.
+- **codex** — Claude, Gemini, Aider, OpenAI, Groq and future adapters
 - **language** — Python, Ruby, Rust, Go, TypeScript, etc.
 
 The repository started as a Claude-focused MiniGit experiment and is now being generalized into a reusable **multi-problem, multi-codex, multi-language benchmark harness**.
@@ -117,6 +117,7 @@ ruby benchmark.rb --codex gemini --problem minigit --lang python --trials 1
 ### Installation
 
 ### Windows Environment Setup
+
 If you are running the benchmarks on Windows, you can automatically install the required languages and compilers using the provided PowerShell script.
 
 Open your terminal as Administrator and run:
@@ -136,12 +137,6 @@ Ensure you have [Homebrew](https://brew.sh/) installed before running the script
    ```bash
    chmod +x scripts/install_mac.sh
 
-
-
-## What is already generalized
-
-### Multiple problems
-
 Each problem lives in its own folder:
 
 ```text
@@ -160,6 +155,15 @@ problems/<problem>/
 - phase-specific specs
 - phase-specific tests
 - prompt templates
+
+#### Multiple problems
+Currently, the repository supports the following problems:
+
+- **mini-git**: A minimal version control system implementation.
+- **mini-playlist**: A command-line music playlist manager to add, show, remove, and search songs.
+- **mini-grades**: A command-line student manager to add/delete student and grades, calculate average for student, list students and generate report.
+
+*To add a new problem, simply create a new folder under `problems/` following the structure above.*
 
 #### Multiple codexes
 

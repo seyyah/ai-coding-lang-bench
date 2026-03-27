@@ -1,0 +1,88 @@
+{
+  "project_name": "mini-grades",
+  "author": "berkevnl (Efe Berke Ağlık)",
+  "version": "2.0",
+  "last_updated": "2026-03-27",
+  "language": "Python 3.13.2",
+  "description": "A robust CLI student management and performance tracking tool with persistent storage and defensive programming.",
+  "environment": {
+    "data_directory": ".minigrades/",
+    "main_data_file": ".minigrades/data.txt",
+    "report_file": ".minigrades/report.txt"
+  },
+  "commands": {
+    "init": {
+      "description": "Initializes the database environment.",
+      "usage": "python solution.py init",
+      "expected_output": "System initialized successfully."
+    },
+    "add": {
+      "args": ["id:int", "name:string"],
+      "description": "Adds a new student with a unique ID.",
+      "success_msg": "Student added successfully.",
+      "errors": {
+        "duplicate_id": "Error: Student with ID <id> already exists.",
+        "non_numeric": "Invalid input: Please enter a numeric value."
+      }
+    },
+    "add-grade": {
+      "args": ["id:int", "grade:int"],
+      "description": "Appends a grade to an existing student's record.",
+      "success_msg": "Grades added successfully for student <id>.",
+      "errors": {
+        "not_found": "Error: No student found with ID <id>.",
+        "out_of_range": "Invalid grade: Grades must be between 0 and 100.",
+        "non_numeric": "Invalid input: Please enter a numeric value."
+      }
+    },
+    "del-grade": {
+      "args": ["id:int", "grade:int"],
+      "description": "Removes a specific grade from a student's record.",
+      "success_msg": "Grade <grade> successfully removed!",
+      "errors": {
+        "not_found": "Error: No student found with ID <id>.",
+        "grade_not_found": "Error: Grade <target_grade> not found for this student.",
+        "non_numeric": "Invalid input: Please enter a numeric value."
+      }
+    },
+    "calc-avg": {
+      "args": ["id:int"],
+      "description": "Calculates and displays the average of a student's grades.",
+      "success_pattern": "Average for student <id> is <average>.",
+      "errors": {
+        "not_found": "Error: No student found with ID <id>.",
+        "calc_fail": "Error: Could not calculate average for student <id>."
+      }
+    },
+    "delete": {
+      "args": ["id:int"],
+      "description": "Deletes a student and all associated data.",
+      "success_msg": "Student and all grades deleted successfully.",
+      "errors": {
+        "not_found": "Error: No student found with ID <id>."
+      }
+    },
+    "list": {
+      "description": "Displays all students and their detailed data.",
+      "errors": {
+        "empty": "Error: No students found in the system. Operation aborted."
+      }
+    },
+    "report": {
+      "description": "Generates a structured report.txt file.",
+      "success_msg": "Report saved to .minigrades/report.txt",
+      "errors": {
+        "empty": "Error: No data available to generate a report."
+      }
+    }
+  },
+  "global_errors": {
+    "unknown_command": "Unknown command: <command>. Please select from the menu.",
+    "not_initialized": "Not initialized. Run: python solution.py init"
+  },
+  "benchmarking_notes": {
+    "id_pattern": "ID | Name separator is mandatory.",
+    "float_precision": "Average should be displayed with 2 decimal places.",
+    "test_coverage_required": "100% functional coverage based on test.sh"
+  }
+}
