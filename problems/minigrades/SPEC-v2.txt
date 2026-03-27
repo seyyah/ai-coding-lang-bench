@@ -52,24 +52,19 @@ Output: "Report saved to .minigrades/report.txt" or "Error: No data available to
 Usage: User provides the ID of the student and the grade to be deleted.
 Output: "Grade <grade> successfully removed!" or "Error: No student found with ID <id>."
 
---- change_grades ---
-Usage: User provides the ID of the student, old grade and new grade.
-Output: "Grade <old_grade> changed to <new_grade> for student <id>."
-This function will be implemented in future weeks.
-
 ========================================
 DATA FORMAT (v2)
 ========================================
 
 File: .minigrades/report.txt
 Format: One student per line, fields separated by |
-(Note: Grades and Average columns are placeholders in this version)
+Columns: ID | NAME | GRADES | AVERAGE
 
 Example: 
-ID  | NAME  | GRADES
--------------------
-101 | Berke | 85
-102 | Efe   | 90
+ID  | NAME  | GRADES | AVERAGE
+------------------------------
+101 | Berke | 70,30  | 50.0
+102 | Efe   | 90     | 90.0
 
 ========================================
 ERROR HANDLING
@@ -84,3 +79,6 @@ ERROR HANDLING
 - No path exists: "Not initialized. Run: python solution.py init"
 - Grade not found: "Error: Grade <target_grade> not found for this student."
 - Average could not calculate: "Error: Could not calculate average for student <id>."
+========================================
+
+END
