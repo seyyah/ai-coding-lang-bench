@@ -1,0 +1,48 @@
+PROJECT: mini-converter
+AUTHOR: HASAN YILMAZ (250708022)
+VERSION: v0
+DATE: 2026-03-15
+
+========================================
+OVERVIEW
+========================================
+mini-converter is a CLI tool for length unit conversions.
+Supported units: meters (m), kilometers (km), centimeters (cm), millimeters (mm).
+All data is stored in a directory called .miniconv/ in the current directory.
+
+========================================
+COMMANDS
+========================================
+
+--- init ---
+Usage: python miniconverter.py init
+Behavior: Creates .miniconv/ directory and history.dat file.
+Output: "Conversion storage initialized." or "Already initialized."
+
+--- convert ---
+Usage: python miniconverter.py convert <value> <from_unit> <to_unit>
+Behavior: Converts the value and logs it to .miniconv/history.dat.
+Output: "<value> <from_unit> is <result> <to_unit>"
+
+--- history ---
+Usage: python miniconverter.py history
+Output: "Command 'history' will be implemented in future weeks."
+
+--- stats ---
+Usage: python miniconverter.py stats
+Output: "Command 'stats' will be implemented in future weeks."
+
+========================================
+DATA FORMAT
+========================================
+File: .miniconv/history.dat
+Format: value|from_unit|to_unit|result|date
+Example: 10.0|m|cm|1000.0|2026-03-13
+
+========================================
+ERROR HANDLING
+========================================
+- Run before init: "Error: Not initialized. Run: python miniconverter.py init"
+- Unsupported unit: "Error: Unsupported unit <unit>. Use m, km, cm, or mm."
+- Missing arguments: "Usage: python miniconverter.py <command> [args]"
+- Unknown command: "Unknown command: <command>"
