@@ -1,0 +1,44 @@
+{
+    "id": "mini-playlist",
+    "title": "Mini Playlist Manager",
+    "author": "Ahmet TANGAZ",
+    "version": "v1",
+    "description": "A command-line music playlist manager. It keeps songs listed and allows the user to add, show, remove, and search.",
+    "data_format": {
+        "file_path": ".miniplaylist/playlists.dat",
+        "separator": "|",
+        "format": "ID|Name|Author|Album"
+    },
+    "commands": [
+        {
+            "name": "init",
+            "usage": "python minipl.py init",
+            "description": "Creates a .miniplaylist/ directory and an empty playlists.dat file."
+        },
+        {
+            "name": "add",
+            "usage": "python minipl.py add \"Dark Red\" \"Steve Lacy\" \"Dark Red\"",
+            "description": "Appends a new song to playlists.dat with an auto-incremented ID."
+        },
+        {
+            "name": "remove",
+            "usage": "python minipl.py remove 1",
+            "description": "Removes a song from the playlist by its ID."
+        },
+        {
+            "name": "show",
+            "usage": "python minipl.py show",
+            "description": "Shows all songs in the playlist, one per line."
+        },
+        {
+            "name": "search",
+            "usage": "python minipl.py search \"Keyword\"",
+            "description": "Searches for a keyword in song names, artists, and albums (case-insensitive)."
+        }
+    ],
+    "expected_files": [
+        "SPEC.txt",
+        "test_spec.py",
+        "solution_v1.py"
+    ]
+}
