@@ -1,0 +1,132 @@
+"""
+mini-library v1
+Author: [Nazlı Karagöz] ([251478051]) [cite: 1, 10]
+
+V1 TASKS:
+1. Implemented list, borrow, and return commands. [cite: 16, 17, 18]
+2. Added 'suggest' command for language recommendations (FR1, FR2). [cite: 19, 20]
+3. Refined error handling with clear messages (FR3, NFR3). [cite: 21, 24]
+"""
+
+import sys
+import os
+
+#  HELPER FUNCTIONS 
+
+def read_data():
+    """Reads the database file and returns lines as a list."""
+    if not os.path.exists(".minilib/books.dat"): [cite: 3, 12]
+        return []
+    with open(".minilib/books.dat", "r", encoding="utf-8") as f:
+        return f.readlines()
+
+def write_data(lines):
+    """Writes the given lines to the database file."""
+    with open(".minilib/books.dat", "w", encoding="utf-8") as f:
+        f.writelines(lines)
+
+#  CORE FUNCTIONS 
+
+def initialize():
+    """Creates the library directory and database file."""
+    if os.path.exists(".minilib"): [cite: 5, 14]
+        return "Already initialized" [cite: 5, 14]
+    
+    os.mkdir(".minilib") [cite: 4, 13]
+    open(".minilib/books.dat", "w", encoding="utf-8").close() [cite: 4, 13]
+    return "Library initialized successfully."
+
+def add_book(book_name):
+    """Adds a new book with AVAILABLE status."""
+    if not os.path.exists(".minilib"):
+        return "Not initialized. Run: python minilib.py init"
+    
+    lines = read_data()
+    new_id = len(lines) + 1 [cite: 6, 15]
+    
+    with open(".minilib/books.dat", "a", encoding="utf-8") as f:
+        f.write(f"{new_id}|{book_name}|AVAILABLE\n") [cite: 6, 15]
+    return f"Added book #{new_id}: {book_name}" [cite: 6, 15]
+
+def list_books():
+    """Prints all books from the database."""
+    lines = read_data()
+    if not lines:
+        return "The library is empty or not initialized."
+    
+    output = "ID | Title | Status\n" + "-"*30 + "\n"
+    for line in lines:
+        # Formats the raw id|title|status data for display [cite: 16]
+        output += line.replace("|", " | ")
+    return output
+
+def update_status(book_id, new_status):
+    """Updates book status to BORROWED or AVAILABLE."""
+    lines = read_data()
+    found = False
+    new_lines = []
+    
+    for line in lines:
+        parts = line.strip().split("|")
+        if parts[0] == str(book_id):
+            parts[2] = new_status [cite: 8, 17]
+            new_lines.append("|".join(parts) + "\n")
+            found = True
+        else:
+            new_lines.append(line)
+            
+    if found:
+        write_data(new_lines)
+        status_text = "borrowed" if new_status == "BORROWED" else "returned"
+        return f"Book #{book_id} is now {status_text}." [cite: 8, 9, 17, 18]
+    else:
+        return f"Error: Book ID #{book_id} not found!"
+
+def suggest_language():
+    """Suggests a programming language based on user interest (FR1, FR2)."""
+    print("\n--- Programming Language Suggester ---")
+    print("1. Web Development") [cite: 19]
+    print("2. Data Science & AI")
+    print("3. Game Development")
+    
+    choice = input("Select your field of interest (1-3): ") [cite: 19]
+    
+    if choice == "1":
+        return "Recommendation: JavaScript or TypeScript." [cite: 20]
+    elif choice == "2":
+        return "Recommendation: Python or R." [cite: 20]
+    elif choice == "3":
+        return "Recommendation: C++ or C#." [cite: 20]
+    else:
+        return "Error: Invalid selection!" [cite: 21, 24]
+
+#  MAIN PROGRAM 
+
+if len(sys.argv) < 2:
+    print("Usage: python minilib.py <command> [args]")
+else:
+    command = sys.argv[1]
+
+    if command == "init":
+        print(initialize())
+    elif command == "add":
+        if len(sys.argv) < 3:
+            print("Usage: python minilib.py add \"Title\"")
+        else:
+            print(add_book(sys.argv[2]))
+    elif command == "list":
+        print(list_books())
+    elif command == "borrow":
+        if len(sys.argv) < 3:
+            print("Usage: python minilib.py borrow <id>")
+        else:
+            print(update_status(sys.argv[2], "BORROWED"))
+    elif command == "return":
+        if len(sys.argv) < 3:
+            print("Usage: python minilib.py return <id>")
+        else:
+            print(update_status(sys.argv[2], "AVAILABLE"))
+    elif command == "suggest":
+        print(suggest_language())
+    else:
+        print(f"Unknown command: {command}")

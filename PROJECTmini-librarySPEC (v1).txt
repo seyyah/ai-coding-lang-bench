@@ -1,0 +1,30 @@
+PROJECT: mini-library (Version 1.0) 
+AUTHOR: [Nazlı Karagöz] ([251478051]) 
+OVERVIEW 
+mini-library is a command-line tool designed to manage book lending and provide programming language recommendations. 
+It tracks book availability (AVAILABLE/BORROWED).
+All data is stored in the .minilib/ directory within the current working folder.It includes a built-in "Language Suggester" to help users choose a programming path.
+COMMANDS 
+initUsage: python minilib.py 
+init Action: Creates the .minilib/ directory and an empty books.dat file.
+Edge Case: If already initialized, prints "Already initialized".
+addUsage: python minilib.py add "Book Title" 
+Action: Appends a book with an auto-increment ID and AVAILABLE status.
+Output: "Added book #<id>: <title>".listUsage: python minilib.py list 
+Action: Displays all books in a formatted table showing ID, Title, and Status.
+borrowUsage: python minilib.py borrow <id> 
+Action: Updates the status of the specified book to BORROWED.
+returnUsage: python minilib.py return <id> 
+Action: Updates the status of the specified book to AVAILABLE. suggest (New V1 Feature)
+Usage: python minilib.py suggest 
+Action: Asks the user for an interest area and recommends a programming language.
+REQUIREMENTS CHECKLIST Functional (FR):FR1 & FR2: System takes user input and provides a language recommendation.
+FR3 & FR4: Validates input and provides clear error messages for invalid IDs or commands.
+FR5: Results are presented in a clean, readable table format.
+Non-Functional (NFR):NFR1 & NFR2: Fast execution with a user-friendly CLI.N
+FR3: Error messages are clear and helpful.
+DATA FORMAT File: .minilib/books.datStructure: id|title|statusExample:
+ 1|The Great Gatsby|AVAILABLEERROR HANDLING Missing Init: "Not initialized. 
+Run: python minilib.py 
+init"Invalid Command: "Unknown command: <command>"
+Invalid ID: "Error: Book ID not found." 
