@@ -1,0 +1,14 @@
+{
+  "display_name": "Mini Playlist",
+  "binary_name": "miniplaylist",
+  "phases": {
+    "v1": {
+      "spec": "SPEC-v1.txt",
+      "test": "test-v1.sh"
+    },
+    "v2": {
+      "spec": "SPEC-v2.txt",
+      "test": "test-v2.sh"
+    }
+  }
+}

@@ -1,0 +1,67 @@
+PROJECT: mini-playlist
+AUTHOR: Kamil Efe Aygör (251478093)
+VERSION: v1
+DATE: 2026-03-26
+
+========================================
+OVERVIEW
+========================================
+
+mini-playlist is a command-line music playlist manager.
+Users can create custom named playlists, add songs to specific 
+playlists, view the songs, and delete them.
+
+All data is persisted in a directory called .miniplaylist/
+Each playlist is stored as a separate text file.
+
+========================================
+COMMANDS
+========================================
+
+--- init ---
+Usage: python miniplaylist.py init
+Creates a .miniplaylist/ directory.
+If .miniplaylist/ already exists, print "Already initialized" and exit.
+
+--- create ---
+Usage: python miniplaylist.py create "98 Model Polo Yol Sarkilari"
+Creates a new file named "98 Model Polo Yol Sarkilari.dat" inside .miniplaylist/
+Prints "Playlist '98 Model Polo Yol Sarkilari' created."
+If it already exists, prints "Playlist already exists."
+
+--- add ---
+Usage: python miniplaylist.py add "98 Model Polo Yol Sarkilari" "Gurbette Sevgilim"
+Appends a new song to the specific playlist file.
+Each song has: id (auto-increment), title, added_date.
+Prints "Added 'Gurbette Sevgilim' to '98 Polo Yol Sarkilari'."
+If playlist does not exist, prints "Playlist not found."
+
+--- show ---
+Usage: python miniplaylist.py show "98 Model Polo Yol Sarkilari"
+Prints all songs in the playlist, one per line:
+  [1] Gurbette Sevgilim (2026-03-26)
+If playlist has no songs, prints "Playlist is empty."
+
+--- delete ---
+Usage: python miniplaylist.py delete "98 Model Polo Yol Sarkilari" 1
+Removes song #1 from the specified playlist.
+Prints "Deleted song #1 from '98 Model Polo Yol Sarkilari'."
+If song or playlist does not exist, prints "Not found."
+
+========================================
+DATA FORMAT
+========================================
+
+File: .miniplaylist/<playlist_name>.dat
+Format: One song per line, fields separated by |
+Example (98 Model Polo Yol Sarkilari.dat):
+1|Gurbette Sevgilim|2026-03-26
+2|Seviyorum Delicesine|2026-03-25
+
+========================================
+ERROR HANDLING
+========================================
+
+- Running any command before "init": print "Not initialized."
+- Invalid command: print "Unknown command: <command>"
+- Missing arguments: print "Usage: python miniplaylist.py <command> [args]"
