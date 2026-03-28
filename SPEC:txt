@@ -1,0 +1,85 @@
+PROJECT: mini-timer
+AUTHOR: Ömer Faruk Aksoy (251478060)
+VERSION: v1
+DATE: 2026-03-28
+
+========================================
+OVERVIEW
+========================================
+
+mini-timer is a command-line Pomodoro and time-tracking application.
+It forces users to focus by limiting the number of pauses allowed during a session.
+All data is persisted in a directory called .minitimer/
+in the current working directory.
+
+========================================
+COMMANDS
+========================================
+
+--- init ---
+Usage: python minitimer.py init
+Creates a .minitimer/ directory and an empty timer.dat file.
+If .minitimer/ already exists, print "Already initialized" and exit.
+
+--- start ---
+Usage: python minitimer.py start "Math Study"
+Starts a new task. Checks if the last completed task was finished less than 5 minutes ago. 
+If so, rejects starting.
+Appends a new task to timer.dat with status RUNNING.
+Prints "Started task: <description>. Focus!"
+
+--- pause ---
+Usage: python minitimer.py pause
+Pauses the currently RUNNING task. 
+A user can only pause a task a maximum of 3 times.
+If pause count is 3, prints "Error: Pause limit reached! Keep focusing."
+Otherwise, updates status to PAUSED, increments pause count, and prints "Task paused. <X> pauses remaining."
+
+--- resume ---
+Usage: python minitimer.py resume
+Changes the currently PAUSED task status back to RUNNING.
+Prints "Task resumed. Get back to work!"
+
+--- stop ---
+Usage: python minitimer.py stop
+Stops the active task and calculates total elapsed time.
+If elapsed time is less than 25 minutes, prints "Warning: Stopped before 25 minutes."
+Marks task as DONE.
+Prints "Task stopped. Total time: <minutes> mins."
+
+--- log ---
+Usage: python minitimer.py log
+Prints all tasks, one per line:
+  [1] [DONE] Math Study (25 mins) - 2 pauses
+  [2] [RUNNING] Read Book (12 mins) - 0 pauses
+If no tasks exist, prints "No timer logs found."
+
+========================================
+DATA FORMAT
+========================================
+
+File: .minitimer/timer.dat
+Format: One task per line, fields separated by |
+Structure: id | description | status | elapsed_minutes | pause_count | last_update_timestamp
+Example:
+1|Math Study|DONE|25|2|1710345600
+2|Read Book|RUNNING|12|0|1710347800
+
+========================================
+DISPLAY REQUIREMENTS
+========================================
+
+--- Time Formatting ---
+All durations displayed to the user must follow the MM:SS (Minutes:Seconds) format. 
+If the total duration exceeds 60 minutes, the format must automatically switch to HH:MM:SS (Hours:Minutes:Seconds). 
+Internal integer values (seconds) must be converted to this human-readable format before being printed to the console.
+
+========================================
+ERROR HANDLING
+========================================
+
+- Running any command before "init": print "Not initialized. Run: python minitimer.py init"
+- Starting a task while one is RUNNING: print "Error: A task is already running. Stop or pause it first."
+- Pausing a task that is not RUNNING: print "Error: No active task to pause."
+- Starting a task before 5-minute break: print "Error: You must rest for 5 minutes between tasks."
+- Invalid command: print "Unknown command: <command>"
