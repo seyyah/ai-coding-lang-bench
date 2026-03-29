@@ -1,0 +1,112 @@
+PROJECT: mini-grades
+AUTHOR: Davud Kılıç - 251478023
+VERSION: v1
+DATE: 2026-03-28
+
+========================================
+OVERVIEW
+========================================
+
+mini-grades is a command-line student grade manager.
+It stores student records and their grades in a plain text file
+and supports adding students, entering grades, calculating
+averages, generating reports, and deleting students.
+
+All data is persisted in a file called grades.txt
+in the current working directory.
+
+========================================
+COMMANDS
+========================================
+
+--- init ---
+Usage: python grades.py init
+Creates an empty grades.txt file.
+If grades.txt already exists, print "Already initialized" and exit.
+
+--- ogrenci-ekle ---
+Usage: python grades.py ogrenci-ekle "Ali Veli"
+Adds a new student with no grades yet.
+Each student has: id , name.
+Prints "Added student #<id>: <name>"
+
+--- not-gir ---
+Usage: python grades.py not-gir 1 85
+Appends a grade for student #1.
+Valid grades are integers between 0 and 100.
+Prints "Grade 85 added for student #1."
+If student does not exist, prints "Student #1 not found."
+If grade is not between 0 and 100, prints "Invalid grade: <grade>. Must be between 0 and 100."
+
+--- listele ---
+Usage: python grades.py listele
+Lists all students in the file, one per line.
+Format: #<id> - <name>
+Example output:
+  #1 - Ali Veli
+  #2 - Ayse Kaya
+If no students exist, prints "No students found."
+NOTE: This is a v1 intermediate command. "rapor" will replace/extend it in a future version.
+
+--- ortalama ---
+Usage: python grades.py ortalama 1
+Calculates and prints the average of all grades for student #1.
+Prints "Student #1 (<name>) average: <avg>"
+Average is rounded to 2 decimal places.
+If student has no grades, prints "Student #1 has no grades yet."
+If student does not exist, prints "Student #1 not found."
+STATUS: Not yet implemented.
+
+--- rapor ---
+Usage: python grades.py rapor
+Prints all students and their averages, one per line:
+  [1] Ali Veli - Average: 87.50 (3 grades)
+  [2] Ayse Kaya - No grades yet.
+If no students exist, prints "No students found."
+STATUS: Not yet implemented.
+
+--- ogrenci-sil ---
+Usage: python grades.py ogrenci-sil 1
+Removes student #1 and all their grades from grades.txt.
+Prints "Deleted student #1: <name>"
+If student does not exist, prints "Student #1 not found."
+STATUS: Not yet implemented.
+
+========================================
+DATA FORMAT
+========================================
+
+File: grades.txt
+Format: One record per line, fields separated by |
+Student record: STUDENT|<id>|<name>
+Grade record:   GRADE|<student_id>|<grade>
+
+Example:
+STUDENT|1|Ali Veli
+GRADE|1|85
+GRADE|1|90
+STUDENT|2|Ayse Kaya
+GRADE|2|70
+
+========================================
+ERROR HANDLING
+========================================
+
+- Running any command before "init": print "Not initialized. Run: python grades.py init"
+- Invalid command: print "Unknown command: <command>"
+- Missing arguments: print "Usage: python grades.py <command> [args]"
+- Non-integer grade input: print "Invalid grade: <input>. Must be an integer."
+- Non-integer student ID input: print "Invalid ID: <input>. Must be an integer."
+
+========================================
+CHANGELOG
+========================================
+
+v0 (2026-03-13)
+  - init, ogrenci-ekle, not-gir komutlari eklendi.
+  - Temel dosya I/O ve ID yonetimi implemente edildi.
+
+v1 (2026-03-28)
+  - listele komutu eklendi.
+  - while dongusu ile dosyadan satir satir okuma implemente edildi.
+  - Unknown command hatasi eklendi.
