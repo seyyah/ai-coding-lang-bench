@@ -1,0 +1,48 @@
+PROJECT: mini-bookmark
+AUTHOR: Sevim Sıla Tekinay (251478029)
+VERSION: v1
+DATE: 2026-03-29
+
+========================================
+OVERVIEW (V1 UPDATES)
+========================================
+The v1 release focuses on robust input validation, official implementation 
+of the listing feature, and improved file management for better stability.
+
+========================================
+COMPLETED IMPROVEMENTS
+========================================
+
+--- 1. Input Validation (Add Command) ---
+The 'add' command now checks if the page number provided is a valid digit.
+- If a non-numeric value is entered: 
+  Print "ERROR: '<page>' is not a valid page number! Please enter digits."
+- If successful:
+  Print "SUCCESSFULLY SAVED: <Book Name> (Page: <page>)"
+
+--- 2. List Command Implementation ---
+The 'list' command is now fully functional. It reads the '.bookmarks/marks.dat' 
+file and displays all saved entries.
+- If the file is empty:
+  Print "Your list is currently empty. Add a book first."
+- If bookmarks exist:
+  Print "--- YOUR CURRENT BOOK LIST ---" followed by the file content.
+
+--- 3. Secure File Handling ---
+All file operations (init, add, list) have been migrated to the 'with open' 
+context manager. This ensures files are properly closed even if an error occurs.
+
+========================================
+COMMANDS (Current Status)
+========================================
+
+- init: Fully functional. Creates directory and data file.
+- add: Fully functional with digit validation.
+- list: Fully functional. Displays all saved data.
+- last: Planned for V2 (Coming soon).
+
+========================================
+ERROR HANDLING (Added in V1)
+========================================
+- Non-numeric page input: Prevents system crashes by validating strings.
+- Missing data file: Prints "ERROR: List file not found. Please run 'init' first."

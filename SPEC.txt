@@ -1,0 +1,57 @@
+PROJECT: mini-bookmark
+AUTHOR:Sevim Sıla Tekinay 251478029
+VERSION: v1
+DATE: 16/03/2026
+
+
+----------OVERVIEW-----------
+
+
+mini-bookmark is a command-line tool to track reading progress.
+It allows users to save the book name and the last page they read.
+
+All data is stored in a directory called .bookmarks/
+in the current working directory.
+
+
+----------COMMANDS-----------
+
+
+--- init ---
+Usage: python bookmark.py init
+Creates a .bookmarks/ directory and an empty marks.dat file.
+If .bookmarks/ already exists, print "Already initialized" and exit.
+
+--- add ---
+Usage: python bookmark.py add "Book Name" 150
+Saves a new bookmark with the book title, page number, and current date.
+Status is set to READING by default.
+Prints "Bookmark saved for <Book Name> at page <page>."
+
+--- list ---
+Usage: python bookmark.py list
+(To be fully implemented) 
+Prints "Feature coming soon: Listing all your bookmarks."
+
+--- last ---
+Usage: python bookmark.py last
+(To be fully implemented)
+Prints "Feature coming soon: Showing the last book you read."
+
+
+----------DATA FORMAT-----------
+
+
+File: .bookmarks/marks.dat
+Format: Book Name|Page|Status|Date
+Example:
+The little prince |82|READING|2026-03-16
+Crime and Punishment|210|READING|2026-03-15
+
+
+---------ERROR HANDLING----------
+
+
+- Running any command before "init": print "Not initialized. Run: python bookmark.py init"
+- Invalid command: print "Unknown command: <command>"
+- Missing page number in add: print "Error: Please provide a page number."
