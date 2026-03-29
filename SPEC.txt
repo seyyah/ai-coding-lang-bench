@@ -88,6 +88,14 @@ If such products exist print a warning.
 
 Example:
 WARNING: Low stock for Apple
+----------------------------------------
+--- update ---
+Usage: python stocktracker.py update "ProductName" quantity price
+Updates the quantity and price of an existing product.
+If the product does not exist print:
+"Product not found"
+Output example:
+Updated product: Apple | Quantity: 100 | Price: 15
 
 ========================================
 DATA FORMAT
