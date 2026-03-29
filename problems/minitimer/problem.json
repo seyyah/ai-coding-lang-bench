@@ -1,7 +1,0 @@
-{
-  "name": "mini-timer",
-  "author": "Ali Efe AKIN",
-  "version": "2.0",
-  "description": "A command-line time tracking tool to initialize, start, stop, and get statistics of daily tasks.",
-  "language": "python"
-}
