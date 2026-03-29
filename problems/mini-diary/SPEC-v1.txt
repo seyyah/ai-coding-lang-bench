@@ -1,9 +1,1 @@
-cat <<EOF > problems/mini-diary/SPEC-v1.txt
-PROJECT: Mini-Diary
-PHASE: Version 1.0 (Constraint-Driven)
-REQUIREMENTS:
-1. Initialize a hidden directory '.minidiary' with an empty 'diary.dat'.
-2. Append new entries to 'diary.dat' using 'write' command.
-3. Automatically generate unique IDs by counting existing lines.
-CONSTRAINTS: No loops, no collections.
-EOF
+
