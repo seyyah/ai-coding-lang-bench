@@ -1,0 +1,31 @@
+SPEC.txt
+
+PROJECT: mini-pool
+AUTHOR: [Yusuf Şahin] ([251478062])
+VERSION: v0
+DATE: 2026-03-29
+
+========================================
+OVERVIEW
+========================================
+
+mini-pool is a command-line physics simulator for a single billiard ball.
+Data is stored in a directory called .minipool/ in the current directory.
+
+========================================
+COMMANDS
+========================================
+--- init ---
+Usage: python minipool.py init
+Creates a .minipool/ directory and a state.dat file.
+Initial values: 100.0|100.0|10.0|10.0 (x|y|vx|vy)
+If already exists, prints "Already initialized".
+
+--- move ---
+Usage: python minipool.py move
+Updates coordinates: new_x = x + vx, new_y = y + vy.
+Saves to state.dat and prints "Ball moved to (x, y)".
+
+--- status ---
+Usage: python minipool.py status
+Prints the current state of the ball.
