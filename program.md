@@ -6,6 +6,28 @@
 
 This repo measures **AI coding systems** (codexes) across multiple dimensions: generation time, cost, lines of code, and test pass rate — across multiple programming languages and coding problems.
 
+## Benchmark requirement additions
+
+The following functional requirements are mandatory additions for benchmark quality and safety.
+
+### FR-BENCH-011
+
+**Description**: The benchmark system shall measure and record peak RAM usage (in MB) for each generated solution during both v1 and v2 test execution, and include these measurements in `results.json`, generated reports, and figures.
+
+**Rationale**: Time and pass rate alone are insufficient for fair comparison. Peak memory usage captures hardware efficiency, enabling more realistic cross-language and cross-codex evaluation.
+
+### FR-BENCH-012
+
+**Description**: The benchmark system shall enforce a maximum execution timeout for generated code during v1 and v2 test runs, and explicitly record timeout outcomes in benchmark artifacts.
+
+**Rationale**: Timeout enforcement prevents infinite loops and hung processes from biasing benchmark stability, and makes failure modes measurable and reproducible.
+
+### FR-BENCH-013
+
+**Description**: Before executing generated code, the benchmark system shall run a security validation step (static checks and policy rules), and block execution when critical violations are detected.
+
+**Rationale**: Generated code is untrusted input. A pre-execution security gate reduces host risk and improves the safety and integrity of benchmark operations.
+
 ## Current research question
 
 **Which codex produces the fastest, cheapest, and most correct implementations across languages?**
