@@ -1,0 +1,123 @@
+PROJECT: stock-tracker
+AUTHOR: Elvan Negiş(251478063)
+VERSION: v1
+DATE: 2026-03-15
+
+========================================
+OVERVIEW
+========================================
+
+stock-tracker is a command-line stock management system.
+
+The program allows the user to manage products in a simple inventory.
+Users can add products, remove products, search for products,
+list all products and check low stock warnings.
+
+All data is stored in a text file.
+
+The system creates a directory called .stocktracker in the current
+working directory and stores product information in products.dat.
+
+========================================
+COMMANDS
+========================================
+
+--- init ---
+Usage: python stocktracker.py init
+
+Creates a .stocktracker directory and an empty products.dat file.
+
+If the directory already exists, print:
+"Already initialized"
+
+----------------------------------------
+
+--- add ---
+Usage: python stocktracker.py add "ProductName" quantity price
+
+Adds a new product to the system.
+
+Output example:
+Added product #1: Apple
+
+----------------------------------------
+
+--- remove ---
+Usage: python stocktracker.py remove "ProductName" quantity
+
+Decreases the stock quantity of the given product.
+
+If the product does not exist print:
+"Product not found"
+
+----------------------------------------
+
+--- list ---
+Usage: python stocktracker.py list
+
+Lists all products stored in the system.
+
+Example output:
+
+[1] Apple | Quantity: 50 | Price: 10
+[2] Banana | Quantity: 30 | Price: 5
+
+If no products exist print:
+"No products found."
+
+----------------------------------------
+
+--- search ---
+Usage: python stocktracker.py search "ProductName"
+
+Searches for a product by name.
+
+If found, prints the product information.
+
+If not found print:
+"Product not found"
+
+----------------------------------------
+
+--- lowstock ---
+Usage: python stocktracker.py lowstock
+
+Shows products that have quantity lower than 10.
+
+If such products exist print a warning.
+
+Example:
+WARNING: Low stock for Apple
+
+========================================
+DATA FORMAT
+========================================
+
+File: .stocktracker/products.dat
+
+Each product is stored on a single line.
+
+Format:
+id|name|quantity|price|date|status
+
+Example:
+
+1|Apple|50|10|2026-03-15|1
+2|Banana|30|5|2026-03-15|1
+
+Status:
+1 = active
+0 = inactive
+
+========================================
+ERROR HANDLING
+========================================
+
+Running any command before "init":
+print "Not initialized. Run: python stocktracker.py init"
+
+Unknown command:
+print "Unknown command: <command>"
+
+Missing arguments:
+print "Usage: python stocktracker.py <command> [args]"
