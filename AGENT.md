@@ -128,6 +128,27 @@ When adding support for a new AI coding system:
 - Run `bin/which-language benchmark <name> minigit --dry-run` before submitting
 
 ---
+## New language checklist
+
+* Add the language to `config/languages.yml`
+* Verify toolchain is available on target platform
+* Test with: `bin/which-language run <codex> <problem> --lang <lang> --trials 1`
+* Document any platform-specific setup steps in `CLAUDE.md`
+* Update `plan.md` status
+* Add walkthrough.md entry
+```
+
+Yani dosyanın sonu şöyle görünmeli:
+```
+## New language checklist
+
+* Add the language to `config/languages.yml`
+* Verify toolchain is available on target platform
+...
+
+## For AI agents specifically
+
+If you are an AI agent...
 
 ## For AI agents specifically
 
