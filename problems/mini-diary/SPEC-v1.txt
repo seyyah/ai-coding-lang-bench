@@ -1,1 +1,65 @@
+PROJECT: mini-diary
+AUTHOR: [Kadir Enes Cakiroglu] ([251478073])
+VERSION: v1
+DATE: 2026-03-15
 
+========================================
+OVERVIEW
+========================================
+
+mini-diary is a command-line application to keep daily notes.
+It allows users to write entries, list them, and read specific days.
+
+All data is stored in a directory called .minidiary/ 
+in the current working directory.
+
+========================================
+COMMANDS
+========================================
+
+--- init ---
+Usage: python diary.py init
+Creates a .minidiary/ directory and an empty diary.dat file.
+If .minidiary/ already exists, print "Already initialized" and exit.
+
+--- write ---
+Usage: python diary.py write "Today I started my project"
+Appends a new entry to diary.dat.
+Format: id | date | content
+Prints: "Entry saved with ID: <id>"
+
+--- list ---
+Usage: python diary.py list
+Prints all entries (ID and Date only):
+  [1] 2026-03-15
+  [2] 2026-03-16
+If empty, prints "Diary is empty."
+
+--- read ---
+Usage: python diary.py read 1
+Shows the full content of entry #1.
+Prints: "Content of entry #1: <content>"
+If ID not found, prints "Entry #1 not found."
+
+--- delete ---
+Usage: python diary.py delete 1
+Removes entry #1 from the file.
+Prints: "Deleted entry #1."
+
+========================================
+DATA FORMAT
+========================================
+
+File: .minidiary/diary.dat
+Format: id|date|content
+Example:
+1|2026-03-15|Today was a great day.
+2|2026-03-16|I worked on my Python assignment.
+
+========================================
+ERROR HANDLING
+========================================
+
+- Using commands before "init": print "Error: Initialize first using 'init'"
+- Invalid command: print "Unknown command: <command>"
+- Missing arguments: print "Usage: python diary.py <command> [args]"
