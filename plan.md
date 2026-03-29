@@ -3,7 +3,7 @@
 > Living document. Updated by human + AI contributors at the end of each session.
 > See [AGENT.md](./AGENT.md) for update protocol.
 
-**Last updated**: 2026-03-28
+**Last updated**: 2026-03-29
 **Current phase**: Phase 1 — Major Cloud APIs + Framework Stabilization
 
 ---
@@ -15,6 +15,8 @@
 | 1 | Groq adapter validation (3+ trials, multi-language) | [ ] | — | Adapter exists, needs systematic benchmark data |
 | 2 | Aider adapter validation (end-to-end test) | [ ] | — | Adapter exists (`aider_codex.rb`), needs testing |
 | 3 | MiniGrades problem validation | [ ] | — | Problem dir exists, needs benchmark runs |
+| 4 | FR-BENCH-011 RAM metric design/implementation | [ ] | — | Track peak memory per phase and surface in report/plots |
+| 5 | FR-BENCH-013 security pre-check design | [ ] | — | Define static checks and block-on-critical policy |
 
 ## Backlog
 
@@ -52,6 +54,7 @@
 - [ ] Fix README.md broken markdown (unclosed code block in Installation section)
 - [ ] Multi-codex ensemble experiments
 - [ ] Add `config/languages.local.yml` override support documentation for end-users
+- [ ] Implement FR-BENCH-012 explicit timeout outcome reporting in artifacts
 
 ## Open questions
 
@@ -65,6 +68,7 @@
 - 📏 **Lines of Code** (generated)
 - ✅ **Test Pass Rate** (%)
 - 🎯 **Token Efficiency** (output tokens / test passed)
+- 🧠 **Peak RAM Usage** (MB during v1/v2 test execution)
 
 ## Completed
 

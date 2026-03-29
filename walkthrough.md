@@ -5,6 +5,23 @@
 
 ---
 
+## 2026-03-29 — Added formal benchmark gap requirements
+
+**Contributor**: AI agent (GitHub Copilot)
+**What was done**: Added formal functional requirements in `program.md` for identified benchmark gaps and synchronized planning docs.
+- Added FR-BENCH-011 (peak RAM tracking during test execution)
+- Added FR-BENCH-012 (timeout enforcement and explicit timeout outcome reporting)
+- Added FR-BENCH-013 (security validation gate before running generated code)
+- Updated `plan.md` with active tasks for RAM/security implementation and benchmark metric list update
+
+**Codex/Problem/Language**: N/A (documentation and planning)
+**Key metrics**: N/A
+**Observations**: The current benchmark captures time/cost/LOC/pass-rate but does not yet capture memory efficiency or pre-execution security checks.
+**Decisions made**: Document requirements first in `program.md` to align future implementation work and evaluation consistency.
+**Next**: Implement FR-BENCH-011 in `src/benchmark.rb`, then propagate memory metrics into `src/report.rb` and `src/plot.py`.
+
+---
+
 ## 2026-03-28 — Clean Architecture Refactor: DRY Configs & Unified CLI
 
 **Contributor**: AI agent (Claude Code)
