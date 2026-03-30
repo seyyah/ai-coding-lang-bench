@@ -3,17 +3,17 @@ set -e
 
 echo "Running test-v1.sh for MiniTimer..."
 
-# Temiz bir başlangıç yap
+# Start with a clean slate
 rm -rf .minitimer
 
-# Init komutunu test et
+# Test the init command
 python3 minitimer.py init
 
-# Start komutunu test et
+# Test starting tasks
 python3 minitimer.py start "Study Physics"
 python3 minitimer.py start "Coding Project"
 
-# Dosyanın oluştuğunu doğrula
+# Verify that the data file is created
 if [ ! -f ".minitimer/timers.dat" ]; then
     echo "Error: timers.dat not found!"
     exit 1
