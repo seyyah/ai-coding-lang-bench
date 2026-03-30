@@ -1,22 +1,23 @@
 #!/bin/bash
-# test-v2.sh - Testing edge-cases and new features (stop, stats)
+set -e
 
-echo "--- Running test-v2.sh ---"
+echo "Running test-v2.sh for MiniTimer..."
 
-# Clean up any existing test data to start fresh
+# Temiz bir başlangıç
 rm -rf .minitimer
-
-# Initialize and start a task
 python3 minitimer.py init
 python3 minitimer.py start "Study Physics"
 
-# Test stopping the task
+# Stop komutunu test et
 python3 minitimer.py stop 1
 
-# Test the edge-case (trying to stop an already stopped task)
+# Edge-case test et (Zaten durmuş sayacı durdurma)
 python3 minitimer.py stop 1
 
-# Test viewing statistics
+# İstatistikleri test et
 python3 minitimer.py stats
 
-echo "--- Test v2 completed successfully ---"
+# Log komutunu test et
+python3 minitimer.py log
+
+echo "Test v2 passed successfully!"
