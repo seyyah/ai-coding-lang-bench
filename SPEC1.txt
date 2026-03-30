@@ -1,5 +1,5 @@
 PROJECT: mini-vocab
-AUTHOR: Öğrenci Adı (No)
+AUTHOR: Aleyna Akın 251478072
 VERSION: v1
 DATE: 2026-03-12
 
