@@ -1,0 +1,75 @@
+PROJECT: mini-todo
+AUTHOR: [Ceren Cenikli] (251478097)
+VERSION: v1.0
+DATE: 2026-03-16
+
+========================================
+OVERVIEW
+========================================
+
+mini-todo is a minimalist command-line task management tool.
+Its primary purpose is to provide a distraction-free 
+environment for tracking immediate daily goals.
+
+The application utilizes a raw flat-file storage system 
+to ensure data portability and transparency. 
+All persistent records are stored within a hidden 
+directory named .todo_data/ located in the 
+current working directory.
+
+========================================
+COMMANDS
+========================================
+
+--- init ---
+Usage: python todo.py init 
+Behavior: Checks for the .todo_data/ directory. If not present, creates the directory and an empty registry.txt file. 
+ Output: If successful, prints [SYSTEM] New data environment created in .todo_data/. If already initialized, prints [SYSTEM] Environment is already active.
+--- add ---
+Usage: python todo.py add "Task description" <priority> 
+Behavior: Appends a new entry to registry.txt. Each task includes: id (auto-increment starting at 1), status (default: ACTIVE), priority (1-3), and created_date.
+ Output: Prints [SUCCESS] Entry #<id> has been registered.
+
+--- list ---
+Usage: python todo.py list 
+Behavior: Parses registry.txt and displays tasks grouped into categories: --- ACTIVE --- and --- CLOSED ---. Displays ID, Priority, Date, and Description for each task. 
+Output: If no tasks exist, prints [LOG] Storage is currently empty.
+
+--- done ---
+Usage: python todo.py done <id> 
+Behavior: Locates task #<id> and toggles its status field from ACTIVE to CLOSED.
+Output: Prints [UPDATE] Entry #<id> is now marked as CLOSED. 
+Exception: If task does not exist, prints [FATAL] Entry #<id> could not be located.
+
+--- delete ---
+Usage: python todo.py delete <id> 
+Behavior: Permanently removes the line associated with task #<id> from registry.txt.
+Output: Prints [REMOVED] Entry #<id> has been permanently erased. 
+Exception: If task does not exist, prints [FATAL] Purge failed: Unknown ID.
+
+
+
+========================================
+DATA FORMAT
+========================================
+
+File Path: .todo_data/registry.txt
+Format: Plain-text, one task per line. Fields are separated by the pipe (|) delimiter as the standard separator.
+Schema Order: id|status|priority|created_date|description
+Example Entries: 1|ACTIVE|1|2026-03-16|Complete the algorithm lab
+2|CLOSED|3|2026-03-15|Review Python documentation
+3|ACTIVE|2|2026-03-16|Fix the terminal prompt issue
+
+
+========================================
+ERROR HANDLING
+========================================
+
+Uninitialized Environment: If any command is executed before init.
+	•	Print: [FATAL] Data environment not found. Please run: python todo.py init
+Invalid Command: If the user enters an undefined command.
+	•	Print: [ERROR] Unknown command: <input_command>.
+Missing Arguments: If a command is called without required parameters.
+	•	Print: [USAGE] Syntax error. Required format: python todo.py <command> [args]
+Non-Existent ID: If a user references an ID that is not present in the registry.
+	•	Print: [ERROR] Target ID #<id> does not exist in the current registry.
