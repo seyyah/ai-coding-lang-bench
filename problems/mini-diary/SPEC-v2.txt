@@ -1,1 +1,67 @@
+PROJECT: mini-diary
+AUTHOR: [Kadir Enes Cakiroglu] ([251478073])
+VERSION: v2
+DATE: 2026-03-30
 
+========================================
+OVERVIEW
+========================================
+
+mini-diary v2 is an enhanced version of the command-line diary application.
+[cite: 2] It extends the core functionality by introducing advanced data retrieval 
+and search capabilities for a more robust user experience.
+[cite: 3] All data remains stored in the .minidiary/ directory.
+
+========================================
+NEW FEATURES & CHANGES
+========================================
+
+- Iterative Logic: Loops and collections are now permitted for data processing.
+- Data Integrity: Enhanced sanitization to protect the flat-file database structure.
+- Professional Formatting: Outputs are now displayed in a structured table format.
+
+========================================
+COMMANDS
+========================================
+
+--- init ---
+Usage: python solution.py init
+Creates a .minidiary/ directory and an empty diary.dat file.
+[cite: 5] If .minidiary/ already exists, prints "Already initialized".
+
+--- write ---
+Usage: python solution.py write "Content"
+Appends a new entry with an automated timestamp and sanitized content.
+[cite: 6] Format: id | date | content
+Prints: "Entry saved with ID: <id>"
+
+--- list ---
+Usage: python solution.py list
+Iteratively reads and prints all entries in a formatted table:
+  ID [1] | 2026-03-30 | Hello World
+  ID [2] | 2026-03-30 | Python Development
+If empty, prints "Diary is empty."
+
+--- search ---
+Usage: python solution.py search "keyword"
+Performs a case-insensitive search through all diary entries.
+[cite: 8] Prints all matching records found in the database.
+If no matches, prints "No entries found matching: <keyword>".
+
+========================================
+DATA FORMAT
+========================================
+
+File: .minidiary/diary.dat
+Format: id|date|content
+[cite: 10] Example:
+1|2026-03-30 14:20:00|Started the advanced phase.
+2|2026-03-30 14:25:00|Search engine is now functional.
+
+========================================
+ERROR HANDLING
+========================================
+
+- Using commands before "init": print "Error: Initialize first using 'init'"
+- Invalid command: print "Unknown command: <command>"
+- Missing search keyword: print "Usage: python solution.py search <keyword>"
