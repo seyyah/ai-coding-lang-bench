@@ -1,16 +1,22 @@
 #!/bin/bash
-# test-v1.sh - Testing core functionality (init, start)
+set -e
 
-echo "--- Running test-v1.sh ---"
+echo "Running test-v1.sh for MiniTimer..."
 
-# Clean up any existing test data to start fresh
+# Temiz bir başlangıç yap
 rm -rf .minitimer
 
-# Test initializing the timer
+# Init komutunu test et
 python3 minitimer.py init
 
-# Test starting tasks
+# Start komutunu test et
 python3 minitimer.py start "Study Physics"
 python3 minitimer.py start "Coding Project"
 
-echo "--- Test v1 completed successfully ---"
+# Dosyanın oluştuğunu doğrula
+if [ ! -f ".minitimer/timers.dat" ]; then
+    echo "Error: timers.dat not found!"
+    exit 1
+fi
+
+echo "Test v1 passed successfully!"
