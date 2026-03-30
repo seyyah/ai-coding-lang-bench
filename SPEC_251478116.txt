@@ -1,0 +1,80 @@
+PROJECT: mini-quiz
+AUTHOR: Feyzanur Sahin (251478116)
+VERSION: v1
+DATE: 2026-03-15
+
+MINI QUIZ APPLICATION SPECIFICATION
+
+Mini-quiz is a command-line quiz application. Mini Quiz is a simple command line program that allows the user to create and answer quiz questions.
+All data is persisted in a directory called .miniquiz/ in the current working directory.
+
+COMMANDS
+
+init
+Description: Creates the quiz data file if it does not exist.
+Usage: python miniquiz.py init
+print: "Quiz data initialized."
+
+add
+Usage: python miniquiz.py add "question" "answer"
+Description: Adds a new quiz question
+print: "Question added"
+
+list
+Usage: python miniquiz.py list
+Description: Shows all quiz questions stored in the data.
+print: Displays all questions.
+
+answer
+Usage: python miniquiz.py answer 1 "4"
+Checks the user's answer for question #1.
+If correct: print "Correct!"
+If wrong: print "Wrong answer."
+
+DATA FORMAT
+========================================
+
+File: .miniquiz/questions.dat
+
+id|question|answer
+
+Example:
+1|What is 2+2?|4
+2|Capital of Turkey?|Ankara
+
+
+========================================
+ERROR HANDLING
+========================================
+
+If the user runs a command before init:
+print "Not initialized. Run: python miniquiz.py init"
+
+If the user enters an unknown command:
+print "Error: Unknown command."
+
+If parameters are missing:
+print "Error: Missing parameters."
+
+If the data file does not exist:
+print "Error: Data not initialized."
+
+========================================
+NEW REQUIREMENT
+========================================
+
+The system shall allow the user to list all previously added quiz questions.
+
+Description
+
+The user can execute the "list" command to display all stored questions from the data file.
+
+Rationale
+
+This feature improves usability by allowing users to review the questions they have added.
+
+Acceptance Criteria
+
+- When the user runs the "list" command, all questions are displayed.
+- If there are no questions, the system should inform the user.
+- If the system is not initialized, an appropriate error message should be shown.
