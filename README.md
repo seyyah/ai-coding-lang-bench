@@ -178,3 +178,11 @@ This entire movement was ignited by a single, powerful question: *Which Programm
 We proudly stand alongside other incredible benchmarking initiatives:
 - [AutoCodeBench](https://autocodebench.github.io)
 - [LiveCodeBench](https://livecodebench.github.io)
+- ---
+
+## 🛠️ Proposed Extension: Database Management
+### --- clear ---
+**Usage:** `python solution_v1.py clear`
+**Description:** Removes all records from `.minicontacts/contacts.dat` and resets the database to an empty state.
+**Output:** Prints "All contacts cleared."
+**Rationale:** Provides a quick way for users to reset their local database without manual file deletion.
