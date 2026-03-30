@@ -3,21 +3,21 @@ set -e
 
 echo "Running test-v2.sh for MiniTimer..."
 
-# Temiz bir başlangıç
+# Clean start
 rm -rf .minitimer
 python3 minitimer.py init
 python3 minitimer.py start "Study Physics"
 
-# Stop komutunu test et
+# Test stopping the task
 python3 minitimer.py stop 1
 
-# Edge-case test et (Zaten durmuş sayacı durdurma)
+# Test the edge-case (trying to stop an already stopped task)
 python3 minitimer.py stop 1
 
-# İstatistikleri test et
+# Test viewing statistics
 python3 minitimer.py stats
 
-# Log komutunu test et
+# Test the log command
 python3 minitimer.py log
 
 echo "Test v2 passed successfully!"
