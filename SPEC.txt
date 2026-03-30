@@ -1,0 +1,49 @@
+PROJECT: mini-bookmark
+AUTHOR: Hüdanur Şener (251478066)
+VERSION: v0
+DATE: 2026-03-16
+
+========================================
+OVERVIEW
+========================================
+mini-bookmark is a CLI tool to save and manage web URLs.
+It stores bookmarks in a plain text file.
+All data is kept in a directory named .minibookmark/
+
+========================================
+COMMANDS
+========================================
+
+--- init ---
+Usage: python minibookmark.py init
+Creates .minibookmark/ directory and an empty links.dat file.
+If it exists, prints "Already initialized."
+
+--- add ---
+Usage: python minibookmark.py add "Google" "https://google.com"
+Saves a new bookmark with an auto-increment ID.
+Format: id|title|url|date
+Prints: "Added bookmark #<id>: <title>"
+
+--- list ---
+Usage: python minibookmark.py list
+(To be implemented)
+Will show all saved bookmarks.
+
+--- delete ---
+Usage: python minibookmark.py delete <id>
+(To be implemented)
+Will remove a bookmark by ID.
+
+========================================
+DATA FORMAT
+========================================
+File: .minibookmark/links.dat
+Format: id|title|url|2026-03-16
+
+========================================
+ERROR HANDLING
+========================================
+- Running without init: "Not initialized. Run: python minibookmark.py init"
+- Unknown command: "Unknown command: <command>"
+- Missing arguments: "Usage: python minibookmark.py <command> [args]"
