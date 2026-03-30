@@ -1,0 +1,10 @@
+ {
+  "name": "mini-todo",
+  "binary_name": "todo",
+  "v1_spec": "SPEC-v1.txt",
+  "v1_test": "test-v1.sh",
+  "v1_prompt": "Implement {{binary_name}} as described in SPEC-v1.txt using {{language}}. The executable must be named '{{binary_name}}.py' and handle init, add, list, and done commands.",
+  "v2_spec": "SPEC-v2.txt",
+  "v2_test": "test-v2.sh",
+  "v2_prompt": "Read SPEC-v2.txt and extend the existing {{binary_name}} implementation with the clear command and enhanced error handling. Verify your implementation using test-v2.sh."
+}
