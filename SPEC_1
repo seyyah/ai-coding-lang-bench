@@ -1,0 +1,30 @@
+PROJECT: mini-todo
+AUTHOR: Halimenur (251478083)
+VERSION: v0
+DATE: 2026-03-16
+
+========================================
+OVERVIEW
+========================================
+mini-todo is a simple command-line task manager.
+It stores tasks in .minitodo/tasks.dat.
+
+========================================
+COMMANDS
+========================================
+--- init ---
+Usage: python solution_v0.py init
+Creates .minitodo/ directory and tasks.dat.
+
+--- add ---
+Usage: python solution_v0.py add "Task Name"
+Saves task as: id|description|status|date
+
+--- list / done / delete ---
+Not implemented in v0. Prints "not implemented" message.
+
+========================================
+ERROR HANDLING
+========================================
+- If no init: "Not initialized. Run: init"
+- Unknown command: "Unknown command: <name>"
