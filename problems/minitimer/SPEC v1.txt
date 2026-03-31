@@ -3,6 +3,7 @@ AUTHOR: Ali Efe AKIN
 VERSION: v1
 DATE: 2026-03-12
 
+
 1-) OVERVIEW
 
 mini-timer is a command-line time tracking tool.
