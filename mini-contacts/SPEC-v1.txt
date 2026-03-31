@@ -1,0 +1,31 @@
+PROJECT: mini-contacts
+AUTHOR: Esmanur Ceviz (251478077)
+VERSION: v1
+DATE: 2026-03-16
+========================================
+OVERVIEW
+========================================
+mini-contacts is a command-line contact management tool.
+It stores contacts in a plain text file. 
+This version (v1) focuses on initialization and adding contacts 
+without using loops or list structures.
+
+========================================
+COMMANDS
+========================================
+--- init ---
+Usage: python solution_v1.py init
+Action: Creates the .minicontacts/ directory and contacts.dat file.
+
+--- add ---
+Usage: python solution_v1.py add "Name" "Phone" "Email"
+Action: Appends a contact. ID is calculated by line count (no loops).
+
+--- list / search / clear ---
+Output: "Command will be implemented in future weeks."
+
+========================================
+DATA FORMAT
+========================================
+File: .minicontacts/contacts.dat
+Format: id|name|phone|email

@@ -1,0 +1,37 @@
+PROJECT: mini-contacts
+AUTHOR: Esmanur Ceviz (251478077)
+VERSION: v2
+DATE: 2026-03-31
+
+========================================
+OVERVIEW
+========================================
+mini-contacts is a command-line tool for managing personal contacts. 
+It supports persistent storage using a text-based database.
+All data is stored in: .minicontacts/contacts.dat
+
+========================================
+COMMANDS (COMPLETED & PLANNED)
+========================================
+--- init ---
+Usage: python solution_v2.py init
+Output: "Initialized." or "Already initialized."
+
+--- add ---
+Usage: python solution_v2.py add "Name" "Phone" "Email"
+Action: Adds a contact. ID is auto-incremented based on line count.
+
+--- list --- (New in v2)
+Usage: python solution_v2.py list
+Action: Uses LOOPS to display all contacts in a formatted list.
+
+--- search --- (New in v2)
+Usage: python solution_v2.py search "Keyword"
+Action: Uses LOOPS to find matches in names (Case-insensitive).
+
+--- clear --- (New in v2)
+Usage: python solution_v2.py clear
+Action: Deletes all data and resets the database.
+
+--- delete & export --- (Planned)
+Output: "Command will be implemented in future weeks."
