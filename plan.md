@@ -86,3 +86,5 @@
 - [LiveCodeBench](https://livecodebench.github.io/)
 - [AutoCodeBench](https://autocodebench.github.io/)
 
+## Functional Requirements
+If the user enters an unsuppported language, the system should display a warning message: "This language is not supported yet, please choose a language from the list."
