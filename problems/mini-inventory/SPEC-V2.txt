@@ -1,0 +1,121 @@
+PROJECT: mini-inventory
+AUTHOR: Elvan Negiş (251478063)
+VERSION: v2
+DATE: 2026-03-20
+
+========================================
+OVERVIEW
+========================================
+
+mini-inventory is an enhanced command-line inventory management system[cite: 1, 2]. 
+The program allows users to manage items, track categories, and view financial summaries[cite: 3]. 
+All data is persisted in a flat-file database[cite: 4].
+
+The system maintains a hidden directory called .inventory in the current working directory and stores all item information in items.dat[cite: 4].
+
+========================================
+COMMANDS
+========================================
+
+--- init ---
+Usage: python inventory.py init
+
+Creates a .inventory directory and an empty items.dat file[cite: 5]. 
+If the directory already exists, print: [cite: 6]
+"Already initialized"
+
+----------------------------------------
+
+--- add ---
+Usage: python inventory.py add "ItemName" quantity price "Category"
+
+Adds a new item including a category field[cite: 7].
+Output example: [cite: 7]
+Added product #1: Apple
+
+----------------------------------------
+
+--- remove ---
+Usage: python inventory.py remove "ItemName" quantity
+
+Decreases the stock quantity of the given item[cite: 8].
+If the item does not exist, print: [cite: 8]
+"Product not found"
+
+If the removal quantity exceeds current stock, print:
+"Error: Insufficient stock. Current: <qty>"
+
+----------------------------------------
+
+--- list ---
+Usage: python inventory.py list
+
+Lists all items including their category[cite: 9].
+Example output: [cite: 9]
+
+[1] Apple | Quantity: 50 | Price: 10 | Category: Fruit [cite: 10]
+
+If no items exist, print: [cite: 10]
+"No products found."
+
+----------------------------------------
+
+--- search ---
+Usage: python inventory.py search "ItemName"
+
+Searches for an item by name[cite: 11]. Prints full item details if found[cite: 11].
+If not found, print: [cite: 11]
+"Product not found"
+
+----------------------------------------
+
+--- lowstock ---
+Usage: python inventory.py lowstock
+
+Shows items with quantity lower than 10[cite: 11].
+Example: [cite: 12]
+WARNING: Low stock for Apple
+
+----------------------------------------
+
+--- summary ---
+Usage: python inventory.py summary
+
+Displays a financial and quantity overview of the entire inventory.
+Example:
+Total Items: 120
+Total Inventory Value: 1500
+
+========================================
+DATA FORMAT
+========================================
+
+File: .inventory/items.dat [cite: 13]
+
+Each item is stored on a single line using a pipe-delimited format[cite: 13].
+Format: id|name|quantity|price|category|date|status [cite: 13]
+
+Example:
+1|Apple|50|10|Fruit|2026-03-20|1
+2|Laptop|5|1200|Electronics|2026-03-20|1
+
+Status:
+1 = active
+0 = inactive
+
+========================================
+ERROR HANDLING
+========================================
+
+Running any command before "init": [cite: 13]
+print "Not initialized. Run: python inventory.py init" [cite: 13]
+
+Invalid Input:
+If quantity or price are not numeric, print:
+"Error: Quantity and Price must be numbers."
+
+Unknown command: [cite: 13]
+print "Unknown command: <command>" [cite: 13]
+
+Missing arguments: [cite: 13]
+print "Usage: python inventory.py <command> [args]" [cite: 13]
