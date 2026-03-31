@@ -1,0 +1,29 @@
+PROJECT: miniscoreboard
+AUTHOR: Utkuhan Akar (251478036)
+VERSION: v2
+DATE: 2026-03-31
+
+========================================
+OVERVIEW
+========================================
+
+This version extends miniscoreboard by adding the ability to view
+all historical matches and filter matches by a specific team.
+It inherits all data formats and error handling from v1.
+
+========================================
+COMMANDS
+========================================
+
+--- history ---
+Usage: python miniscore.py history
+Reads the .miniscore/matches.dat file and prints all matches.
+Format per line: [<ID>] <TeamA> <ScoreA> - <ScoreB> <TeamB> (<Date>)
+If no matches exist, prints "History is empty."
+
+--- team ---
+Usage: python miniscore.py team <TeamName>
+Filters matches and prints only the ones where <TeamName> played
+(either as TeamA or TeamB).
+Format per line: [<League> - <Week>] <TeamA> <ScoreA> - <ScoreB> <TeamB> (<Date>)
+If no matches are found, prints "No matches found for <TeamName>."
