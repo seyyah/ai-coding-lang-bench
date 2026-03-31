@@ -102,6 +102,7 @@ We are constantly expanding our coverage. Here is where the initiative stands to
 - 💾 **minigit** — Minimal version control system
 - 🎓 **minigrades** — Student grade manager
 - 🎵 **miniplaylist** — Playlist management system
+- 💰 **minibudget** — Budget tracking system
 
 ---
 
@@ -129,9 +130,9 @@ This project thrives on the brilliant minds driving it forward. We celebrate eve
 
 <div align="center">
 
-| [<img src="https://github.com/mame.png?size=100" width="100px;"/><br /><sub><b>mame</b></sub>](https://github.com/mame) | [<img src="https://github.com/berkevnl.png?size=100" width="100px;"/><br /><sub><b>berkevnl</b></sub>](https://github.com/berkevnl) | [<img src="https://github.com/Ahmetngz.png?size=100" width="100px;"/><br /><sub><b>Ahmetngz</b></sub>](https://github.com/Ahmetngz) |
-| :---: | :---: | :---: |
-| 🚀 Visionary | 💻 Core Architect | 💻 Core Architect |
+| [<img src="https://github.com/mame.png?size=100" width="100px;"/><br /><sub><b>mame</b></sub>](https://github.com/mame) | [<img src="https://github.com/berkevnl.png?size=100" width="100px;"/><br /><sub><b>berkevnl</b></sub>](https://github.com/berkevnl) | [<img src="https://github.com/Ahmetngz.png?size=100" width="100px;"/><br /><sub><b>Ahmetngz</b></sub>](https://github.com/Ahmetngz) | [<img src="https://github.com/Arda-Ylmaz.png?size=100" width="100px;"/><br /><sub><b>Arda-Ylmaz</b></sub>](https://github.com/Arda-Ylmaz) |
+| :---: | :---: | :---: | :---: |
+| 🚀 Visionary | 💻 Core Architect | 💻 Core Architect | 🧩 Problem Architect |
 
 </div>
 

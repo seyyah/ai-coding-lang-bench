@@ -1,0 +1,21 @@
+PROJECT: mini-budget
+AUTHOR: Arda Yımaz 251478089 
+VERSION: v1
+DATE: 2026-03-31
+
+OVERVIEW:
+A simple command-line tool to track income and expenses.
+Data is saved in .minibudget/budget.dat file.
+
+TASKS:
+1. 'list' command added: reads all records from budget.dat using a while loop.
+2. 'summary' command added: shows total transaction count.
+3. 'delete <name>' command added: deletes a transaction by description (AI-assisted).
+4. Error messages localized to Turkish and clarified.
+
+COMMANDS:
+- init: Creates the database folder.
+- add <desc> <amount> <cat>: Adds a new transaction.
+- list: Shows all transactions.
+- summary: Shows total record count.
+- delete <desc>: Deletes matching transaction.

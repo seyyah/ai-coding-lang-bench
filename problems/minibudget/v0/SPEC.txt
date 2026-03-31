@@ -1,0 +1,13 @@
+PROJECT: mini-budget
+AUTHOR: Arda Yımaz 251478089 
+VERSION: v0
+DATE: 2026-03-29
+
+OVERVIEW:
+A simple command-line tool to track income and expenses.
+Data is saved in .minibudget/budget.dat file.
+
+COMMANDS:
+- init: Creates the database folder.
+- add <desc> <amount> <cat>: Adds a new transaction.
+- list: Shows all transactions (to be improved in V1).
