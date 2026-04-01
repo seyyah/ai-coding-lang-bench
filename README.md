@@ -7,7 +7,7 @@
   
   [![Join the Movement](https://img.shields.io/badge/Join-The_Movement-blue?style=for-the-badge&logo=github)](./AGENT.md)
   [![Codexes](https://img.shields.io/badge/Supported_Codexes-5-success?style=for-the-badge)](#-supported-codexes)
-  [![Problems](https://img.shields.io/badge/Benchmarks-2-orange?style=for-the-badge)](#-the-arena-problems)
+  [![Problems](https://img.shields.io/badge/Benchmarks-5-orange?style=for-the-badge)](#-the-arena-problems)
   
   *We are on a mission to map the "native tongue" of Large Language Models. Join us in benchmarking Claude, Gemini, OpenAI, and more across every programming language known to humanity.*
 </div>
@@ -102,6 +102,7 @@ We are constantly expanding our coverage. Here is where the initiative stands to
 - 💾 **minigit** — Minimal version control system
 - 🎓 **minigrades** — Student grade manager
 - 🎵 **miniplaylist** — Playlist management system
+- 📚 **minilibrary** — Command-line book management system
 
 ---
 

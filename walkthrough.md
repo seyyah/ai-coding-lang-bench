@@ -5,6 +5,29 @@
 
 ---
 
+## 2026-04-01 — MiniLibrary Restructure & Multi-Problem Update
+
+**Contributor**: AI agent (Antigravity)
+**What was done**: Reconstructed the `minilibrary` problem from scratch to match project standards. Updated repository-wide problem counts and documentation.
+- **Translated**: Converted all Turkish specifications, tests, and comments to English.
+- **Restructured**: Renamed `mini-library/` to `minilibrary/` and created standard 5-file set (`problem.json`, `SPEC-v*.txt`, `test-v*.sh`).
+- **Validated**: Ensured v2 extends v1 (v2 files now contain full v1 content plus extensions).
+- **Cleanup**: Removed non-standard solution and Python test files from the `problems/` directory to follow benchmark-only convention.
+- **Documentation**: Updated `README.md` (badges and list), `CLAUDE.md`, and `plan.md` to reflect 5 active benchmark problems.
+
+**Observations**:
+- Original `mini-library` was heavily Turkish-dependent and used Python-specific test scripts (`test_spec_v1.py`).
+- Corrected a mismatch where `v1` files were accidentally longer than `v2`; `v2` is now a true superset as required by `program.md`.
+- Found that `miniplaylist` was already complete but listed as "missing" in `plan.md` — updated status.
+
+**Decisions made**:
+- Removed user's original `Solution_v1.py` from the PR scope to keep the benchmark problem directory clean (AI will generate solutions during runs).
+- Standardized binary name to `minilibrary` across all specs to match `minigit` pattern.
+
+**Next**: Validate `minilibrary` with a dry-run using any codex.
+
+---
+
 ## 2026-03-28 — Clean Architecture Refactor: DRY Configs & Unified CLI
 
 **Contributor**: AI agent (Claude Code)

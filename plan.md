@@ -48,7 +48,6 @@
 
 ### Other
 
-- [ ] Add mini-playlist problem (listed in README but missing from problems/)
 - [ ] Fix README.md broken markdown (unclosed code block in Installation section)
 - [ ] Multi-codex ensemble experiments
 - [ ] Add `config/languages.local.yml` override support documentation for end-users
@@ -75,6 +74,8 @@
 - [x] Aider adapter (code exists, needs validation)
 - [x] MiniGit problem (canonical, well-tested)
 - [x] MiniGrades problem (exists in problems/)
+- [x] MiniLibrary problem (new, translated, validated)
+- [x] MiniPlaylist problem (exists in problems/)
 - [x] Multi-codex architecture refactor
 - [x] Documentation infrastructure (program.md, AGENT.md, plan.md, walkthrough.md)
 - [x] DRY consolidation (merged ROADMAP, INDEX, QUICK_START, CODEX_COMPARISON)
