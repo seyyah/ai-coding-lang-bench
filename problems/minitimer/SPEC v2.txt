@@ -4,7 +4,6 @@ STUDENT NO: 251478024
 VERSION: v2
 DATE: 25.03.2026
 
-
 1-) OVERVIEW
 
 mini-timer is a command-line time tracking tool.
