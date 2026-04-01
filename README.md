@@ -102,8 +102,10 @@ We are constantly expanding our coverage. Here is where the initiative stands to
 - 💾 **minigit** — Minimal version control system
 - 🎓 **minigrades** — Student grade manager
 - 🎵 **miniplaylist** — Playlist management system
-- ⏱️ **minitimer** — Simple task-time manager.
-- 📊 **miniscoreboard** — Lightweight match manager and logger.
+- ⏱️ **minitimer** — Simple task-time manager
+- 📊 **miniscoreboard** — Lightweight match manager and logger
+- 📖 **minilibrary** - Book management and library tracking tool
+- 📦 **miniinventory** - Inventory manager
 
 ---
 
