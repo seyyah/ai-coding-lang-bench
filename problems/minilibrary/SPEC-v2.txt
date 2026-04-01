@@ -90,7 +90,7 @@ Exit 0.
 ----------------------------------------
 
 If not initialized:
-    print "Not initialized. Run: python minilibrary.py init"
+    print "Not initialized. Run: minilibrary init"
     exit 1
 
 Calculate new book ID as current line count + 1.
@@ -106,7 +106,7 @@ Print:
 ----------------------------------------
 
 If not initialized:
-    print "Not initialized. Run: python minilibrary.py init"
+    print "Not initialized. Run: minilibrary init"
     exit 1
 
 If no books:
@@ -127,7 +127,7 @@ Lines are indented with two leading spaces.
 ----------------------------------------
 
 If not initialized:
-    print "Not initialized. Run: python minilibrary.py init"
+    print "Not initialized. Run: minilibrary init"
     exit 1
 
 If book not found:
@@ -152,7 +152,7 @@ If book is available:
 ----------------------------------------
 
 If not initialized:
-    print "Not initialized. Run: python minilibrary.py init"
+    print "Not initialized. Run: minilibrary init"
     exit 1
 
 If book not found:
@@ -172,7 +172,7 @@ If book is borrowed:
 ----------------------------------------
 
 If not initialized:
-    print "Not initialized. Run: python minilibrary.py init"
+    print "Not initialized. Run: minilibrary init"
     exit 1
 
 If book not found:
@@ -189,7 +189,7 @@ Print:
 ----------------------------------------
 
 If not initialized:
-    print "Not initialized. Run: python minilibrary.py init"
+    print "Not initialized. Run: minilibrary init"
     exit 1
 
 If the book already exists in the library (matching title and author):
@@ -214,7 +214,7 @@ If the book has not been requested before:
 ----------------------------------------
 
 If not initialized:
-    print "Not initialized. Run: python minilibrary.py init"
+    print "Not initialized. Run: minilibrary init"
     exit 1
 
 If no pending requests:
@@ -235,7 +235,7 @@ Lines are indented with two leading spaces.
     exit 1
 
 - Missing arguments:
-    print "Usage: python minilibrary.py <command> [args]"
+    print "Usage: minilibrary <command> [args]"
     exit 1
 
 ========================================
