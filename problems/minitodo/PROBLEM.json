@@ -1,0 +1,10 @@
+# mini-todo Projesi
+
+**Öğrenci:** Halimenur (251478083)  
+**Versiyon:** V1
+
+## V0'dan V1'e Geçiş Notları
+V0 sürümündeki temel iskelet üzerine aşağıdaki geliştirmeler yapılmıştır:
+- **Listeleme Özelliği:** `python solution_v1.py list` komutu ile görevleri ID bazlı görebilme imkanı eklendi.
+- **Dinamik Tarih:** Görevler artık sabit bir tarih yerine eklendiği günün tarihini alıyor.
+- **Hata Yönetimi:** Dosya okuma/yazma süreçleri `with` yapısıyla optimize edildi.
