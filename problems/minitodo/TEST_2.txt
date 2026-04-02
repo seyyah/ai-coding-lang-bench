@@ -1,0 +1,73 @@
+"""
+mini-todo V1 Test Senaryolari
+Ogrenci: Halime (251478083)
+"""
+import subprocess
+import os
+import shutil
+from datetime import date
+
+def run_cmd(args):
+    result = subprocess.run(
+        ["python", "solution_v1.py"] + args,
+        capture_output=True,
+        text=True
+    )
+    return result.stdout.strip()
+
+def setup_function():
+    if os.path.exists(".minitodo"):
+        shutil.rmtree(".minitodo")
+
+# --- TEST SENARYOLARI ---
+
+def test_init_creates_dir():
+    setup_function()
+    run_cmd(["init"])
+    assert os.path.exists(".minitodo")
+
+def test_add_task_success():
+    run_cmd(["init"])
+    output = run_cmd(["add", "V1 Testi"])
+    assert "Added task #1" in output
+
+def test_list_functional():
+    run_cmd(["init"])
+    run_cmd(["add", "Ekmek al"])
+    output = run_cmd(["list"])
+    
+    # Format kontrolü: [ID] Görev (Durum) - Tarih
+    assert "Ekmek al" in output
+    assert "PENDING" in output
+    assert "[1]" in output
+
+def test_dynamic_date_check():
+
+    run_cmd(["init"])
+    run_cmd(["add", "Tarih Testi"])
+    today = date.today().strftime("%Y-%m-%d")
+    output = run_cmd(["list"])
+    assert today in output
+
+def test_list_empty_state():
+    
+    run_cmd(["init"])
+    output = run_cmd(["list"])
+    assert "No tasks found" in output
+
+def test_done_still_not_implemented():
+
+    run_cmd(["init"])
+    output = run_cmd(["done", "1"])
+    assert "not implemented" in output
+
+def test_delete_still_not_implemented():
+    
+    run_cmd(["init"])
+    output = run_cmd(["delete", "1"])
+    assert "not implemented" in output
+
+def test_missing_add_args():
+    run_cmd(["init"])
+    output = run_cmd(["add"])
+    assert "Usage" in output m  
