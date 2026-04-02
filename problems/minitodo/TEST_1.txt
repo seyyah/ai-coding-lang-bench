@@ -1,0 +1,89 @@
+"""
+mini-todo Test Senaryolari
+Ogrenci: Halime (251478083)
+"""
+import subprocess
+import os
+import shutil
+
+def run_cmd(args):
+    """
+    Bu fonksiyon, yazdigimiz ana programi terminal üzerinden calistirir 
+    ve ekrana basilan sonuclari metin olarak bize geri dondurur.
+    """
+    result = subprocess.run(
+        ["python", "solution_v0.py"] + args,
+        capture_output=True,
+        text=True
+    )
+    return result.stdout.strip()
+
+def setup_function():
+    """
+    Her test calismadan hemen once calisir. 
+    Eski testlerden kalan .minitodo klasoru varsa siler ki testler sifirdan baslasin.
+    """
+    if os.path.exists(".minitodo"):
+        shutil.rmtree(".minitodo")
+
+# --- TEST SENARYOLARI ---
+
+def test_init_creates_dir():
+    # init komutunun klasor olusturup olusturmadigini kontrol eder.
+    run_cmd(["init"])
+    assert os.path.exists(".minitodo")
+
+def test_init_already_exists():
+    # Sistem zaten kuruluyken tekrar init yapilirsa uyari vermesini test eder.
+    run_cmd(["init"])
+    output = run_cmd(["init"])
+    assert "Already initialized" in output
+
+def test_add_task_success():
+    # Yeni bir gorev eklendiginde onay mesaji gelip gelmedigini test eder.
+    run_cmd(["init"])
+    output = run_cmd(["add", "Sut al"])
+    assert "Added task #1" in output
+
+def test_add_multiple_tasks():
+    # Iki gorev eklendiginde ID numarasinin arttigini (#2 oldugunu) denetler.
+    run_cmd(["init"])
+    run_cmd(["add", "Birinci"])
+    output = run_cmd(["add", "Ikinci"])
+    assert "#2" in output
+
+def test_error_no_init():
+    # Kurulum yapilmadan (init) komut calistirilirsa hata vermesini test eder.
+    setup_function() 
+    output = run_cmd(["add", "Test"])
+    assert "Not initialized" in output
+
+def test_unknown_command():
+    # Bilinmeyen bir komut girildiginde programin hata mesajini denetler.
+    run_cmd(["init"])
+    output = run_cmd(["fly"])
+    assert "Unknown" in output
+
+def test_list_not_implemented():
+    # list komutunun v0 surumunde 'henuz hazir degil' demesini bekler.
+    run_cmd(["init"])
+    output = run_cmd(["list"])
+    assert "not implemented" in output
+
+def test_done_not_implemented():
+    # done komutunun v0 surumunde 'henuz hazir degil' demesini bekler.
+    run_cmd(["init"])
+    output = run_cmd(["done", "1"])
+    assert "not implemented" in output
+
+def test_delete_not_implemented():
+    # delete komutunun v0 surumunde 'henuz hazir degil' demesini bekler.
+    run_cmd(["init"])
+    output = run_cmd(["delete", "1"])
+    assert "not implemented" in output
+
+def test_missing_add_args():
+    # add komutu yanina aciklama yazilmadan kullanilirsa yardim mesaji dondurur.
+    run_cmd(["init"])
+    output = run_cmd(["add"])
+    assert "Usage" in output
