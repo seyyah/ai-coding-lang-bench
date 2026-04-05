@@ -182,3 +182,15 @@ This entire movement was ignited by a single, powerful question: *Which Programm
 We proudly stand alongside other incredible benchmarking initiatives:
 - [AutoCodeBench](https://autocodebench.github.io)
 - [LiveCodeBench](https://livecodebench.github.io)
+- ---
+
+## 🎓 Academic Contributions
+
+This repository is supported by the **Samsun University Software Engineering** community. 
+
+### 📝 Documentation & SPEC Standards
+The technical specifications and documentation of this project are periodically reviewed by students to ensure alignment with modern software engineering standards.
+
+- **Contributor:** Pelin Kışlak ([@251478025-kodlayici](https://github.com/251478025-kodlayici))
+- **Role:** Technical Documentation Reviewer & Python Implementation Analyst
+- **Update Note:** Verified Python `os` and `datetime` module usage standards in SPEC implementations for V1 reliability.
