@@ -1,0 +1,47 @@
+PROJECT: mini-todo
+AUTHOR: [ilayda dinçer] (251478050)
+VERSION: v1
+DATE: 2026-04-06
+
+================================================================================
+OVERVIEW
+================================================================================
+This program is a command-line task manager designed to handle daily activities.
+
+================================================================================
+COMMANDS
+================================================================================
+
+--- init ---
+Usage: python solution_v1.py init
+Behavior: Creates ".minitodo/" directory and empty "tasks.dat". If exists, prints "Already initialized".
+
+--- add ---
+Usage: python solution_v1.py add "Task description"
+Behavior: Appends task to "tasks.dat" (Format: id|description|status|date). Default status: PENDING. 
+
+--- list ---
+Usage: python solution_v1.py list
+Behavior: Prints all tasks stored in tasks.dat. 
+UPDATE (V1): If no tasks exist, it gracefully prints "No tasks found."
+
+--- done ---
+Usage: python solution_v1.py done <id>
+Behavior: Changes the task status from PENDING to DONE for the given ID.
+UPDATE (V1): If the task ID does not exist, prints "Task #<id> not found."
+
+--- delete ---
+Usage: python solution_v1.py delete <id>
+Note: This command is not implemented in V1.
+
+================================================================================
+DATA FORMAT
+================================================================================
+File: .minitodo/tasks.dat
+Format: id|description|status|date
+
+================================================================================
+ERROR HANDLING
+================================================================================
+- Missing Init: "Not initialized. Run: python solution_v1.py init"
+- Unknown Command: "Unknown command: <command_name>"
