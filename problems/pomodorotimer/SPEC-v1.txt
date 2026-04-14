@@ -69,7 +69,7 @@ Example:
 ERROR HANDLING
 ========================================
 
-- Running any command before "init": print "Not initialized. Run: python minitimer.py init"
+- Running any command before "init": print "Not initialized. Run: python pomodorotimer.py init"
 - Starting a task while one is RUNNING: print "Error: A task is already running. Stop or pause it first."
 - Pausing a task that is not RUNNING: print "Error: No active task to pause."
 - Starting a task before 5-minute break: print "Error: You must rest for 5 minutes between tasks."
