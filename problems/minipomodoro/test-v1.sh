@@ -2,10 +2,10 @@
 # test-v1.sh - Testing core functionality (init, start, log)
 
 echo "--- Running test-v1.sh ---"
-rm -rf .pomodorotimer
+rm -rf .minipomodoro
 
-python3 pomodorotimer.py init
-python3 pomodorotimer.py start "Math Study"
-python3 pomodorotimer.py log
+python3 minipomodoro.py init
+python3 minipomodoro.py start "Math Study"
+python3 minipomodoro.py log
 
 echo "--- Test v1 completed successfully ---"
