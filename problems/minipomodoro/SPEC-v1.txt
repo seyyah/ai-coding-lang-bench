@@ -1,4 +1,4 @@
-PROJECT: pomodorotimer
+PROJECT: minipomodoro
 AUTHOR: Ömer Faruk Aksoy (251478060)
 VERSION: v1
 DATE: 2026-03-13
@@ -7,9 +7,9 @@ DATE: 2026-03-13
 OVERVIEW
 ========================================
 
-pomodorotimer is a command-line Pomodoro and time-tracking application.
+minipomodoro is a command-line Pomodoro and time-tracking application.
 It forces users to focus by limiting the number of pauses allowed during a session.
-All data is persisted in a directory called .pomodorotimer/
+All data is persisted in a directory called .minipomodoro/
 in the current working directory.
 
 ========================================
@@ -17,38 +17,38 @@ COMMANDS
 ========================================
 
 --- init ---
-Usage: python pomodorotimer.py init
-Creates a .pomodorotimer/ directory and an empty timer.dat file.
-If .pomodorotimer/ already exists, print "Already initialized" and exit.
+Usage: python minipomodoro.py init
+Creates a .minipomodoro/ directory and an empty timer.dat file.
+If .minipomodoro/ already exists, print "Already initialized" and exit.
 
 --- start ---
-Usage: python pomodorotimer.py start "Math Study"
+Usage: python minipomodoro.py start "Math Study"
 Starts a new task. Checks if the last completed task was finished less than 5 minutes ago. 
 If so, rejects starting.
 Appends a new task to timer.dat with status RUNNING.
 Prints "Started task: <description>. Focus!"
 
 --- pause ---
-Usage: python pomodorotimer.py pause
+Usage: python minipomodoro.py pause
 Pauses the currently RUNNING task. 
 A user can only pause a task a maximum of 3 times.
 If pause count is 3, prints "Error: Pause limit reached! Keep focusing."
 Otherwise, updates status to PAUSED, increments pause count, and prints "Task paused. <X> pauses remaining."
 
 --- resume ---
-Usage: python pomodorotimer.py resume
+Usage: python minipomodoro.py resume
 Changes the currently PAUSED task status back to RUNNING.
 Prints "Task resumed. Get back to work!"
 
 --- stop ---
-Usage: python pomodorotimer.py stop
+Usage: python minipomodoro.py stop
 Stops the active task and calculates total elapsed time.
 If elapsed time is less than 25 minutes, prints "Warning: Stopped before 25 minutes."
 Marks task as DONE.
 Prints "Task stopped. Total time: <minutes> mins."
 
 --- log ---
-Usage: python pomodorotimer.py log
+Usage: python minipomodoro.py log
 Prints all tasks, one per line:
   [1] [DONE] Math Study (25 mins) - 2 pauses
   [2] [RUNNING] Read Book (12 mins) - 0 pauses
@@ -58,7 +58,7 @@ If no tasks exist, prints "No timer logs found."
 DATA FORMAT
 ========================================
 
-File: .pomodorotimertimer/timer.dat
+File: .minipomodoro/timer.dat
 Format: One task per line, fields separated by |
 Structure: id | description | status | elapsed_minutes | pause_count | last_update_timestamp
 Example:
@@ -69,7 +69,7 @@ Example:
 ERROR HANDLING
 ========================================
 
-- Running any command before "init": print "Not initialized. Run: python pomodorotimer.py init"
+- Running any command before "init": print "Not initialized. Run: python minipomodoro.py init"
 - Starting a task while one is RUNNING: print "Error: A task is already running. Stop or pause it first."
 - Pausing a task that is not RUNNING: print "Error: No active task to pause."
 - Starting a task before 5-minute break: print "Error: You must rest for 5 minutes between tasks."
