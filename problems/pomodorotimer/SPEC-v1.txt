@@ -9,7 +9,7 @@ OVERVIEW
 
 pomodorotimer is a command-line Pomodoro and time-tracking application.
 It forces users to focus by limiting the number of pauses allowed during a session.
-All data is persisted in a directory called .pomodoro.timer/
+All data is persisted in a directory called .pomodorotimer/
 in the current working directory.
 
 ========================================
