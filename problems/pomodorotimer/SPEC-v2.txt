@@ -58,7 +58,7 @@ If no tasks exist, prints "No timer logs found."
 DATA FORMAT
 ========================================
 
-File: .minitimer/timer.dat
+File: .pomodorotimer/timer.dat
 Format: One task per line, fields separated by |
 Structure: id | description | status | elapsed_minutes | pause_count | last_update_timestamp
 Example:
