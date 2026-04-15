@@ -1,0 +1,68 @@
+PROJECT:mini-inventory
+AUTHOR:Ceren Baş (251478031)
+VERSION:V2
+DATE:2026-04-15
+
+------------------------------------------------------------------------
+ OVERVIEW
+------------------------------------------------------------------------
+
+
+mini-inventory is a CLI tool to track product stock.
+It allows users to initialize a warehouse, add products, update stock levels and view inventory. 
+
+All data is stored in .inventory/products.dat.
+
+
+----------------------------------------------------------------------
+ COMMANDS
+----------------------------------------------------------------------
+
+----init----
+Usage: python inventory.py init
+Creates .inventory/ directory and an empty products.dat.
+If already exits,prints "Warehouse already initialized."
+
+----add----
+Usage:python inventory.py add "Skirt" 300 20
+Adds a product: <name> <price> <quantity>.
+Format: id|name|price|quantity|date
+Prints: "Added product #<id>: <name>
+
+----list----
+Usage: python inventory.py list
+Prints all products in the file (raw format for v0).
+If empty, prints "Inventory is empty."
+
+
+----update----
+Usage:python inventory.py update 1 5
+Adds 5 units to the quantity of product #1.
+(To be fully implemented in v2/v3).
+
+----search----
+Usage:python inventory.py search "Skirt"
+Action:Checks if the product name is in the file.
+Prints:If the product is found, it prints the line,otherwise it says the product was not found.
+
+---------------------------------------------------------------------
+ DATA FORMAT
+---------------------------------------------------------------------  
+File: .inventory/products.dat
+Seperator:|
+Example:1|Skirt|300|20|2026-03-15
+
+--------------------------------------------------------------------
+ ERROR HANDLING
+--------------------------------------------------------------------
+-Numeric Error: "Error: Price and quantity must be numbers."
+-No init: "Error: Run 'python inventory.py init' first."
+-Unknown command: "Unknown command:<command>"
+-Missing args: "Usage: python inventory.py <command> [args]"
+
+v1 -> v2 SUMMARY
+ New search Command: Version 2 introduces a search command that allows users to check if a specific product name exists in the inventory file.
+ 
+ New Numeric Validation: A "Numeric Error" was added to ensure that the price and quantity inputs are valid numbers.
+
+ Updated Error Logic: The error handling section was expanded to provide more specific feedback for unknown commands and missing arguments.
