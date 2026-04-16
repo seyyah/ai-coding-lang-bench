@@ -1,5 +1,8 @@
 {
   "name": "miniconverter",
+  "type": "cli",
+  "language": "python",
+  "adapter": "cli",
   "binary_name": "solution_v2.py",
   "v0_spec": "SPEC-v0.txt",
   "v0_test": "test-v0.sh",
