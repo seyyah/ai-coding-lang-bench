@@ -1,8 +1,7 @@
 PROJECT: miniconverter
 AUTHOR: HASAN YILMAZ (250708022)
-VERSION: V1
-DATE: 2026-03-27
-
+VERSION: v0
+DATE: 2026-03-15
 
 ========================================
 OVERVIEW
@@ -10,7 +9,6 @@ OVERVIEW
 mini-converter is a CLI tool for length unit conversions.
 Supported units: meters (m), kilometers (km), centimeters (cm), millimeters (mm).
 All data is stored in a directory called .miniconv/ in the current directory.
-
 
 ========================================
 COMMANDS
@@ -24,11 +22,6 @@ Output: "Conversion storage initialized." or "Already initialized."
 --- convert ---
 Usage: python miniconverter.py convert <value> <from_unit> <to_unit>
 Behavior: Converts the value and logs it to .miniconv/history.dat.
-
-[V2 ENHANCEMENTS]:
-- Case Insensitivity: Unit inputs (m, km, cm, mm) are accepted regardless of case (e.g., KM, m, Cm are all valid).
-- Decimal Precision: Input values and results support decimal numbers and are processed with 2-decimal precision (e.g., 1.234 m is calculated as 123.40 cm).
-
 Output: "<value> <from_unit> is <result> <to_unit>"
 
 --- history ---
@@ -39,23 +32,12 @@ Output: "Command 'history' will be implemented in future weeks."
 Usage: python miniconverter.py stats
 Output: "Command 'stats' will be implemented in future weeks."
 
-
-========================================
-V1 CHANGE LOG
-========================================
-1. Added full support for mixed-case unit strings (Case Insensitivity).
-2. Implemented 2-decimal place precision for all numeric calculations.
-3. Maintained backward compatibility with v0 file structures and commands.
-4. Updated error messages to provide better guidance for input units.
-
-
 ========================================
 DATA FORMAT
 ========================================
 File: .miniconv/history.dat
 Format: value|from_unit|to_unit|result|date
-Example: 10.0|m|cm|1000.00|2026-03-27
-
+Example: 10.0|m|cm|1000.0|2026-03-13
 
 ========================================
 ERROR HANDLING

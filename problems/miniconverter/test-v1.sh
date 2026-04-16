@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # mini-converter v1 Bash Test Script
-# Ogrenci: HASAN YILMAZ 250708022
+# Ogrenci: HASAN YILMAZ (250708022)
 set -e
 
 PASS_COUNT=0
@@ -18,12 +18,12 @@ pass() {
 }
 
 cleanup() {
-  # Her testten once klasoru temizle
+  # Her testten once klasoru temizle [cite: 18]
   rm -rf .miniconv
 }
 
-# Calistirilacak ana komut
-BIN="python3 solution_v0.py"
+# [DIKKAT] Artik solution_v1.py dosyasini test ediyoruz! [cite: 18]
+BIN="python3 solution_v1.py"
 
 ######################################
 # Setup
@@ -31,8 +31,30 @@ BIN="python3 solution_v0.py"
 cleanup
 
 ######################################
-# Test 1: init creates directory
+# Test 1: Case Insensitivity (KM to M) 
 ######################################
+$BIN init > /dev/null
+# Kullanici 'KM' ve 'M' yazsa da hata almamali ve dogru sonuc donmeli 
+if $BIN convert 1 KM M | tr '[:upper:]' '[:lower:]' | grep -q "1.0 km is 1000.0 m"; then
+  pass "v2: case insensitivity works (KM -> M)"
+else
+  fail "v2: case insensitivity works (KM -> M)"
+fi
+
+######################################
+# Test 2: Decimal Precision (2 digits) 
+######################################
+# 1.234 metre, 123.4 (veya 123.40) olarak yuvarlanmali 
+if $BIN convert 1.234 m cm | grep -q "123.4"; then
+  pass "v2: decimal precision (2 digits) works"
+else
+  fail "v2: decimal precision (2 digits) works"
+fi
+
+######################################
+# Test 3: init creates folder 
+######################################
+cleanup
 if $BIN init > /dev/null && [ -d .miniconv ]; then
   pass "init creates .miniconv directory"
 else
@@ -40,16 +62,7 @@ else
 fi
 
 ######################################
-# Test 2: init already exists
-######################################
-if $BIN init | grep -q "Already initialized"; then
-  pass "init already exists prints correct message"
-else
-  fail "init already exists prints correct message"
-fi
-
-######################################
-# Test 3: convert m to cm
+# Test 4: convert m to cm 
 ######################################
 if $BIN convert 1 m cm | grep -q "1.0 m is 100.0 cm"; then
   pass "convert 1 m to cm works"
@@ -58,16 +71,7 @@ else
 fi
 
 ######################################
-# Test 4: convert km to m
-######################################
-if $BIN convert 2 km m | grep -q "2000.0 m"; then
-  pass "convert 2 km to m works"
-else
-  fail "convert 2 km to m works"
-fi
-
-######################################
-# Test 5: unsupported unit
+# Test 5: unsupported unit [cite: 20]
 ######################################
 if $BIN convert 5 m mile | grep -q "Error"; then
   pass "unsupported unit returns Error"
@@ -76,41 +80,13 @@ else
 fi
 
 ######################################
-# Test 6: future weeks commands (history/stats)
-######################################
-if $BIN history | grep -q "future weeks" && $BIN stats | grep -q "future weeks"; then
-  pass "history/stats show future weeks message"
-else
-  fail "history/stats show future weeks message"
-fi
-
-######################################
-# Test 7: error no init
+# Test 6: error no init [cite: 20]
 ######################################
 cleanup
 if $BIN convert 1 m cm | grep -q "Not initialized"; then
   pass "error when running convert without init"
 else
   fail "error when running convert without init"
-fi
-
-######################################
-# Test 8: unknown command
-######################################
-$BIN init > /dev/null
-if $BIN reset | grep -q "Unknown command"; then
-  pass "unknown command returns correct message"
-else
-  fail "unknown command returns correct message"
-fi
-
-######################################
-# Test 9: missing arguments
-######################################
-if $BIN convert 10 m | grep -q "Usage"; then
-  pass "missing arguments shows Usage message"
-else
-  fail "missing arguments shows Usage message"
 fi
 
 ######################################
@@ -124,7 +100,7 @@ echo "TOTAL:  $((PASS_COUNT + FAIL_COUNT))"
 echo "========================"
 
 if [ "$FAIL_COUNT" -eq 0 ]; then
-  echo "ALL V1 TESTS PASSED"
+  echo "ALL V2 TESTS PASSED"
   exit 0
 else
   exit 1

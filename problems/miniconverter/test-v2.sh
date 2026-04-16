@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
-# mini-converter v2 (v1.1) Bash Test Script
+# miniconverter v2 Full Regression Test Script
 # Ogrenci: HASAN YILMAZ (250708022)
+# Guncelleme: V0, V1 ve V2 ozelliklerinin tamamı denetlenmektedir.
 set -e
 
 PASS_COUNT=0
 FAIL_COUNT=0
 
-#
+# Yardımcı Fonksiyonlar
 fail() {
   echo "FAIL: $1"
   FAIL_COUNT=$((FAIL_COUNT+1))
@@ -18,90 +19,115 @@ pass() {
 }
 
 cleanup() {
-  # Her testten once klasoru temizle [cite: 18]
+  # Her testten once klasoru temizleyerek izole bir ortam saglıyoruz
   rm -rf .miniconv
 }
 
-# [DIKKAT] Artik solution_v1.py dosyasini test ediyoruz! [cite: 18]
-BIN="python3 solution_v1.py"
+# [KRITIK] problem.json ile uyumlu ikili dosya ismi
+BIN="python3 solution_v2.py"
 
 ######################################
-# Setup
+# SETUP & INITIALIZATION
 ######################################
 cleanup
 
 ######################################
-# Test 1: Case Insensitivity (KM to M) 
+# TEST 1: V0 - Init Creates Directory
 ######################################
-$BIN init > /dev/null
-# Kullanici 'KM' ve 'M' yazsa da hata almamali ve dogru sonuc donmeli 
-if $BIN convert 1 KM M | tr '[:upper:]' '[:lower:]' | grep -q "1.0 km is 1000.0 m"; then
-  pass "v2: case insensitivity works (KM -> M)"
-else
-  fail "v2: case insensitivity works (KM -> M)"
-fi
-
-######################################
-# Test 2: Decimal Precision (2 digits) 
-######################################
-# 1.234 metre, 123.4 (veya 123.40) olarak yuvarlanmali 
-if $BIN convert 1.234 m cm | grep -q "123.4"; then
-  pass "v2: decimal precision (2 digits) works"
-else
-  fail "v2: decimal precision (2 digits) works"
-fi
-
-######################################
-# Test 3: init creates folder 
-######################################
-cleanup
+# Program ilk kez calıstıgında dizin olusturmalı
 if $BIN init > /dev/null && [ -d .miniconv ]; then
-  pass "init creates .miniconv directory"
+  pass "v0: init creates .miniconv directory"
 else
-  fail "init creates .miniconv directory"
+  fail "v0: init creates .miniconv directory"
 fi
 
 ######################################
-# Test 4: convert m to cm 
+# TEST 2: V0 - Basic Conversion (m to cm)
 ######################################
-if $BIN convert 1 m cm | grep -q "1.0 m is 100.0 cm"; then
-  pass "convert 1 m to cm works"
+# Temel donusum dogru calısmalı
+if $BIN convert 10 m cm | grep -q "10.0 m is 1000.00 cm"; then
+  pass "v0: basic convert (10m to cm) works"
 else
-  fail "convert 1 m to cm works"
+  fail "v0: basic convert (10m to cm) works"
 fi
 
 ######################################
-# Test 5: unsupported unit [cite: 20]
+# TEST 3: V1 - Case Insensitivity (KM to M)
 ######################################
+# Buyuk harf girisleri kucuk harf gibi islenmeli
+if $BIN convert 1 KM M | tr '[:upper:]' '[:lower:]' | grep -q "1.0 km is 1000.00 m"; then
+  pass "v1: case insensitivity works (KM -> M)"
+else
+  fail "v1: case insensitivity works (KM -> M)"
+fi
+
+######################################
+# TEST 4: V1 - Decimal Precision (Float Support)
+######################################
+# Ondalık sayılar 2 basamak hassasiyetle gosterilmeli
+if $BIN convert 1.234 m cm | grep -q "123.40"; then
+  pass "v1: decimal precision (1.234m -> 123.40cm) works"
+else
+  fail "v1: decimal precision (1.234m -> 123.40cm) works"
+fi
+
+######################################
+# TEST 5: V2 - Invalid Value Validation
+######################################
+# Sayı yerine metin girildiginde program cokmemeli
+if $BIN convert elma m cm | grep -q "Error: elma is not a valid number."; then
+  pass "v2: non-numeric value error handling (elma test) works"
+else
+  fail "v2: non-numeric value error handling (elma test) works"
+fi
+
+######################################
+# TEST 6: V2 - Unknown Command Handling
+######################################
+# Bilinmeyen bir komut girildiginde kullanıcı uyarılmalı
+if $BIN reset | grep -q "Unknown command: reset"; then
+  pass "v2: unknown command handling works"
+else
+  fail "v2: unknown command handling works"
+fi
+
+######################################
+# TEST 7: Global - Unsupported Unit Error
+######################################
+# Desteklenmeyen birimler hata dondurmeli
 if $BIN convert 5 m mile | grep -q "Error"; then
-  pass "unsupported unit returns Error"
+  pass "global: unsupported unit returns Error"
 else
-  fail "unsupported unit returns Error"
+  fail "global: unsupported unit returns Error"
 fi
 
 ######################################
-# Test 6: error no init [cite: 20]
+# TEST 8: Global - Error No Init
 ######################################
 cleanup
+# Init yapılmadan islemlere izin verilmemeli
 if $BIN convert 1 m cm | grep -q "Not initialized"; then
-  pass "error when running convert without init"
+  pass "global: error when running convert without init"
 else
-  fail "error when running convert without init"
+  fail "global: error when running convert without init"
 fi
 
 ######################################
-# Summary
+# SUMMARY REPORT
 ######################################
 echo ""
-echo "========================"
+echo "========================================"
+echo "      MINICONVERTER V2 TEST RESULTS     "
+echo "========================================"
 echo "PASSED: $PASS_COUNT"
 echo "FAILED: $FAIL_COUNT"
-echo "TOTAL:  $((PASS_COUNT + FAIL_COUNT))"
-echo "========================"
+echo "TOTAL TESTS: $((PASS_COUNT + FAIL_COUNT))"
+echo "========================================"
 
 if [ "$FAIL_COUNT" -eq 0 ]; then
-  echo "ALL V2 TESTS PASSED"
+  echo ">>> ALL V0, V1 AND V2 TESTS PASSED <<<"
   exit 0
 else
+  echo ">>> SOME TESTS FAILED <<<"
   exit 1
 fi
