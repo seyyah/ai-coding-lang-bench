@@ -1,0 +1,69 @@
+PROJECT: miniconverter
+AUTHOR: HASAN YILMAZ (250708022)
+VERSION: V3
+DATE: 2026-04-16
+
+
+========================================
+OVERVIEW
+========================================
+miniconverter is a CLI tool for length unit conversions.
+Supported units: meters (m), kilometers (km), centimeters (cm), millimeters (mm).
+All data is stored in a directory called .miniconv/ in the current directory.
+
+
+========================================
+COMMANDS
+========================================
+
+--- init ---
+Usage: python miniconverter.py init
+Behavior: Creates .miniconv/ directory and history.dat file.
+Output: "Conversion storage initialized." or "Already initialized."
+
+--- convert ---
+Usage: python miniconverter.py convert <value> <from_unit> <to_unit>
+Behavior: Converts the value and logs it to .miniconv/history.dat.
+
+[V2 ENHANCEMENTS]:
+- Case Insensitivity: Unit inputs (m, km, cm, mm) are accepted regardless of case (e.g., KM, m, Cm are all valid).
+- Decimal Precision: Input values and results support decimal numbers and are processed with 2-decimal precision (e.g., 1.234 m is calculated as 123.40 cm).
+
+[V3 ENHANCEMENTS]:
+- Value Validation: The system checks if the input <value> is a valid number before processing to prevent crashes.
+
+Output: "<value> <from_unit> is <result> <to_unit>"
+
+--- history ---
+Usage: python miniconverter.py history
+Output: "Command 'history' will be implemented in future weeks."
+
+--- stats ---
+Usage: python miniconverter.py stats
+Output: "Command 'stats' will be implemented in future weeks."
+
+
+========================================
+V3 CHANGE LOG
+========================================
+1. Added full support for mixed-case unit strings (Inherited from V2).
+2. Implemented 2-decimal place precision for all numeric calculations (Inherited from V2).
+3. Added strict validation to catch non-numeric inputs for the <value> argument.
+
+
+========================================
+DATA FORMAT
+========================================
+File: .miniconv/history.dat
+Format: value|from_unit|to_unit|result|date
+Example: 10.0|m|cm|1000.00|2026-04-16
+
+
+========================================
+ERROR HANDLING
+========================================
+- Run before init: "Error: Not initialized. Run: python miniconverter.py init"
+- Unsupported unit: "Error: Unsupported unit <unit>. Use m, km, cm, or mm."
+- Invalid Value: "Error: <value> is not a valid number."
+- Missing arguments: "Usage: python miniconverter.py <command> [args]"
+- Unknown command: "Unknown command: <command>"
