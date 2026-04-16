@@ -1,0 +1,154 @@
+name: "Validate: Benchmark Artifact"
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "artifacts/**"
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  validate-artifact:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch base branch
+        run: git fetch origin ${{ github.base_ref }}
+
+      - name: Validate artifact structure
+        id: validate
+        run: |
+          set +e
+          ERRORS=""
+
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+
+          # 1. Check that ALL changes are under artifacts/
+          NON_ARTIFACT_FILES=$(echo "$CHANGED_FILES" | grep -v '^artifacts/' || true)
+          if [ -n "$NON_ARTIFACT_FILES" ]; then
+            ERRORS="$ERRORS\n❌ **Mixed contribution detected.** An artifact PR must ONLY touch files under \`artifacts/\`.\n\nFiles outside artifacts/:\n\`\`\`\n$NON_ARTIFACT_FILES\n\`\`\`\n"
+          fi
+
+          # 2. Check no existing files are modified (additions only)
+          MODIFIED_EXISTING=$(echo "$CHANGED_FILES" | grep '^artifacts/' | while read f; do
+            if git show origin/${{ github.base_ref }}:"$f" &>/dev/null; then
+              echo "$f"
+            fi
+          done)
+
+          if [ -n "$MODIFIED_EXISTING" ]; then
+            ERRORS="$ERRORS\n❌ **Modifying existing artifacts is not allowed.** Only new files can be added.\n\nModified files:\n\`\`\`\n$MODIFIED_EXISTING\n\`\`\`\n"
+          fi
+
+          # 3. Validate directory structure: artifacts/<codex>/<model>/<problem>/
+          ARTIFACT_FILES=$(echo "$CHANGED_FILES" | grep '^artifacts/' || true)
+
+          # Get known codexes from config
+          KNOWN_CODEXES=$(grep -E '^\s{2}[a-z]' config/codexes.yml | grep -v '^#' | sed 's/://;s/^[[:space:]]*//' | head -20)
+          echo "Known codexes: $KNOWN_CODEXES"
+
+          # Get known problems
+          KNOWN_PROBLEMS=$(ls -1 problems/ 2>/dev/null)
+          echo "Known problems: $KNOWN_PROBLEMS"
+
+          for f in $ARTIFACT_FILES; do
+            # Extract path components: artifacts/<codex>/<model>/<problem>/...
+            DEPTH=$(echo "$f" | tr '/' '\n' | wc -l)
+            if [ "$DEPTH" -lt 5 ]; then
+              ERRORS="$ERRORS\n❌ **Invalid artifact path:** \`$f\`\n\nExpected structure: \`artifacts/<codex>/<model>/<problem>/<files>\`\n"
+              continue
+            fi
+
+            CODEX=$(echo "$f" | cut -d'/' -f2)
+            PROBLEM=$(echo "$f" | cut -d'/' -f4)
+
+            # Validate codex exists
+            if ! echo "$KNOWN_CODEXES" | grep -qw "$CODEX"; then
+              ERRORS="$ERRORS\n❌ **Unknown codex:** \`$CODEX\` in path \`$f\`\n\nKnown codexes: \`$(echo $KNOWN_CODEXES | tr '\n' ', ')\`\n"
+            fi
+
+            # Validate problem exists
+            if ! echo "$KNOWN_PROBLEMS" | grep -qw "$PROBLEM"; then
+              ERRORS="$ERRORS\n❌ **Unknown problem:** \`$PROBLEM\` in path \`$f\`\n\nKnown problems: \`$(echo $KNOWN_PROBLEMS | tr '\n' ', ')\`\n"
+            fi
+          done
+
+          # 4. Check file types
+          INVALID_TYPES=$(echo "$ARTIFACT_FILES" | grep -vE '\.(json|md|csv|png|txt|log)$' || true)
+          if [ -n "$INVALID_TYPES" ]; then
+            ERRORS="$ERRORS\n⚠️ **Unusual file types detected:**\n\`\`\`\n$INVALID_TYPES\n\`\`\`\nExpected types: \`.json\`, \`.md\`, \`.csv\`, \`.png\`, \`.txt\`, \`.log\`\n"
+          fi
+
+          # Write results
+          if [ -n "$ERRORS" ]; then
+            echo "status=failure" >> $GITHUB_OUTPUT
+            {
+              echo "errors<<ERRORS_EOF"
+              echo -e "$ERRORS"
+              echo "ERRORS_EOF"
+            } >> $GITHUB_OUTPUT
+            exit 1
+          else
+            echo "status=success" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Comment on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const errors = `${{ steps.validate.outputs.errors }}`;
+
+            let body = `## 🔍 Artifact Validation Failed\n\n`;
+            body += `### Issues Found\n\n${errors}\n`;
+            body += `---\n\n`;
+            body += `### 📖 Required Structure\n\n`;
+            body += `\`\`\`\nartifacts/<codex-name>/<model-name>/<problem-name>/\n  benchmark_results.json\n  report.md\n  figures.png\n  ...\n\`\`\`\n\n`;
+            body += `📖 See [AGENT.md](./AGENT.md) for the full contributor protocol.\n`;
+            body += `🔄 Push fixes and the checks will re-run automatically.`;
+
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+      - name: Comment on success
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            let body = `## ✅ Artifact Validation Passed\n\n`;
+            body += `Benchmark artifacts are correctly structured. Ready for maintainer review. 🚀`;
+
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+      - name: Add label on success
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['✅ artifact-validated']
+            });

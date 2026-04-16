@@ -46,7 +46,7 @@ class ClaudeCodex < BaseCodex
       elapsed = Time.now - start_time
       metrics = parse_metrics(result[:stdout])
 
-      log_execution(log_path, prompt, result[:stdout]) if log_path && result[:stdout]
+      log_execution(log_path, prompt, metrics, {}, result[:stdout]) if log_path && result[:stdout]
       
       # Claude CLI handles file creation, but we use BaseCodex extraction as a safety measure
       save_generated_code(result[:stdout], dir)
@@ -96,22 +96,6 @@ class ClaudeCodex < BaseCodex
     }
   rescue JSON::ParserError
     nil
-  end
-
-  def log_execution(path, prompt, raw_stdout)
-    FileUtils.mkdir_p(File.dirname(path))
-    File.write(path, JSON.pretty_generate({
-      prompt: prompt,
-      raw_output: raw_stdout,
-      timestamp: Time.now.iso8601
-    }))
-  end
-
-  def handle_error(e, start_time)
-    puts "\n" + ("!" * 50)
-    puts "❌ CLAUDE CLI ERROR: #{e.message}"
-    puts ("!" * 50) + "\n"
-    { success: false, elapsed_seconds: (Time.now - start_time).round(1), error: e.message }
   end
 
   def validate_cli_availability!

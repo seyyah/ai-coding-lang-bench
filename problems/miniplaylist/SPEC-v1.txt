@@ -1,0 +1,69 @@
+PROJECT: MiniPlaylist
+VERSION: v1
+
+==========================================
+		OVERVIEW
+==========================================
+
+minipl is a command-line tool for managing a music playlist.
+It keeps songs listed and allows the user to add, show, and remove songs.
+
+All data is persisted in a file called `playlists.dat` inside a `.miniplaylist/` directory in the current working directory.
+
+==========================================
+		DETERMINISM RULES
+==========================================
+1. Do not print any text other than what is explicitly requested.
+2. Exit with code 0 on success, and code 1 on errors (unless specified otherwise).
+3. Do not prompt the user for input. Assume arguments are provided strictly via CLI args.
+4. Auto-incrementing IDs must firmly start at 1.
+
+==========================================
+		COMMANDS
+==========================================
+
+------------------init--------------------
+Usage: minipl init
+Creates a `.miniplaylist/` directory and an empty `playlists.dat` file.
+If `.miniplaylist/` already exists, print "Already initialized" and exit 0.
+
+-------------------add--------------------
+Usage: minipl add "Name" "Author" "Album"
+Example: minipl add "Dark Red" "Steve Lacy" "Dark Red"
+Appends a new song to `playlists.dat`.
+Each song has: Name, Author, Album, ID (auto-incremented integer starting at 1).
+Print "Song Added Successfully <Name>"
+Exit 0.
+
+------------------remove------------------
+Usage: minipl remove <ID>
+Example: minipl remove 1
+Removes the song with the given ID from `playlists.dat`.
+Print "Song Successfully Removed <Name>"
+If song does not exist, print "You don't have song to remove" and exit 1.
+
+---------------------show-----------------
+Usage: minipl show
+Shows all songs, one per line in the format:
+<ID> | <Name> | <Author> | <Album>
+
+Example:
+1 | Dark Red | Steve Lacy | Dark Red
+2 | Shut Up My Moms Calling | Hotel Ugly | Shut Up My Moms Calling
+
+If no song exists, print "List is empty" and exit 0.
+
+==========================================
+		DATA FORMAT
+==========================================
+File: .miniplaylist/playlists.dat
+Format: One song per line, fields separated by " | "
+Example:
+1 | Dark Red | Steve Lacy | Dark Red
+2 | Shut Up My Moms Calling | Hotel Ugly | Shut Up My Moms Calling
+
+==========================================
+		ERROR HANDLING
+==========================================
+- Running any command before "init": print "Not initialized. Run: minipl init" and exit 1.
+- Invalid command: print "Unknown command: <command>" and exit 1.

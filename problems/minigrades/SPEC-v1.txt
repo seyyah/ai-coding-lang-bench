@@ -1,0 +1,187 @@
+MiniGrades Specification
+Version: 1.0
+Command name: minigrades
+External libraries: NOT allowed
+Standard library: Allowed
+Persistent storage: Local filesystem only
+
+========================================
+1. Overview
+========================================
+
+MiniGrades is a minimal command-line student management
+and grade tracking tool.
+
+The executable must be called:
+
+    minigrades
+
+All data must be stored in:
+
+    .minigrades/
+
+All commands operate relative to current directory.
+
+----------------------------------------
+
+Supported commands:
+
+    minigrades init
+    minigrades add <id> <name>
+    minigrades add-grade <id> <grade>
+    minigrades delete <id>
+    minigrades list
+    minigrades average <id>
+
+========================================
+2. Data Storage
+========================================
+
+After init:
+
+    .minigrades/
+        data.txt
+
+data.txt:
+    One student per line.
+    Format: <id>|<name>|<grade1>,<grade2>,...
+
+    Example:
+    101|Berke|70,30
+    102|Efe|
+
+    If a student has no grades, the grades field is empty.
+
+========================================
+3. Command Specifications
+========================================
+
+----------------------------------------
+3.1 init
+----------------------------------------
+
+Create .minigrades/ directory and empty data.txt file.
+
+If already exists:
+    print "Already initialized"
+Exit 0.
+
+----------------------------------------
+3.2 add <id> <name>
+----------------------------------------
+
+If not initialized:
+    print "Not initialized. Run: minigrades init"
+    exit 1
+
+If id is not a positive integer:
+    print "Invalid input: Please enter a numeric value."
+    exit 1
+
+If student with id already exists:
+    print "Error: Student with ID <id> already exists."
+    exit 1
+
+Add student to data.txt with empty grades.
+
+Print:
+    Student added successfully.
+
+----------------------------------------
+3.3 add-grade <id> <grade>
+----------------------------------------
+
+If not initialized:
+    print "Not initialized. Run: minigrades init"
+    exit 1
+
+If id or grade is not numeric:
+    print "Invalid input: Please enter a numeric value."
+    exit 1
+
+If grade < 0 or grade > 100:
+    print "Invalid grade: Grades must be between 0 and 100."
+    exit 1
+
+If student not found:
+    print "Error: No student found with ID <id>."
+    exit 1
+
+Append grade to student's grade list.
+
+Print:
+    Grades added successfully for student <id>.
+
+----------------------------------------
+3.4 delete <id>
+----------------------------------------
+
+If not initialized:
+    print "Not initialized. Run: minigrades init"
+    exit 1
+
+If student not found:
+    print "Error: No student found with ID <id>."
+    exit 1
+
+Remove student from data.txt.
+
+Print:
+    Student deleted successfully.
+
+----------------------------------------
+3.5 list
+----------------------------------------
+
+If not initialized:
+    print "Not initialized. Run: minigrades init"
+    exit 1
+
+If no students:
+    print "Error: No students found in the system. Operation aborted."
+    exit 1
+
+Output format (exactly):
+
+ID | Name
+-----------
+<id> | <name>
+<id> | <name>
+
+Students listed in insertion order (file order).
+
+----------------------------------------
+3.6 average <id>
+----------------------------------------
+
+If not initialized:
+    print "Not initialized. Run: minigrades init"
+    exit 1
+
+If student not found:
+    print "Error: No student found with ID <id>."
+    exit 1
+
+In v1, average is not yet implemented:
+    print "Average calculation will be implemented in future weeks."
+
+========================================
+4. Error Handling
+========================================
+
+- Unknown command:
+    print "Unknown command: <command>. Please select from the menu."
+    exit 1
+
+========================================
+5. Determinism Rules
+========================================
+
+- No extra spaces in output
+- No debug output
+- Exact string matching required
+- Exit 0 on success, exit 1 on error
+
+========================================
+END
+========================================

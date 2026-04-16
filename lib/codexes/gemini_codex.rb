@@ -17,8 +17,8 @@ class GeminiCodex < BaseCodex
     
     # API Credentials & Config
     @api_key      = presence(config[:api_key]) || ENV['GOOGLE_API_KEY']
-    @api_url      = presence(config[:api_url]) || presence(config[:api_endpoint])
-    @model_name   = presence(config[:model]) || presence(config[:model_name])
+    @api_endpoint = presence(config[:api_endpoint]) || presence(config[:api_url])
+    @model        = presence(config[:model]) || presence(config[:model_name])
     
     # Runtime Settings
     @cooldown_seconds = float_or_default(config[:cooldown_seconds], 1.2)
@@ -31,37 +31,16 @@ class GeminiCodex < BaseCodex
     validate_config!
   end
 
-  def version; @model_name; end
+  def version; @model; end
 
   # Connectivity check with a minimal prompt
   def warmup(warmup_dir)
-    puts "  Warmup: Validating Gemini connectivity (#{@model_name})..."
+    puts "  Warmup: Validating Gemini connectivity (#{@model})..."
     run_generation('Respond with just OK.', dir: warmup_dir)
   end
 
-  def run_generation(prompt, dir:, log_path: nil)
-    start_time = Time.now
-    begin
-      raw, response_text, usage = call_gemini_api(prompt)
-      elapsed = Time.now - start_time
-      metrics = build_metrics(usage, elapsed)
-
-      log_execution(log_path, prompt, metrics, usage, raw) if log_path
-      save_generated_code(response_text, dir)
-      sleep(@cooldown_seconds)
-
-      { success: true, elapsed_seconds: elapsed.round(1), metrics: metrics, response_text: response_text }
-    rescue StandardError => e
-      handle_error(e, start_time)
-    end
-  end
-
-  private
-
-  # Executes the core HTTP POST request using the dynamic URL and API key
-  def call_gemini_api(prompt)
-    # Gemini API expects the key as a query parameter rather than a header
-    uri = URI("#{@api_url}/#{@model_name}:generateContent?key=#{@api_key}")
+  def call_api(prompt)
+    uri = URI("#{@api_endpoint}/#{@model}:generateContent?key=#{@api_key}")
     
     req = Net::HTTP::Post.new(uri).tap do |r|
       r['Content-Type'] = 'application/json'
@@ -96,37 +75,14 @@ class GeminiCodex < BaseCodex
       input_tokens: input,
       output_tokens: output,
       cost_usd: calculate_cost(input, output),
-      model: @model_name,
+      model: @model,
       duration_ms: (elapsed * 1000).round
     }
   end
 
-  # Calculates cost based on millions of tokens
-  def calculate_cost(input, output)
-    ((input / MILLION) * @price_input_1m + (output / MILLION) * @price_output_1m).round(8)
-  end
-
-  def log_execution(path, prompt, metrics, usage, raw)
-    FileUtils.mkdir_p(File.dirname(path))
-    File.write(path, JSON.pretty_generate({
-      model: @model_name,
-      prompt: prompt,
-      metrics: metrics,
-      usage: usage,
-      raw_response: raw
-    }))
-  end
-
-  def handle_error(e, start_time)
-    puts "\n" + ("!" * 50)
-    puts "❌ GEMINI ADAPTER ERROR: #{@model_name} -> #{e.message}"
-    puts ("!" * 50) + "\n"
-    { success: false, elapsed_seconds: (Time.now - start_time).round(1), error: e.message }
-  end
-
   def validate_config!
     raise CodexError, 'GOOGLE_API_KEY not configured' unless @api_key
-    raise CodexError, 'Gemini API URL not configured' unless @api_url
-    raise CodexError, 'Model name not configured for Gemini' unless @model_name
+    raise CodexError, 'Gemini API URL not configured' unless @api_endpoint
+    raise CodexError, 'Model name not configured for Gemini' unless @model
   end
 end

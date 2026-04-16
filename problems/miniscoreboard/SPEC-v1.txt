@@ -1,0 +1,51 @@
+PROJECT: miniscoreboard
+AUTHOR: Utkuhan Akar (251478036)
+VERSION: v1
+DATE: 2026-03-31
+
+========================================
+OVERVIEW
+========================================
+
+miniscoreboard is a command-line sports match management tool.
+It stores match records in a plain text file and supports
+initializing the system and adding new match results.
+
+All data is persisted in a directory called .miniscore/
+in the current working directory.
+
+========================================
+COMMANDS
+========================================
+
+--- init ---
+Usage: python miniscore.py init
+Creates a .miniscore/ directory and an empty matches.dat file.
+If .miniscore/ already exists, prints "Already initialized".
+
+--- add-match ---
+Usage: python miniscore.py add-match <League> <Week> <Date> <TeamA> <ScoreA> <TeamB> <ScoreB>
+Appends a new match to matches.dat.
+Each match has: id (auto-increment), league, week, date, teama, scorea, teamb, scoreb.
+Prints "Added match #<id>: [<League> - <Week>] <TeamA> <ScoreA> - <ScoreB> <TeamB> on <Date>"
+
+========================================
+DATA FORMAT
+========================================
+
+File: .miniscore/matches.dat
+Format: One match per line, fields separated by |
+Example:
+1|SuperLig|W1|2026-03-31|GALATASARAY|2|FENERBAHCE|1
+
+========================================
+ERROR HANDLING
+========================================
+
+- Running any command before "init": print "Not initialized."
+- Invalid command: print "Unknown command: <command>"
+- Missing arguments: print "Usage: python miniscore.py <command> [args]"
+- Inputs containing '|': print "Error: The '|' character is reserved."
+- Non-numeric scores: print "Error: Scores must be positive numbers."
+- Empty team names: print "Error: Team names cannot be empty."
+- Team playing itself: print "Error: A team cannot play against itself."

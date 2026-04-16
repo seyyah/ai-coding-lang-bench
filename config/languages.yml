@@ -1,0 +1,67 @@
+languages:
+  rust:
+    exts:
+      - rs
+    version_cmd: "rustc --version"
+  go:
+    exts:
+      - go
+    version_cmd: "go version"
+  c:
+    exts:
+      - c
+      - h
+    version_cmd: "gcc --version | head -1"
+  typescript:
+    exts:
+      - ts
+    version_cmd: "tsc --version"
+  javascript:
+    exts:
+      - js
+    version_cmd: "node --version"
+  java:
+    exts:
+      - java
+    version_cmd: "java --version 2>&1 | head -1"
+  perl:
+    exts:
+      - pl
+      - pm
+    version_cmd: "perl --version | head -2 | tail -1"
+  python:
+    exts:
+      - py
+    version_cmd: "python3 --version"
+  python/mypy:
+    exts:
+      - py
+    version_cmd: "python3 --version && mypy --version"
+    extra_prompt: "Write fully type-annotated Python code. All functions must have complete type hints. After passing the tests, also verify type correctness by running: mypy --strict *.py"
+  ruby:
+    exts:
+      - rb
+    version_cmd: "ruby --version"
+  ruby/steep:
+    exts:
+      - rb
+      - rbs
+    version_cmd: "ruby --version && steep --version"
+    extra_prompt: "Write Ruby code with RBS type signatures. Create .rbs files for all Ruby source files. After passing the tests, also verify type correctness by running: steep check"
+  lua:
+    exts:
+      - lua
+    version_cmd: "lua -v"
+  scheme:
+    exts:
+      - scm
+    version_cmd: "guile --version | head -1"
+  ocaml:
+    exts:
+      - ml
+      - mli
+    version_cmd: "ocaml --version"
+  haskell:
+    exts:
+      - hs
+    version_cmd: "ghc --version"

@@ -1,0 +1,132 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'optparse'
+require_relative '../lib/codex_loader'
+
+BASE_DIR = File.expand_path('..', __dir__)
+SRC_DIR = File.join(BASE_DIR, 'src')
+
+def usage!
+  puts <<~USAGE
+    Usage: bin/which-language <command> <codex> <problem> [options]
+
+    Commands:
+      benchmark   Run the benchmark suite for a codex and problem
+      report      Generate markdown evaluation report from benchmark results
+      plot        Generate visualizations from benchmark results
+      run         Execute benchmark, report, and plot consecutively (end-to-end)
+
+    Arguments:
+      codex       The AI codex to use (e.g., claude, gemini, openai, aider)
+      problem     The problem key to run against (e.g., minigit, minitest)
+
+    Options:
+      --dry-run   Perform a dry run without actually calling the AI (benchmark & run only)
+      (Any other options will be passed directly to the underlying scripts)
+
+    Examples:
+      bin/which-language run gemini minigit
+      bin/which-language benchmark openai minigit --lang python,ruby --trials 1
+      bin/which-language report claude minitest
+  USAGE
+  exit 1
+end
+
+command = ARGV.shift
+codex = ARGV.shift
+problem = ARGV.shift
+
+usage! if [command, codex, problem].any?(&:nil?) || %w[-h --help].include?(command)
+
+valid_commands = %w[benchmark report plot run]
+unless valid_commands.include?(command)
+  puts "Unknown command: #{command}"
+  usage!
+end
+
+# Check for dry-run in remaining args to pass to root resolver
+dry_run = ARGV.include?('--dry-run')
+
+def resolve_base_dir(codex, problem, dry_run)
+  CodexLoader.default_output_root(
+    codex,
+    problem: problem,
+    base_dir: BASE_DIR,
+    dry_run: dry_run
+  )
+end
+
+def run_benchmark(codex, problem, extra_args)
+  puts "==> Running benchmark (codex: #{codex}, problem: #{problem})"
+  cmd = ["ruby", File.join(SRC_DIR, 'benchmark.rb'), "--codex", codex, "--problem", problem] + extra_args
+  system(*cmd)
+  raise "Benchmark failed" unless $?.success?
+end
+
+def run_report(codex, problem, dry_run)
+  puts "==> Generating report"
+  base_dir = resolve_base_dir(codex, problem, dry_run)
+  results_dir = File.join(base_dir, 'results')
+  results_json = File.join(results_dir, 'results.json')
+  meta_json = File.join(results_dir, 'meta.json')
+  report_md = File.join(results_dir, 'report.md')
+
+  unless File.exist?(results_json)
+    raise "Missing results file: #{results_json}. Did you run the benchmark first?"
+  end
+
+  cmd = [
+    "ruby", File.join(SRC_DIR, 'report.rb'),
+    "--codex", codex,
+    "--results", results_json,
+    "--meta", meta_json,
+    "--output", report_md
+  ]
+  system(*cmd)
+  raise "Report generation failed" unless $?.success?
+end
+
+def run_plot(codex, problem, dry_run)
+  puts "==> Generating figures"
+  base_dir = resolve_base_dir(codex, problem, dry_run)
+  results_json = File.join(base_dir, 'results', 'results.json')
+  outdir = File.join(base_dir, 'figures')
+
+  unless File.exist?(results_json)
+    raise "Missing results file: #{results_json}. Did you run the benchmark first?"
+  end
+
+  FileUtils.mkdir_p(outdir)
+
+  cmd = [
+    "python3", File.join(SRC_DIR, 'plot.py'),
+    results_json,
+    "--codex", codex,
+    "--outdir", outdir
+  ]
+  system(*cmd)
+  raise "Plot generation failed" unless $?.success?
+end
+
+begin
+  case command
+  when 'benchmark'
+    run_benchmark(codex, problem, ARGV)
+  when 'report'
+    run_report(codex, problem, dry_run)
+  when 'plot'
+    run_plot(codex, problem, dry_run)
+  when 'run'
+    run_benchmark(codex, problem, ARGV)
+    run_report(codex, problem, dry_run)
+    run_plot(codex, problem, dry_run)
+    
+    base_dir = resolve_base_dir(codex, problem, dry_run)
+    puts
+    puts "All artifacts written under: #{base_dir}"
+  end
+rescue RuntimeError => e
+  puts "\nError: #{e.message}"
+  exit 1
+end

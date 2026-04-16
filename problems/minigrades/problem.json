@@ -1,0 +1,10 @@
+{
+  "name": "MiniGrades",
+  "binary_name": "minigrades",
+  "v1_spec": "SPEC-v1.txt",
+  "v1_test": "test-v1.sh",
+  "v1_prompt": "Implement {{binary_name}} as described in SPEC-v1.txt using {{language}}. The executable must be named '{{binary_name}}' and be runnable as ./{{binary_name}}. For compiled languages, include a Makefile or build script. For interpreted languages, ensure the {{binary_name}} file has a proper shebang line and is executable. Verify your implementation passes all tests by running: bash test-v1.sh",
+  "v2_spec": "SPEC-v2.txt",
+  "v2_test": "test-v2.sh",
+  "v2_prompt": "Read SPEC-v2.txt and extend the existing {{binary_name}} implementation with del-grade, calc-avg (real calculation), report generation, and enhanced list output. Verify your implementation passes all tests by running: bash test-v2.sh"
+}

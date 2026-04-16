@@ -17,7 +17,7 @@ class GroqCodex < BaseCodex
     
     # API Credentials & Config
     @api_key      = presence(config[:api_key]) || ENV['GROQ_API_KEY']
-    @api_url      = presence(config[:api_url]) || presence(config[:api_endpoint])
+    @api_endpoint = presence(config[:api_endpoint]) || "https://api.groq.com/openai/v1/chat/completions"
     @model_name   = presence(config[:model]) || presence(config[:model_name])
     
     # Runtime Settings
@@ -39,28 +39,8 @@ class GroqCodex < BaseCodex
     run_generation('Respond with just OK.', dir: warmup_dir)
   end
 
-  def run_generation(prompt, dir:, log_path: nil)
-    start_time = Time.now
-    begin
-      raw, response_text, usage = call_groq_api(prompt)
-      elapsed = Time.now - start_time
-      metrics = build_metrics(usage, elapsed)
-
-      log_execution(log_path, prompt, metrics, usage, raw) if log_path
-      save_generated_code(response_text, dir)
-      sleep(@cooldown_seconds)
-
-      { success: true, elapsed_seconds: elapsed.round(1), metrics: metrics, response_text: response_text }
-    rescue StandardError => e
-      handle_error(e, start_time)
-    end
-  end
-
-  private
-
-  # Executes the HTTP POST request to the Groq backend
-  def call_groq_api(prompt)
-    uri = URI.parse(@api_url)
+  def call_api(prompt)
+    uri = URI.parse(@api_endpoint)
     
     # Path Fallback: Ensure a valid chat completions path is used
     path = uri.path.empty? ? '/openai/v1/chat/completions' : uri.path
@@ -122,31 +102,9 @@ class GroqCodex < BaseCodex
     }
   end
 
-  def calculate_cost(input, output)
-    ((input / MILLION) * @price_input_1m + (output / MILLION) * @price_output_1m).round(8)
-  end
-
-  def log_execution(path, prompt, metrics, usage, raw)
-    FileUtils.mkdir_p(File.dirname(path))
-    File.write(path, JSON.pretty_generate({
-      model: @model_name,
-      prompt: prompt,
-      metrics: metrics,
-      usage: usage,
-      raw_response: raw
-    }))
-  end
-
-  def handle_error(e, start_time)
-    puts "\n" + ("!" * 50)
-    puts "❌ GROQ ADAPTER ERROR: #{@model_name} -> #{e.message}"
-    puts ("!" * 50) + "\n"
-    { success: false, elapsed_seconds: (Time.now - start_time).round(1), error: e.message }
-  end
-
   def validate_config!
     raise CodexError, 'GROQ_API_KEY not configured' unless @api_key
-    raise CodexError, 'Groq API URL/Endpoint not configured' unless @api_url
+    raise CodexError, 'Groq API URL/Endpoint not configured' unless @api_endpoint
     raise CodexError, 'Model name not configured for Groq' unless @model_name
   end
 end

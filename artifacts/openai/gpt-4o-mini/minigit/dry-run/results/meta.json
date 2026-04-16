@@ -1,0 +1,24 @@
+{
+  "date": "2026-03-28 01:45:48",
+  "codex": "openai",
+  "problem": "minigit",
+  "codex_version": "dry-run",
+  "trials": 3,
+  "versions": {
+    "rust": "rustc 1.75.0 (82e1608df 2023-12-21) (built from a source tarball)",
+    "go": "go version go1.22.2 linux/amd64",
+    "c": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+    "typescript": "not installed",
+    "javascript": "v24.14.0",
+    "java": "openjdk 21.0.10 2026-01-20",
+    "perl": "This is perl 5, version 38, subversion 2 (v5.38.2) built for x86_64-linux-gnu-thread-multi",
+    "python": "Python 3.12.3",
+    "python/mypy": "Python 3.12.3",
+    "ruby": "ruby 3.2.3 (2024-01-18 revision 52bb2ac0a6) [x86_64-linux-gnu]",
+    "ruby/steep": "ruby 3.2.3 (2024-01-18 revision 52bb2ac0a6) [x86_64-linux-gnu]",
+    "lua": "Lua 5.4.6  Copyright (C) 1994-2023 Lua.org, PUC-Rio",
+    "scheme": "guile (GNU Guile) 3.0.9",
+    "ocaml": "The OCaml toplevel, version 4.14.1",
+    "haskell": "The Glorious Glasgow Haskell Compilation System, version 9.4.7"
+  }
+}

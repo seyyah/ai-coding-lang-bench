@@ -23,7 +23,24 @@ class BaseCodex
   end
 
   # --- Abstract Interface (To be implemented by subclasses) ---
-  def run_generation(prompt, dir:, log_path: nil); raise NotImplementedError; end
+  def run_generation(prompt, dir:, log_path: nil)
+    start_time = Time.now
+    begin
+      raw, response_text, usage = call_api(prompt)
+      elapsed = Time.now - start_time
+      metrics = build_metrics(usage, elapsed)
+
+      log_execution(log_path, prompt, metrics, usage, raw) if log_path
+      save_generated_code(response_text, dir)
+      sleep(@cooldown_seconds || 1.0)
+
+      { success: true, elapsed_seconds: elapsed.round(1), metrics: metrics, response_text: response_text }
+    rescue StandardError => e
+      handle_error(e, start_time)
+    end
+  end
+
+  def call_api(prompt); raise NotImplementedError; end
   def version; raise NotImplementedError; end
   def warmup(warmup_dir); { success: true, elapsed_seconds: 0.0 }; end
 
@@ -36,6 +53,34 @@ class BaseCodex
   def float_or_nil(v); Float(v.to_s.delete(',')) rescue nil; end
   def float_or_default(v, d); float_or_nil(v) || d; end
   def integer_or_default(v, d); Integer(v.to_s.delete(',')) rescue d; end
+
+  # --- Common Operations ---
+  def calculate_cost(input, output, cached: 0)
+    million = 1_000_000.0
+    total = 0.0
+    total += ((input - cached) / million) * (@price_input_1m || 0.0)
+    total += (cached / million) * (@price_cached_input_1m || @price_input_1m || 0.0)
+    total += (output / million) * (@price_output_1m || 0.0)
+    total.round(8)
+  end
+
+  def log_execution(path, prompt, metrics, usage, raw)
+    FileUtils.mkdir_p(File.dirname(path))
+    File.write(path, JSON.pretty_generate({
+      model: @model,
+      prompt: prompt,
+      metrics: metrics,
+      usage: usage,
+      raw_response: raw
+    }))
+  end
+
+  def handle_error(e, start_time)
+    puts "\n" + ("!" * 50)
+    puts "❌ #{@name.upcase} ADAPTER ERROR: #{@model} -> #{e.message}"
+    puts ("!" * 50) + "\n"
+    { success: false, elapsed_seconds: (Time.now - start_time).round(1), error: e.message }
+  end
 
   # --- Central Execution Engine ---
   def run_cmd(cmd, dir: nil, timeout: 600, env: {})

@@ -1,0 +1,23 @@
+[
+  {
+    "language": "python",
+    "trial": 1,
+    "codex": "aider",
+    "v1_dir": "/mnt/c/Users/Ceren/Desktop/which-l/which-language/artifacts/aider/ollama/qwen2.5-coder-7b/minigit/dry-run/generated/minigit-python-1-v1",
+    "v2_dir": "/mnt/c/Users/Ceren/Desktop/which-l/which-language/artifacts/aider/ollama/qwen2.5-coder-7b/minigit/dry-run/generated/minigit-python-1-v2",
+    "v1_time": 0,
+    "v1_pass": false,
+    "v1_passed_count": 0,
+    "v1_failed_count": 0,
+    "v1_total_count": 0,
+    "v1_loc": 0,
+    "v2_time": 0,
+    "v2_pass": false,
+    "v2_passed_count": 0,
+    "v2_failed_count": 0,
+    "v2_total_count": 0,
+    "v2_loc": 0,
+    "v1_metrics": null,
+    "v2_metrics": null
+  }
+]

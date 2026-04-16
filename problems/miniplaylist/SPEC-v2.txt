@@ -1,0 +1,23 @@
+PROJECT: MiniPlaylist
+VERSION: v2
+
+==========================================
+		OVERVIEW
+==========================================
+minipl is a command-line program for managing a music playlist.
+Version 2 introduces the advanced search functionality.
+
+All V1 commands (init, add, remove, show) must continue to work exactly as specified in SPEC-v1.txt.
+
+==========================================
+		NEW COMMANDS
+==========================================
+
+-------------------search-----------------
+Usage: minipl search "Keyword"
+Example: minipl search "Steve"
+Searches for the keyword in song names, artists, and albums (case-insensitive).
+If a match is found, it shows the songs one per line in the standard format:
+<ID> | <Name> | <Author> | <Album>
+
+If no matches exist, print "No matches found for <Keyword>" and exit 0.

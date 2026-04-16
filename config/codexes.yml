@@ -28,9 +28,8 @@ codexes:
       api_key: "${GOOGLE_API_KEY}"
       api_endpoint: "https://generativelanguage.googleapis.com/v1beta/models"
       
-      # Model Identifiers (Maintained as requested)
+      # Model Identifiers
       model: "gemini-3.1-flash-lite-preview"
-      model_name: "gemini-3.1-flash-lite-preview"
       
       # Runtime and Performance Settings
       cooldown_seconds: 1.2
@@ -42,7 +41,7 @@ codexes:
       price_output_1m: 1.50
 
   aider:
-    enabled: true
+    enabled: false
     class: AiderCodex
     description: >
       CLI-based autonomous coding agent. Uses local 'aider' installation 
@@ -52,8 +51,8 @@ codexes:
       gemini_api_key: "${GOOGLE_API_KEY}"
       
       # Model and Execution Metadata
-      model: "gemini/gemini-2.0-flash" # Updated to a stable version
-      python_bin: "py -3.12"           # Configurable python path
+      model: "gemini/gemini-2.0-flash"
+      python_bin: "py -3.12"
       
       # Runtime Behavior
       edit_format: "whole"
@@ -73,7 +72,6 @@ codexes:
       
       # Model Identifiers
       model: "gpt-4o-mini"
-      model_name: "gpt-4o-mini"
       
       # Runtime and Performance Settings
       cooldown_seconds: 0.5
@@ -91,35 +89,12 @@ codexes:
     class: GroqCodex
     description: "Groq API adapter (OpenAI Compatible) - Multi-Language Production Grade"
     config:
-      api_url: "https://api.groq.com/openai/v1/chat/completions"
+      api_endpoint: "https://api.groq.com/openai/v1/chat/completions"
       api_key: "${GROQ_API_KEY}"
       model: "moonshotai/kimi-k2-instruct-0905"
       cooldown_seconds: 1.5
       price_input_1m: 0.08
       price_output_1m: 0.24
-      supported_extensions: ["rb", "py", "go", "rs", "c", "h", "ts", "js", "java", "pl", "lua", "scm", "ml", "hs", "pm", "sh", "php", "cs", "cpp", "hpp"]
-      language_mapping:
-        python: ["python", "py"]
-        ruby: ["ruby", "rb"]
-        go: ["go"]
-        rust: ["rust", "rs"]
-        c: ["c", "cpp"]
-        lua: ["lua"]
-        scheme: ["scheme", "scm", "lisp", "racket"]
-        ocaml: ["ocaml", "ml"]
-        haskell: ["haskell", "hs"]
-        perl: ["perl", "pl", "pm"]
-        java: ["java"]
-        javascript: ["javascript", "js"]
-        typescript: ["typescript", "ts"]
-        php: ["php"]
-        csharp: ["csharp", "cs"]
-      shebangs:
-        python: "#!/usr/bin/env python3"
-        ruby: "#!/usr/bin/env ruby"
-        perl: "#!/usr/bin/env perl"
-        lua: "#!/usr/bin/env lua"
-        javascript: "#!/usr/bin/env node"
 
   # =========================================================================
   # PLANNED CODEXES (Templates - uncomment and configure to enable)

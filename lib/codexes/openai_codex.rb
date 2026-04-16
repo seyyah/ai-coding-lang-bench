@@ -21,7 +21,7 @@ class OpenAICodex < BaseCodex
     @api_endpoint = presence(config[:api_endpoint]) || DEFAULT_ENDPOINT
     @organization = presence(config[:organization]) || ENV['OPENAI_ORG_ID']
     @project      = presence(config[:project]) || ENV['OPENAI_PROJECT_ID']
-    @model_name   = presence(config[:model]) || presence(config[:model_name])
+    @model        = presence(config[:model]) || presence(config[:model_name])
     
     # Runtime Settings
     @cooldown_seconds  = float_or_default(config[:cooldown_seconds], 0.5)
@@ -36,35 +36,15 @@ class OpenAICodex < BaseCodex
     raise CodexError, 'OPENAI_API_KEY not configured' unless @api_key
   end
 
-  def version; @model_name; end
+  def version; @model; end
 
   # Lightweight request to verify connectivity and model status
   def warmup(warmup_dir)
-    puts "  Warmup: Running trivial prompt on OpenAI (#{@model_name})..."
+    puts "  Warmup: Running trivial prompt on OpenAI (#{@model})..."
     run_generation('Respond with just OK.', dir: warmup_dir)
   end
 
-  def run_generation(prompt, dir:, log_path: nil)
-    start_time = Time.now
-    begin
-      raw, response_text, usage = call_openai_api(prompt)
-      elapsed = Time.now - start_time
-      metrics = build_metrics(usage, elapsed)
-
-      log_execution(log_path, prompt, metrics, usage, raw) if log_path
-      save_generated_code(response_text, dir)
-      sleep(@cooldown_seconds)
-
-      { success: true, elapsed_seconds: elapsed.round(1), metrics: metrics, response_text: response_text }
-    rescue StandardError => e
-      handle_error(e, start_time)
-    end
-  end
-
-  private
-
-  # Executes the core HTTP POST request using standard Chat Completions payload
-  def call_openai_api(prompt)
+  def call_api(prompt)
     uri = URI(@api_endpoint)
     req = Net::HTTP::Post.new(uri).tap do |r|
       r['Content-Type'] = 'application/json'
@@ -81,7 +61,7 @@ class OpenAICodex < BaseCodex
 
   def request_payload(prompt)
     {
-      model: @model_name,
+      model: @model,
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.1,
       max_tokens: @max_output_tokens
@@ -108,36 +88,9 @@ class OpenAICodex < BaseCodex
     {
       input_tokens: input,
       output_tokens: output,
-      cost_usd: calculate_cost(input, cached, output),
-      model: @model_name,
+      cost_usd: calculate_cost(input, output, cached: cached),
+      model: @model,
       duration_ms: (elapsed * 1000).round
     }
-  end
-
-  # Cost calculation based on dynamic pricing and cached token benefits
-  def calculate_cost(input, cached, output)
-    total = 0.0
-    total += ((input - cached) / MILLION) * (@price_input_1m || 0)
-    total += (cached / MILLION) * (@price_cached_input_1m || 0)
-    total += (output / MILLION) * (@price_output_1m || 0)
-    total.round(8)
-  end
-
-  def log_execution(path, prompt, metrics, usage, raw)
-    FileUtils.mkdir_p(File.dirname(path))
-    File.write(path, JSON.pretty_generate({ 
-      model: @model_name, 
-      prompt: prompt, 
-      metrics: metrics, 
-      usage: usage, 
-      raw_response: raw 
-    }))
-  end
-
-  def handle_error(e, start_time)
-    puts "\n" + ("!" * 50)
-    puts "❌ OPENAI ADAPTER ERROR: #{@model_name} -> #{e.message}"
-    puts ("!" * 50) + "\n"
-    { success: false, elapsed_seconds: (Time.now - start_time).round(1), error: e.message }
   end
 end

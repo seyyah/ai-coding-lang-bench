@@ -1,64 +1,40 @@
-# AI Coding Language Benchmark
+<div align="center">
+  <img src="./which-language.jpg" alt="Which Language Banner" width="100%" />
 
-Benchmark platform for comparing **AI coding systems** across three axes:
+  # 🚀 The AI Native Language Initiative
+  
+  **AI doesn't just write code—it speaks it. But which language does it speak best?**
+  
+  [![Join the Movement](https://img.shields.io/badge/Join-The_Movement-blue?style=for-the-badge&logo=github)](./AGENT.md)
+  [![Codexes](https://img.shields.io/badge/Supported_Codexes-5-success?style=for-the-badge)](#-supported-codexes)
+  [![Problems](https://img.shields.io/badge/Benchmarks-2-orange?style=for-the-badge)](#-the-arena-problems)
+  
+  *We are on a mission to map the "native tongue" of Large Language Models. Join us in benchmarking Claude, Gemini, OpenAI, and more across every programming language known to humanity.*
+</div>
 
-- **problem** — e.g. MiniGit today, more tomorrow
-- **codex** — Claude, Gemini, OpenAI, and future adapters
-- **language** — Python, Ruby, Rust, Go, TypeScript, etc.
+---
 
-The repository started as a Claude-focused MiniGit experiment and is now being generalized into a reusable **multi-problem, multi-codex, multi-language benchmark harness**.
+## 🌟 The Vision
 
-> Start here: [QUICK_START.md](./QUICK_START.md) · Need the doc map? [INDEX.md](./INDEX.md) · Want internals? [CLAUDE.md](./CLAUDE.md)
+When we ask an AI to build a system from scratch, the language we choose matters. Does an LLM reason better in the strict, typed world of **Rust**, or the dynamic flexibility of **Python**? Does it write better **Ruby** than **Go**? 
 
-## What this repository is for
+This isn't just another benchmarking tool. It's an **exploratory movement** to understand the cognitive alignment between Artificial Intelligence and programming paradigms. We are building the definitive matrix comparing **AI coding systems** (Codexes) against **Programming Languages** through standardized real-world **Problems**.
 
-This project helps answer questions like:
+Be part of the discovery. Help us find the ultimate AI-native programming language.
 
-- Which codex is fastest on the same problem?
-- Which programming languages are cheapest for agent-generated implementations?
-- How much does type-checking overhead change time, cost, or LOC?
-- How stable are repeated runs across trials?
+> 🧠 **Explore Deeper:** Internals → [CLAUDE.md](./CLAUDE.md) · Architecture → [program.md](./program.md) · Roadmap → [plan.md](./plan.md)
 
-Today the canonical bundled problem is **MiniGit**, but the benchmark runner is structured so new problems can be added under `problems/<problem>/`.
+---
 
-## The mental model
+## ⚡ Quick Start: Join the Arena
 
-Think of the benchmark as a matrix:
+You don't need to be an expert to contribute. You can run your first benchmark in less than 2 minutes and join the movement.
 
-| Dimension | Defined by | Example |
-|----------|------------|---------|
-| Problem | `problems/<problem>/problem.json` + assets | `minigit` |
-| Codex | `lib/codexes/*.rb` + `config/codexes*.yml` | `claude`, `gemini`, `openai` |
-| Language | `LANGUAGES` in `benchmark.rb` | `python`, `rust`, `ruby/steep` |
+### 1️⃣ Gear Up
+You'll need `ruby`, toolchains for your target languages, and at least one API key or active tool (Claude CLI, Gemini API, or OpenAI API).
 
-Each benchmark run writes outputs under a namespaced root:
-
-```text
-artifacts/<codex>/<model>/<problem>/
-  generated/
-  logs/
-  results/
-  figures/
-```
-
-The `<model>` segment comes from `config.model`. Values like `gemini/gemini-2.5-pro`
-intentionally create deeper namespaces under the selected codex.
-
-That layout is now the default for both helper scripts and direct `benchmark.rb` usage.
-
-## First successful run
-
-### 1. Prerequisites
-
-- Ruby
-- the toolchains for the languages you want to benchmark
-- at least one enabled codex
-
-### 2. Configure a codex safely
-
-Prefer **local overrides** instead of editing committed config directly.
-
-Create `config/codexes.local.yml`:
+### 2️⃣ Configure Your AI
+Create `config/codexes.local.yml` (this will be gitignored to protect your keys):
 
 ```yaml
 codexes:
@@ -67,216 +43,136 @@ codexes:
     config:
       api_key: "${GOOGLE_API_KEY}"
 ```
-
-Then export your key:
-
 ```bash
-export GOOGLE_API_KEY="your-key"
+export GOOGLE_API_KEY="your-key-here"
 ```
 
-`config/codexes.local.yml` is gitignored, so local secrets and enablement stay out of the repo.
-
-### 3. Smoke test the full pipeline
-
+### 3️⃣ Run Your First Benchmark
+Test the waters with a lightning-fast dry run:
 ```bash
-bash scripts/run-all.sh gemini minigit --dry-run --lang python --trials 1
+bin/which-language run gemini minigit --dry-run --lang python --trials 1
 ```
-
-This verifies:
-
-- problem loading
-- output namespacing
-- report generation
-- figure generation
-
-Dry runs are isolated under:
-
-```text
-artifacts/<codex>/<model>/<problem>/dry-run/
-```
-
-### 4. Run a real benchmark
-
+Or unleash the full power for a real benchmark:
 ```bash
-bash scripts/run-all.sh gemini minigit --lang python --trials 1
+bin/which-language run gemini minigit --lang python --trials 1
 ```
 
-Or, if you prefer the raw runner:
+*Your pristine outputs, including raw data, markdown reports, and gorgeous PNG graphs will be waiting for you in the `artifacts/` directory. You are now officially a benchmark runner!*
 
-```bash
-ruby benchmark.rb --codex gemini --problem minigit --lang python --trials 1
-```
+**Platform Setup Shortcuts:**
+- **Windows**: `.\scripts\install_windows.ps1` (run as Administrator)
+- **macOS**: `chmod +x scripts/install_mac.sh && bash scripts/install_mac.sh`
 
-### 5. Read the outputs
+---
 
-- raw results: `artifacts/<codex>/<model>/<problem>/results/results.json`
-- report: `artifacts/<codex>/<model>/<problem>/results/report.md`
-- figures: `artifacts/<codex>/<model>/<problem>/figures/`
-- generated code / build artifacts: `artifacts/<codex>/<model>/<problem>/generated/`
+## 🧩 The Matrix Model
 
-### Installation
+Think of this initiative as a living, breathing matrix. Every benchmark run is an intersection of three dimensions:
 
-### Windows Environment Setup
-If you are running the benchmarks on Windows, you can automatically install the required languages and compilers using the provided PowerShell script.
+| Dimension | Defined by | Example |
+|----------|------------|---------|
+| 🎯 **Problem** | `problems/<problem>/problem.json` + assets | `minigit`, `minigrades` |
+| 🧠 **Codex** | `lib/codexes/*.rb` + `config/codexes*.yml` | `claude`, `gemini`, `openai` |
+| 🗣️ **Language**| `config/languages.yml` | `python`, `rust`, `ruby/steep` |
 
-Open your terminal as Administrator and run:
-```powershell
-.\scripts\install_windows.ps1
+---
 
-### 🍏 macOS Setup
+## 📊 Current State of the Matrix
 
-For macOS users, we provide an automated setup script that uses **Homebrew** to seamlessly install all required languages, compilers, and sub-dependencies. The script is idempotent, meaning it will safely skip packages that are already installed on your system.
+We are constantly expanding our coverage. Here is where the initiative stands today:
 
-**Prerequisites:**
-Ensure you have [Homebrew](https://brew.sh/) installed before running the script.
-
-**Installation Steps:**
-1. Open your terminal in the root directory of the project.
-2. Make the script executable:
-   ```bash
-   chmod +x scripts/install_mac.sh
-
-
-
-## What is already generalized
-
-### Multiple problems
-
-Each problem lives in its own folder:
-
-```text
-problems/<problem>/
-  problem.json
-  SPEC-v1.txt
-  SPEC-v2.txt
-  test-v1.sh
-  test-v2.sh
-```
-
-`problem.json` declares:
-
-- display name
-- output binary name
-- phase-specific specs
-- phase-specific tests
-- prompt templates
-
-#### Multiple codexes
-
-Codexes use an adapter interface:
-
-- `run_generation(prompt, dir:, log_path:)`
-- `version`
-- optional `warmup`
-- optional `parse_metrics`
-
-This keeps the benchmark runner independent from any specific vendor.
-
-### Multiple languages
-
-Supported languages are defined centrally in `benchmark.rb` via the `LANGUAGES` hash.
-
-Each entry provides things like:
-
-- source extensions for LOC counting
-- a version command
-- optional extra prompting for typed variants like `python/mypy` and `ruby/steep`
-
-## Current support
-
-### Codexes implemented now
-
+### 🧠 Supported Codexes
 | Codex | Status | Notes |
-|------|--------|-------|
-| Claude Code | ✅ | default CLI adapter |
-| Gemini | ✅ | API adapter with metrics extraction |
-| OpenAI | ✅ | Responses API adapter with optional cost accounting |
-| Groq | ✅ | API adapter with robust parsing features for supported models |
+|------|:---:|-------|
+| **Claude Code** | ✅ | Default CLI adapter |
+| **Gemini** | ✅ | API adapter, Flash-Lite/Pro |
+| **OpenAI** | ✅ | Responses API, cost accounting |
+| **Groq** | ✅ | API adapter, robust parsing |
+| **Aider** | 🚧 | CLI adapter, *needs validation* |
 
-See [ROADMAP.md](./ROADMAP.md) for planned adapters such as DeepSeek, Qwen, Aider, Cline, and more.
+*More warriors (DeepSeek, Qwen, Grok, Cline) are entering the arena soon. See [plan.md](./plan.md).*
 
-### Languages currently benchmarkable
+### 🗣️ Supported Languages
+- **Dynamic:** `python`, `ruby`, `javascript`, `perl`, `lua`
+- **Static:** `rust`, `go`, `c`, `typescript`, `java`
+- **Functional:** `scheme`, `ocaml`, `haskell`
+- **Typed Variants:** `python/mypy`, `ruby/steep`
 
-- Dynamic: `python`, `ruby`, `javascript`, `perl`, `lua`
-- Static: `rust`, `go`, `c`, `typescript`, `java`
-- Functional: `scheme`, `ocaml`, `haskell`
-- Typed variants: `python/mypy`, `ruby/steep`
+### 🎯 The Arena (Problems)
+- 💾 **minigit** — Minimal version control system
+- 🎓 **minigrades** — Student grade manager
+- 🎵 **miniplaylist** — Playlist management system
+- ⏱️ **minitimer** — Simple task-time manager
+- 📊 **miniscoreboard** — Lightweight match manager and logger
+- 📖 **minilibrary** - Book management and library tracking tool
+- 📦 **miniinventory** - Inventory manager
+- 📝 **miniquiz** - Quiz application
 
-## Important current assumptions
+---
 
-The framework is generalized, but it still intentionally assumes a few things:
+## 🛠️ Power User Commands
 
-1. **Two benchmark phases** exist: `v1` then `v2`
-2. Each problem supplies shell-based tests for both phases
-3. The implementation must expose the executable named by `binary_name`
-4. Languages are still configured in code (`LANGUAGES`), not a separate data file
+Command the benchmarking pipeline like a pro:
 
-Those constraints are acceptable for now, but they are worth knowing if you plan to add more problem families.
+```bash
+# 🔥 Full pipeline (benchmark + report + figures)
+bin/which-language run gemini minigit --lang python --trials 1
 
-## Repository layout
+# 🏃 Benchmark only 
+bin/which-language benchmark gemini minigit --lang python --trials 1
+
+# ⚔️ Epic Codex Battles (Compare systems head-to-head)
+bin/which-language run claude minigit --lang python --trials 3
+bin/which-language run gemini minigit --lang python --trials 3
+```
+
+---
+
+## 🏆 Contributors
+
+This project thrives on the brilliant minds driving it forward. We celebrate every contribution!
+See the [CHANGELOG.md](./CHANGELOG.md) for a full list of legends who have shaped the initiative.
+
+### Become a Contributor
+Want to join the movement? See our strict but fair [Contributor Protocol (AGENT.md)](./AGENT.md). We are actively hunting for:
+- **Codex Whisperers:** Implement new adapters in `lib/codexes`
+- **Data Scientists:** Run benchmarks on your machines and submit results
+- **Problem Architects:** Design new, brutal testing scenarios in `problems/`
+- **Linguists:** Add support for new programming languages to `config/languages.yml`
+
+---
+
+## 🏗️ Repository Layout
+
+For the curious minds, here is how our engine is built:
 
 ```text
 .
-├── benchmark.rb
-├── report.rb
-├── plot.py
-├── problems/
-│   └── minigit/
-├── lib/
-│   ├── codex_loader.rb
-│   └── codexes/
-├── config/
-│   ├── codexes.yml
-│   └── codexes.local.yml   # local override, gitignored
-├── scripts/
-└── artifacts/
-    └── <codex>/<model>/<problem>/
+├── bin/                  # CLI Application binaries (which-language)
+├── src/                  # Core application scripts (benchmark, report, plot)
+├── problems/             # The arena: problem definitions
+├── lib/codexes/          # The minds: codex adapters
+├── config/codexes.yml    # Codex configuration layer
+├── config/languages.yml  # Languages and toolchain configuration
+├── scripts/              # Productivity accelerators (installers)
+├── program.md            # Agent entry point 
+├── AGENT.md              # Contributor protocol & rules
+├── plan.md               # Living iteration roadmap
+├── walkthrough.md        # Proof-of-work documentation
+├── CLAUDE.md             # Technical internals and secrets
+└── artifacts/            # The spoils: benchmark outputs
 ```
 
-## Recommended commands
+---
 
-### Run benchmark only
+## 🏛️ Historical Context
 
-```bash
-bash scripts/run-benchmark.sh gemini minigit --lang python --trials 1
-```
+This entire movement was ignited by a single, powerful question: *Which Programming Language Is Best for Claude Code?*
 
-### Run benchmark + report + figures
+- 📖 [Read the original publication that started it all](https://dev.to/mame/which-programming-language-is-best-for-claude-code-508a)
+- 🇯🇵 [Japanese version available here](https://zenn.dev/mametter/articles/3e8580ec034201)
 
-```bash
-bash scripts/run-all.sh gemini minigit --lang python --trials 1
-```
-
-### Use the raw runner
-
-```bash
-ruby benchmark.rb --codex gemini --problem minigit --lang python --trials 1
-ruby benchmark.rb --help
-```
-
-## Historical context
-
-This repository began with the published Claude Code / MiniGit experiment:
-
-- [Which Programming Language Is Best for Claude Code?](https://dev.to/mame/which-programming-language-is-best-for-claude-code-508a)
-- [Japanese version](https://zenn.dev/mametter/articles/3e8580ec034201)
-
-Treat that write-up as **historical benchmark context**, not as the entire identity of this repository. The codebase is now evolving toward a broader benchmark platform.
-
-## Contributors
-
-- [mame](https://github.com/mame)
-- [berkevnl](https://github.com/berkevnl)
-- [Ahmetngz](https://github.com/Ahmetngz)
-
-## Where to go next
-
-- Want a guided first run? → [QUICK_START.md](./QUICK_START.md)
-- Want the documentation map? → [INDEX.md](./INDEX.md)
-- Want internal architecture? → [CLAUDE.md](./CLAUDE.md)
-- Want future integrations? → [ROADMAP.md](./ROADMAP.md)
-- Want codex comparison notes? → [CODEX_COMPARISON.md](./CODEX_COMPARISON.md)
-
-## Similar projects
-- https://autocodebench.github.io
-- https://livecodebench.github.io
+## 🌌 The Multiverse (Similar Projects)
+We proudly stand alongside other incredible benchmarking initiatives:
+- [AutoCodeBench](https://autocodebench.github.io)
+- [LiveCodeBench](https://livecodebench.github.io)
