@@ -178,3 +178,11 @@ This entire movement was ignited by a single, powerful question: *Which Programm
 We proudly stand alongside other incredible benchmarking initiatives:
 - [AutoCodeBench](https://autocodebench.github.io)
 - [LiveCodeBench](https://livecodebench.github.io)
+
+## V1 to V2 Transition
+Version 2 of this project builds upon the foundational Version 1 by improving system robustness, error handling, and code organization.
+
+### V2 Completed Tasks:
+1. **Implemented Global Safety Checks:** Added initialization validation to prevent tracking commands from executing outside of a valid repository.
+2. **Enhanced Error Handling:** Standardized exit codes (0 for success, 1 for failure) and improved error messages for missing files and empty commits.
+3. **Refactored Core Logic:** Improved the modularity of the system by separating the custom MiniHash generation and file-system traversal into cleaner, isolated functions.
