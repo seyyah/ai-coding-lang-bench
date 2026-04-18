@@ -88,6 +88,28 @@ The exact algorithm must match this definition.
 ========================================
 
 ----------------------------------------
+4.0 Global Safety Constraints
+----------------------------------------
+
+Before executing any of the following commands:
+
+    minigit add <file>
+    minigit commit -m "<message>"
+    minigit log
+
+the system MUST verify that the repository directory exists:
+
+    .minigit/
+
+If .minigit/ is missing, the command MUST abort immediately, print exactly:
+
+    fatal: not a minigit repository
+
+and exit with code 1.
+
+This check MUST happen before any command-specific validation or processing.
+
+----------------------------------------
 4.1 init
 ----------------------------------------
 
