@@ -1,0 +1,110 @@
+PROJECT: MINI CONTACTS
+
+DESCRIPTION
+This program is a simple contact manager that stores contacts in a text file.
+
+DATA STORAGE
+All contacts are stored in a file called contacts.txt.
+
+Each contact is stored in this format:
+
+id|name|phone
+
+Example:
+1|Ahmet|5551234
+2|Ayse|5559876
+
+
+COMMANDS
+
+init
+Description:
+Creates an empty contacts.txt file.
+
+Input:
+init
+
+Output:
+Contact storage initialized
+
+
+add
+Description:
+Adds a new contact to the storage file.
+
+Input format:
+add id name phone
+
+Example:
+add 1 Ahmet 5551234
+
+Output:
+Contact added
+
+
+list
+Description:
+Displays all contacts.
+
+Input:
+list
+
+Output example:
+1|Ahmet|5551234
+2|Ayse|5559876
+
+
+search
+Description:
+Searches for a contact using id.
+
+Input:
+search id
+
+Example:
+search 1
+
+Output:
+1|Ahmet|5551234
+
+
+delete
+Description:
+Deletes a contact by id.
+
+Input:
+delete id
+
+Output:
+Contact deleted
+
+
+export
+Description:
+Exports contacts to another file.
+
+Input:
+export filename
+
+Output:
+Contacts exported
+
+
+ERROR MESSAGES
+
+Error: Unknown command
+Error: Missing arguments
+Error: Storage not initialized
+
+UPDATE NOTES (V1):
+- list, search, delete, export komutları eklendi
+- Aynı ID ile tekrar ekleme engellendi
+- Hata mesajları iyileştirildi
+
+ACCEPTANCE CRITERIA (V2 için öneri)
+- init: contacts.txt dosyasını oluşturur. Varsa içini temizler.
+- add: Aynı ID ile tekrar ekleme yapılamaz. ID, name, phone boş olamaz.
+- list: Dosya boşsa "No contacts found" yazılır.
+- search: ID bulunamazsa "Contact not found" döner.
+- delete: ID bulunamazsa hata mesajı döner.
+- export: Dosya yoksa önce init çağrılmış mı kontrol edilir.
