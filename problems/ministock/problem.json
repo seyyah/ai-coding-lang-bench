@@ -1,0 +1,27 @@
+{
+  "name": "ministock",
+  "author": "Elvan Negiş (251478063)",
+  "version": "2.0",
+  "description": "CLI inventory system with categories, stock validation, export, discount and financial summary.",
+  "language": "python",
+  "commands": [
+    "init", 
+    "add <name> <qty> <price> <category>", 
+    "remove <name> <qty>", 
+    "list", 
+    "search", 
+    "lowstock", 
+    "summary",
+    "discount",
+    "export"
+  ],
+  "storage": ".inventory/items.dat",
+  "features": [
+    "Category support",
+    "Insufficient stock validation",
+    "Total inventory value calculation",
+    "Negative value validation",
+    "Data export to CSV",
+    "Discount application"
+  ]
+}

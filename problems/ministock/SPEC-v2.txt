@@ -1,0 +1,146 @@
+PROJECT: ministock
+AUTHOR: Elvan Negiş (251478063)
+VERSION: v2
+DATE: 2026-03-20
+
+========================================
+OVERVIEW
+========================================
+
+ministock is an enhanced command-line inventory management system. 
+The program allows users to manage items, track categories, and view financial summaries. 
+All data is persisted in a flat-file database.
+
+The system maintains a hidden directory called .inventory in the current working directory and stores all item information in items.dat.
+
+========================================
+COMMANDS
+========================================
+
+--- init ---
+Usage: python ministock.py init
+
+Creates a .inventory directory and an empty items.dat file. 
+If the directory already exists, print: 
+"Already initialized"
+
+----------------------------------------
+
+--- add ---
+Usage: python ministock.py add "ItemName" quantity price "Category"
+
+Adds a new item including a category field.
+Output example: 
+Added product #1: Apple
+
+----------------------------------------
+
+--- remove ---
+Usage: python ministock.py remove "ItemName" quantity
+
+Decreases the stock quantity of the given item.
+If the item does not exist, print: 
+"Product not found"
+
+If the removal quantity exceeds current stock, print:
+"Error: Insufficient stock. Current: <qty>"
+
+----------------------------------------
+
+--- list ---
+Usage: python ministock.py list
+
+Lists all items including their category.
+Example output: 
+
+[1] Apple | Quantity: 50 | Price: 10 | Category: Fruit 
+
+If no items exist, print: 
+"No products found."
+
+----------------------------------------
+
+--- search ---
+Usage: python ministock.py search "ItemName"
+
+Searches for an item by name. Prints full item details if found.
+If not found, print: 
+"Product not found"
+
+----------------------------------------
+
+--- lowstock ---
+Usage: python ministock.py lowstock
+
+Shows items with quantity lower than 10.
+Example: 
+WARNING: Low stock for Apple
+
+----------------------------------------
+
+--- summary ---
+Usage: python ministock.py summary
+
+Displays a financial and quantity overview of the entire inventory.
+Example:
+Total Items: 120
+Total Inventory Value: 1500
+
+----------------------------------------
+
+--- discount ---
+Usage: python ministock.py discount "ItemName" percentage
+
+Applies a discount percentage to a specific item.
+Example: python ministock.py discount "Apple" 10
+Output: Discount applied. New price for Apple: 9
+
+----------------------------------------
+
+--- export ---
+Usage: python ministock.py export
+
+Exports all active inventory data to a CSV document named 'inventory_export.csv' in the current directory.
+Example Output: Inventory successfully exported to inventory_export.csv
+
+========================================
+DATA FORMAT
+========================================
+
+File: .inventory/items.dat 
+
+Each item is stored on a single line using a pipe-delimited format.
+Format: id|name|quantity|price|category|date|status 
+
+Example:
+1|Apple|50|10|Fruit|2026-03-20|1
+2|Laptop|5|1200|Electronics|2026-03-20|1
+
+Status:
+1 = active
+0 = inactive
+
+========================================
+ERROR HANDLING
+========================================
+
+Running any command before "init": 
+print "Not initialized. Run: python ministock.py init" 
+
+Invalid Input:
+If quantity or price are not numeric, print:
+"Error: Quantity and Price must be numbers."
+
+Negative Input:
+If quantity or price are less than zero, print:
+"Error: Quantity and Price cannot be negative."
+
+Discount Input:
+If discount percentage is less than 0 or greater than 100, print:
+"Error: Discount percentage must be between 0 and 100."
+
+Unknown command: 
+print "Unknown command: <command>" 
+
+Missing arguments: 
+print "Usage: python ministock.py <command> [args]" 
