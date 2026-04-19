@@ -1,7 +1,7 @@
 PROJECT: mini-inventory
 AUTHOR: Tunahan Caner YILDIZ (251478112)
 VERSION: v2
-DATE: 2026-03-29
+DATE: 2026-04-19
 
 ========================================
 OVERVIEW
@@ -10,7 +10,7 @@ OVERVIEW
 mini-inventory is a command-line inventory manager.
 It stores product records in a plain text file and supports
 initializing the system, adding products, listing products,
-updating stock quantities, and deleting products.
+updating stock quantities, deleting products, and searching products.
 
 All data is stored in a directory called .miniinventory/
 in the current working directory.
@@ -107,6 +107,27 @@ Output:
 - Error if system is not initialized:
   "Not initialized. Run: miniinventory init"
 
+--- search ---
+Usage: miniinventory search "Pen"
+
+Searches for products whose name contains the search query.
+
+Validation and filtering rules:
+- The search must be case-insensitive (e.g., searching "pEn" must find "Pencil").
+- Products must be listed in ascending order by ID, matching the exact format of 'list'.
+- The query can be a substring anywhere in the product name.
+
+Output:
+- Success matches:
+  [1] Pencil - Quantity: 50 (2026-03-15)
+  [3] Blue Pen - Quantity: 10 (2026-03-15)
+- No matches found:
+  "No products match the search."
+- Error if arguments are missing:
+  "Usage: miniinventory search <query>"
+- Error if system is not initialized:
+  "Not initialized. Run: miniinventory init"
+
 ========================================
 DATA FORMAT
 ========================================
@@ -162,14 +183,14 @@ Implemented commands:
 - list
 - update
 - delete
+- search
 
 v2 TASKS COMPLETED:
 1. Implemented the "list" command to display all stored products
 2. Implemented the "update" command to modify product quantity
 3. Implemented the "delete" command to remove a product
+4. Implemented the "search" command to perform case-insensitive substring queries
 
 v1 -> v2 SUMMARY:
 - v1 supported only initialization and adding products
-- v2 adds full inventory management through list, update, and delete
-- validation rules were clarified to improve consistency and usability
-
+- v2 adds full inventory management through list, update,, delete, and case-insensitive search logic.
