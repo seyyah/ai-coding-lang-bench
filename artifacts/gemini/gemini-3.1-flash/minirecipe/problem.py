@@ -1,5 +1,5 @@
 # V2 Tasks:
-# 1.Adding an otomatic system for Id and Date info.
+# 1.Adding an automatic system for Id and Date info.
 # 2.Removing the'deleted'message.
 # 3.Missing data error handling
 import sys
