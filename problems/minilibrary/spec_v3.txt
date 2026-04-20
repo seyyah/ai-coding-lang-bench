@@ -1,0 +1,250 @@
+MiniLibrary Specification
+Version: 2.1
+Command name: minilibrary
+External libraries: NOT allowed
+Standard library: Allowed
+Persistent storage: Local filesystem only
+
+========================================
+1. Overview
+========================================
+
+MiniLibrary is a minimal command-line book management
+and library tracking tool.
+
+The executable must be called:
+
+    minilibrary
+
+All data must be stored in:
+
+    .minilibrary/
+
+All commands operate relative to current directory.
+
+----------------------------------------
+
+Supported commands:
+
+    minilibrary init
+    minilibrary add <title> <author>
+    minilibrary list
+    minilibrary borrow <id> <person>
+    minilibrary return <id>
+    minilibrary delete <id>
+    minilibrary request <title> <author>
+    minilibrary listrequests
+    minilibrary blacklist
+    minilibrary listborrowers
+
+========================================
+2. Data Storage
+========================================
+
+After init:
+
+    .minilibrary/
+        books.dat
+        requests.dat
+        borrowers.dat
+        blacklist.dat
+
+----------------------------------------
+
+books.dat:
+    One book per line.
+    Format: <id>|<title>|<author>|<status>|<added_date>|<borrow_date>|<borrower>
+
+    Status is either AVAILABLE or BORROWED.
+    borrow_date is empty when the book is not borrowed.
+    borrower is empty when the book is not borrowed.
+
+    Example:
+    1|The Little Prince|Antoine de Saint-Exupery|AVAILABLE|2026-03-16||
+    2|Clean Code|Robert C. Martin|BORROWED|2026-03-16|2026-03-20|Ahmet
+
+----------------------------------------
+
+requests.dat:
+    One request per line.
+    Format: <title>|<author>|<count>
+
+----------------------------------------
+
+borrowers.dat:
+    Tracks how many books each person has not returned on time.
+
+    Format: <person>|<late_count>
+
+    Example:
+    Ahmet|2
+    Ayse|1
+
+----------------------------------------
+
+blacklist.dat:
+    One person per line.
+
+    Format:
+    <person>
+
+    Example:
+    Ahmet
+
+========================================
+3. Command Specifications
+========================================
+
+----------------------------------------
+3.1 init
+----------------------------------------
+
+Create .minilibrary/ directory, empty books.dat file,
+empty requests.dat file, empty borrowers.dat file,
+and empty blacklist.dat file.
+
+If already exists:
+    print "Already initialized"
+Exit 0.
+
+If created:
+    print "Initialized empty mini-library in .minilibrary/"
+Exit 0.
+
+----------------------------------------
+3.2 add <title> <author>
+----------------------------------------
+
+(NO CHANGE)
+
+----------------------------------------
+3.3 list
+----------------------------------------
+
+(NO CHANGE)
+
+----------------------------------------
+3.4 borrow <id> <person>
+----------------------------------------
+
+If not initialized:
+    print "Not initialized. Run: python minilibrary.py init"
+    exit 1
+
+If person is in blacklist.dat:
+    print "User is blacklisted: <person>"
+    exit 1
+
+If book not found:
+    print "Book #<id> not found."
+    exit 1
+
+If book is already borrowed:
+    (NO CHANGE)
+
+If book is available:
+    Change status to BORROWED
+    Set borrow_date to today
+    Set borrower to <person>
+    Calculate due date as today + 14 days
+
+    print "Book #<id> borrowed. Due date: <due_date>"
+
+----------------------------------------
+3.5 return <id>
+----------------------------------------
+
+If not initialized:
+    print "Not initialized. Run: python minilibrary.py init"
+    exit 1
+
+If book not found:
+    print "Book #<id> not found."
+    exit 1
+
+If book is not borrowed:
+    print "Book #<id> is not borrowed."
+    exit 0
+
+If book is borrowed:
+
+    Calculate if overdue:
+        due_date = borrow_date + 14 days
+
+    If today > due_date:
+        Increment late_count for borrower in borrowers.dat
+        If borrower not exists, create with count = 1
+
+        If late_count >= 3:
+            Add borrower to blacklist.dat (if not already exists)
+
+    Change status to AVAILABLE
+    Clear borrow_date and borrower
+
+    print "Book #<id> returned."
+
+----------------------------------------
+3.6 delete <id>
+----------------------------------------
+
+(NO CHANGE)
+
+----------------------------------------
+3.7 request <title> <author>
+----------------------------------------
+
+(NO CHANGE)
+
+----------------------------------------
+3.8 listrequests
+----------------------------------------
+
+(NO CHANGE)
+
+----------------------------------------
+3.9 blacklist
+----------------------------------------
+
+If not initialized:
+    print "Not initialized. Run: python minilibrary.py init"
+    exit 1
+
+If no users:
+    print "No blacklisted users."
+    exit 0
+
+For each user:
+    print:
+      <person>
+
+----------------------------------------
+3.10 listborrowers
+----------------------------------------
+
+If not initialized:
+    print "Not initialized. Run: python minilibrary.py init"
+    exit 1
+
+If no records:
+    print "No borrower records."
+    exit 0
+
+For each record:
+    print:
+      <person> - <late_count>
+
+========================================
+4. Error Handling
+========================================
+
+(NO CHANGE)
+
+========================================
+5. Determinism Rules
+========================================
+
+(NO CHANGE)
+
+========================================
+END
+========================================
