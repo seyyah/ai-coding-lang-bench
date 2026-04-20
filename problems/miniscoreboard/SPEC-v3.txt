@@ -1,5 +1,6 @@
 PROJECT: miniscoreboard
-AUTHOR: Utkuhan Akar (V3 Upgrade)
+AUTHOR: Utkuhan Akar (V3 Upgrade) (251478036)
+--------------------------------------------
 VERSION: v3
 DATE: 2026-04-20
 
