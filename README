@@ -1,9 +1,0 @@
-# Mini To-Do Projesi
-
-## V1 Görevleri (Tasks)
-1. `list` komutunu implemente et: Dosyayı döngüyle satır satır okuyup ekrana bas.
-2. `done` komutunu implemente et: İstenen ID'yi bul, 'PENDING' durumunu 'DONE' yap.
-3. `list` komutu çalıştırıldığında dosya boşsa "No tasks found" hatasını ver.
-
-## V0 -> V1 Değişim Özeti
-V0 aşamasında sadece `init` ve `add` komutları çalışıyordu. V1 aşamasında `while` döngüsü kullanılarak dosya okuma/yazma işlemleri geliştirildi. `list` ve `done` komutları işlevsel hale getirildi. Hata mesajları SPEC dosyasına uygun olarak güncellendi.
