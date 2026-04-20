@@ -1,0 +1,68 @@
+PROJECT: mini-timer
+AUTHOR: Ali Efe AKIN
+VERSION: v1
+DATE: 2026-03-12
+
+1-) OVERVIEW
+
+mini-timer is a command-line time tracking tool.
+It stores time records in a plain text file and supports
+initializing the workspace, starting a timer for a task, 
+stopping the timer, and viewing the log of tracked tasks.
+
+All data is persisted in a directory called .minitimer/
+in the current working directory.
+
+2-) COMMANDS
+
+--- init ---
+Usage: python minitimer.py init
+Creates a .minitimer/ directory and an empty timers.dat file.
+If .minitimer/ already exists, print "Already initialized" and exit.
+
+--- start ---
+Usage: python minitimer.py start "Study Physics"
+Appends a new task to timers.dat with status RUNNING.
+Each task has: id (auto-increment), description, status, start_time, end_time.
+Prints "Started timer #<id> for: <description>"
+
+--- stop ---
+Usage: python minitimer.py stop 1
+Changes timer #1 status from RUNNING to STOPPED and records the end time.
+Prints "Timer #1 stopped."
+If the timer does not exist, prints "Timer #1 not found."
+
+--- log ---
+Usage: python minitimer.py log
+Prints all timers, one per line:
+  [1] [RUNNING] Study Physics (Started: 14:00)
+  [2] [STOPPED] Coding Project (10:00 - 12:30)
+If no timers exist, prints "No timers found."
+
+--- stats ---
+Usage: python minitimer.py stats
+Prints summary statistics of all recorded timers.
+Example output:
+  Total tasks tracked: 2
+  Completed tasks: 1
+If no timers exist, prints "No timers found."
+
+--- clear ---
+Usage: python minitimer.py clear 1
+Removes timer #1 from timers.dat.
+Prints "Cleared timer #1."
+If timer does not exist, prints "Timer #1 not found."
+
+3-) DATA FORMAT
+
+File: .minitimer/timers.dat
+Format: One timer per line, fields separated by |
+Example:
+1|Study Physics|RUNNING|14:00|NONE
+2|Coding Project|STOPPED|10:00|12:30
+
+4-) ERROR HANDLING
+
+Running any command before "init": print "Not initialized. Run: python minitimer.py init"
+Invalid command: print "Unknown command: <command>"
+Missing arguments: print "Usage: python minitimer.py <command> [args]"

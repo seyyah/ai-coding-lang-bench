@@ -1,0 +1,175 @@
+PROJECT: mini-inventory
+AUTHOR: Tunahan Caner YILDIZ (251478112)
+VERSION: v2
+DATE: 2026-03-29
+
+========================================
+OVERVIEW
+========================================
+
+mini-inventory is a command-line inventory manager.
+It stores product records in a plain text file and supports
+initializing the system, adding products, listing products,
+updating stock quantities, and deleting products.
+
+All data is stored in a directory called .miniinventory/
+in the current working directory.
+
+========================================
+COMMANDS
+========================================
+
+--- init ---
+Usage: miniinventory init
+
+Creates a .miniinventory/ directory and an empty inventory.dat file.
+If .miniinventory/ already exists, print "Already initialized" and exit.
+
+Output:
+- Success: "Initialized empty mini-inventory in .miniinventory/"
+- Error: "Already initialized"
+
+--- add ---
+Usage: miniinventory add "Pencil" 50
+
+Appends a new product to inventory.dat.
+Each product has:
+- id (auto-increment)
+- name
+- quantity
+- created_date
+
+Validation rules:
+- Quantity must be a non-negative integer
+- Product name must not be empty or whitespace only
+- Product name must be unique in the inventory
+
+Output:
+- Success: "Added product #<id>: <name> (<quantity>)"
+- Error if system is not initialized:
+  "Not initialized. Run: miniinventory init"
+- Error if quantity is invalid:
+  "Invalid quantity"
+- Error if product with the same name already exists:
+  "Product already exists"
+- Error if name is empty or only whitespace:
+  "Invalid product name"
+- Error if arguments are missing:
+  "Usage: miniinventory add <name> <quantity>"
+
+--- list ---
+Usage: miniinventory list
+
+Prints all products, one per line, in this format:
+[1] Pencil - Quantity: 50 (2026-03-15)
+[2] Notebook - Quantity: 20 (2026-03-15)
+
+Listing rules:
+- Products are listed in ascending order by ID
+- Each stored product is printed on its own line
+- If no products exist, print "No products found."
+
+Output:
+- Success: prints all products in the required format
+- Error if system is not initialized:
+  "Not initialized. Run: miniinventory init"
+- Output if inventory is empty:
+  "No products found."
+
+--- update ---
+Usage: miniinventory update 1 80
+
+Updates the quantity of product #1 to 80.
+The given quantity must be a non-negative integer.
+
+Output:
+- Success: "Product #1 updated to quantity 80."
+- Error if product does not exist:
+  "Product #1 not found."
+- Error if quantity is invalid:
+  "Invalid quantity"
+- Error if arguments are missing:
+  "Usage: miniinventory update <id> <quantity>"
+- Error if system is not initialized:
+  "Not initialized. Run: miniinventory init"
+
+--- delete ---
+Usage: miniinventory delete 1
+
+Removes product #1 from inventory.dat.
+
+Output:
+- Success: "Deleted product #1."
+- Error if product does not exist:
+  "Product #1 not found."
+- Error if arguments are missing:
+  "Usage: miniinventory delete <id>"
+- Error if system is not initialized:
+  "Not initialized. Run: miniinventory init"
+
+========================================
+DATA FORMAT
+========================================
+
+File: .miniinventory/inventory.dat
+
+Format:
+One product per line, fields separated by |
+
+Fields:
+id|name|quantity|created_date
+
+Example:
+1|Pencil|50|2026-03-15
+2|Notebook|20|2026-03-15
+
+ID RULES:
+- IDs start from 1
+- Each new product gets the next highest ID
+- Deleted IDs are NOT reused
+
+========================================
+ERROR HANDLING
+========================================
+
+- Running any command before "init":
+  print "Not initialized. Run: miniinventory init"
+
+- Invalid command:
+  print "Unknown command: <command>"
+
+- Missing main command:
+  print "Usage: miniinventory <command> [args]"
+
+- Invalid quantity:
+  print "Invalid quantity"
+
+- Invalid product name:
+  print "Invalid product name"
+
+- Duplicate product name:
+  print "Product already exists"
+
+========================================
+VERSION v2 SCOPE
+========================================
+
+The v2 implementation expands the v1 prototype into a usable inventory tool.
+
+Implemented commands:
+- init
+- add
+- list
+- update
+- delete
+
+v2 TASKS COMPLETED:
+1. Implemented the "list" command to display all stored products
+2. Implemented the "update" command to modify product quantity
+3. Implemented the "delete" command to remove a product
+
+v1 -> v2 SUMMARY:
+- v1 supported only initialization and adding products
+- v2 adds full inventory management through list, update, and delete
+- validation rules were clarified to improve consistency and usability
+

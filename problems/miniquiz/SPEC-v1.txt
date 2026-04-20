@@ -1,0 +1,72 @@
+PROJECT: mini-quiz
+AUTHOR: Mucahid Umut Aydin (251478071)
+VERSION: v1
+DATE: 2026-03-16
+
+========================================
+OVERVIEW
+========================================
+
+mini-quiz is a command-line quiz application.
+It stores questions and answers in a plain text file and supports
+adding questions, taking quizzes, viewing results, and deleting questions.
+
+All data is persisted in a directory called .miniquiz/
+in the current working directory.
+
+========================================
+COMMANDS
+========================================
+
+--- init ---
+Usage: python miniquiz.py init
+Creates a .miniquiz/ directory and an empty questions.dat file.
+If .miniquiz/ already exists, print "Already initialized" and exit.
+
+--- add ---
+Usage: python miniquiz.py add "What is the capital of France?" "Paris"
+Appends a new question to questions.dat.
+Each question has: id (auto-increment), question, answer, created_date.
+Prints "Added question #<id>: <question>"
+If question or answer argument is missing, prints:
+  "Usage: python miniquiz.py add <question> <answer>"
+
+--- list ---
+Usage: python miniquiz.py list
+Prints raw file contents (unformatted).
+If no questions exist, prints "No questions found."
+If .miniquiz/ does not exist, prints "Not initialized. Run: python miniquiz.py init"
+
+--- ask ---
+Not implemented in v1. Prints:
+  "Command 'ask' will be implemented in future weeks."
+
+--- delete ---
+Not implemented in v1. Prints:
+  "Command 'delete' will be implemented in future weeks."
+
+========================================
+DATA FORMAT
+========================================
+
+File: .miniquiz/questions.dat
+Format: One question per line, fields separated by |
+Example:
+1|What is the capital of France?|Paris|2026-03-16
+
+========================================
+ERROR HANDLING
+========================================
+
+- Before init: "Not initialized. Run: python miniquiz.py init"
+- Invalid command: "Unknown command: <command>"
+- Missing args for add: "Usage: python miniquiz.py add <question> <answer>"
+- No arguments: "Usage: python miniquiz.py <command> [args]"
+
+========================================
+BEHAVIOR NOTES
+========================================
+
+- IDs use line count + 1 method.
+- Date is hardcoded as "2026-03-16".
+- ask and delete are not yet implemented.
