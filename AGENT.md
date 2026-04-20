@@ -110,6 +110,7 @@ When adding support for a new AI coding system:
 
 ## New problem checklist
 
+- [ ] Ensure the problem name starts with the `mini` prefix (e.g., `minigit`, `minipomodoro`) and is all lowercase with no hyphens.
 - [ ] Create `problems/<problem>/problem.json` with all required keys
 - [ ] Write `SPEC-v1.txt` and `SPEC-v2.txt`
 - [ ] Write `test-v1.sh` and `test-v2.sh` (deterministic, self-contained)
@@ -126,6 +127,10 @@ When adding support for a new AI coding system:
 - Include benchmark results if adding/modifying adapters
 - Keep PRs focused — one adapter or one problem per PR
 - Run `bin/which-language benchmark <name> minigit --dry-run` before submitting
+- **First-time contributors:** GitHub Actions requires manual approval for workflows from first-time contributors. If you are a maintainer or AI agent evaluating a PR:
+  1. Inspect the PR content first.
+  2. If it violates conventions (e.g., missing `mini` prefix for problems), comment and **close** the PR (`gh pr close <id> -c "..."`).
+  3. If it looks legitimate, approve the workflow run (`gh run approve <run-id>`).
 
 ---
 

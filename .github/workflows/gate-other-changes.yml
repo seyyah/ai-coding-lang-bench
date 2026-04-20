@@ -1,0 +1,155 @@
+name: "Gate: Human Review Required"
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  check-for-core-changes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch base branch
+        run: git fetch origin ${{ github.base_ref }}
+
+      - name: Detect core file changes
+        id: detect
+        run: |
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+
+          # Define allowed contribution paths (handled by other workflows)
+          # - problems/<name>/* (new problem only)
+          # - lib/codexes/*_codex.rb + config/codexes.yml (new codex only)
+          # - artifacts/**/* (new artifacts only)
+
+          # Check if ANY file falls outside the three allowed contribution categories
+          CORE_FILES=""
+          ONLY_ALLOWED=true
+
+          while IFS= read -r file; do
+            [ -z "$file" ] && continue
+
+            IS_ALLOWED=false
+
+            # Allow: problems/<name>/<file>
+            if echo "$file" | grep -qE '^problems/[^/]+/[^/]+$'; then
+              IS_ALLOWED=true
+            fi
+
+            # Allow: lib/codexes/*_codex.rb
+            if echo "$file" | grep -qE '^lib/codexes/[a-z_]+_codex\.rb$'; then
+              IS_ALLOWED=true
+            fi
+
+            # Allow: config/codexes.yml
+            if [ "$file" = "config/codexes.yml" ]; then
+              IS_ALLOWED=true
+            fi
+
+            # Allow: artifacts/**
+            if echo "$file" | grep -qE '^artifacts/'; then
+              IS_ALLOWED=true
+            fi
+
+            if [ "$IS_ALLOWED" = "false" ]; then
+              CORE_FILES="$CORE_FILES\n$file"
+              ONLY_ALLOWED=false
+            fi
+          done <<< "$CHANGED_FILES"
+
+          if [ "$ONLY_ALLOWED" = "false" ]; then
+            echo "needs_review=true" >> $GITHUB_OUTPUT
+            {
+              echo "core_files<<CORE_EOF"
+              echo -e "$CORE_FILES"
+              echo "CORE_EOF"
+            } >> $GITHUB_OUTPUT
+          else
+            echo "needs_review=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Add review label
+        if: steps.detect.outputs.needs_review == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            // Create label if not exists
+            try {
+              await github.rest.issues.getLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: '🔍 requires-human-review'
+              });
+            } catch (e) {
+              if (e.status === 404) {
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: '🔍 requires-human-review',
+                  color: 'e4e669',
+                  description: 'This PR modifies core project files and needs maintainer review'
+                });
+              }
+            }
+
+            await github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['🔍 requires-human-review']
+            });
+
+      - name: Comment on core changes
+        if: steps.detect.outputs.needs_review == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const coreFiles = `${{ steps.detect.outputs.core_files }}`;
+
+            // Check if we already commented (avoid duplicate comments on re-runs)
+            const comments = await github.rest.issues.listComments({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            });
+
+            const alreadyCommented = comments.data.some(c =>
+              c.user.login === 'github-actions[bot]' &&
+              c.body.includes('🛡️ Human Review Required')
+            );
+
+            if (alreadyCommented) {
+              console.log('Already commented, skipping.');
+              return;
+            }
+
+            let body = `## 🛡️ Human Review Required\n\n`;
+            body += `This PR modifies **core project files** that are outside the standard contribution paths. `;
+            body += `A maintainer must manually review and approve these changes before merging.\n\n`;
+            body += `### Files requiring review:\n\`\`\`\n${coreFiles.trim()}\n\`\`\`\n\n`;
+            body += `---\n\n`;
+            body += `**Accepted self-service contribution paths:**\n`;
+            body += `- 🎯 \`problems/<name>/\` — New benchmark problems\n`;
+            body += `- 🧠 \`lib/codexes/<name>_codex.rb\` + \`config/codexes.yml\` — New codex adapters\n`;
+            body += `- 📊 \`artifacts/<codex>/<model>/<problem>/\` — Benchmark results\n\n`;
+            body += `If your contribution fits one of these paths, please restructure your PR accordingly.\n`;
+            body += `📖 See [AGENT.md](./AGENT.md) for the full contributor protocol.`;
+
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });

@@ -1,0 +1,104 @@
+PROJECT: mini-quiz
+AUTHOR: Mucahid Umut Aydin (251478071)
+VERSION: v2
+DATE: 2026-03-31
+
+========================================
+OVERVIEW
+========================================
+
+mini-quiz is a command-line quiz application.
+It stores questions and answers in a plain text file and supports
+adding questions, taking quizzes, viewing results, and deleting questions.
+
+All data is persisted in a directory called .miniquiz/
+in the current working directory.
+
+========================================
+COMMANDS
+========================================
+
+--- init ---
+Usage: python miniquiz.py init
+Creates a .miniquiz/ directory and an empty questions.dat file.
+If .miniquiz/ already exists, print "Already initialized" and exit.
+
+--- add ---
+Usage: python miniquiz.py add "What is the capital of France?" "Paris"
+Appends a new question to questions.dat.
+Each question has: id (auto-increment), question, answer, created_date.
+ID is calculated as max(existing_ids) + 1.
+Date is set using datetime.date.today() (YYYY-MM-DD).
+Prints "Added question #<id>: <question>"
+If question or answer argument is missing, prints:
+  "Usage: python miniquiz.py add <question> <answer>"
+
+--- list ---
+Usage: python miniquiz.py list
+Prints all questions formatted as:
+  [1] What is the capital of France? -> Paris (2026-03-31)
+If no questions exist, prints "No questions found."
+If .miniquiz/ does not exist, prints "Not initialized. Run: python miniquiz.py init"
+
+--- ask ---
+Usage: python miniquiz.py ask 1
+Displays the question for the given ID and prompts the user for an answer.
+  Question #1: What is the capital of France?
+  Your answer: <user types here>
+If correct: "Correct! The answer is: Paris"
+If wrong: "Wrong! The correct answer is: Paris"
+If not found: "Question #1 not found."
+If ID missing: "Usage: python miniquiz.py ask <id>"
+If not initialized: "Not initialized. Run: python miniquiz.py init"
+Answer comparison is case-insensitive.
+
+--- delete ---
+Usage: python miniquiz.py delete 1
+Removes question #1 from questions.dat.
+Prints "Deleted question #1."
+If not found: "Question #1 not found."
+If ID missing: "Usage: python miniquiz.py delete <id>"
+If not initialized: "Not initialized. Run: python miniquiz.py init"
+After deletion, remaining questions keep their original IDs.
+
+========================================
+DATA FORMAT
+========================================
+
+File: .miniquiz/questions.dat
+Format: One question per line, pipe-separated with max 3 splits:
+1|What is the capital of France?|Paris|2026-03-31
+
+Using split("|", 3) ensures questions containing | character are handled correctly.
+
+========================================
+ERROR HANDLING
+========================================
+
+- Before init: "Not initialized. Run: python miniquiz.py init"
+- Invalid command: "Unknown command: <command>"
+- Missing args for add: "Usage: python miniquiz.py add <question> <answer>"
+- Missing id for ask/delete: "Usage: python miniquiz.py <command> <id>"
+- No arguments: "Usage: python miniquiz.py <command> [args]"
+- Nonexistent ID: "Question #<id> not found."
+
+========================================
+BEHAVIOR NOTES
+========================================
+
+- IDs start at 1, calculated as max(existing_ids) + 1.
+- IDs never reassigned after deletion; gaps allowed (e.g. 1, 3, 4).
+- Answer matching is always case-insensitive.
+- Date uses datetime.date.today(), not hardcoded.
+- Empty lines and malformed lines in questions.dat are skipped.
+
+========================================
+CHANGELOG
+========================================
+
+v2 (2026-03-31):
+  - ask command: fully implemented with case-insensitive comparison
+  - delete command: fully implemented, other IDs preserved
+  - list command: formatted output [id] question -> answer (date)
+  - add command: date is now dynamic via datetime.date.today()
+  - add command: ID uses max(existing_ids)+1, not line count

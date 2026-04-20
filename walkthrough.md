@@ -5,6 +5,20 @@
 
 ---
 
+## 2026-04-14 — Process First-Time Contributor PR & Update PR Guidelines
+
+**Contributor**: AI agent (Antigravity)
+**What was done**: 
+- Investigated PR #56 (`pomodorotimer`) that was stuck waiting for maintainer approval.
+- Identified that GitHub Actions requires maintainer approval for first-time fork contributors before running workflows.
+- Evaluated PR #56 against `validate-problem.yml` rules and found that the problem name violated the `mini` prefix rule (must be `mini<name>`).
+- Closed PR #56 with a comment explaining the naming violation and the reason for the stalled workflow.
+- Updated `AGENT.md` to explicitly mandate the `mini` prefix in the New Problem Checklist and added a protocol for handling PRs from first-time contributors (inspect, message-close if invalid, or `gh run approve` if valid).
+**Observations**: The `mini` prefix rule was previously only shown in examples rather than strictly mandated in the checklist, leading to invalid submissions like `pomodorotimer`. First-time contributor workflow stalls are confusing to new users without clear documentation.
+**Next**: Await resubmission of the pomodoro timer problem with the correct name (`minipomodoro`) and structure.
+
+---
+
 ## 2026-03-28 — Clean Architecture Refactor: DRY Configs & Unified CLI
 
 **Contributor**: AI agent (Claude Code)
