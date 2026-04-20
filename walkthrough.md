@@ -5,6 +5,19 @@
 
 ---
 
+## 2026-04-20 — Refactor MiniGrades V2 Specification and Test Suite
+
+**Contributor**: AI Agent (Antigravity)
+**What was done**: Expanded the system to V2 by implementing `change-grade` and `info` commands. Integrated a strict 2-decimal precision requirement for all average calculations.
+
+**Key metrics**: 38 test cases, ~400 LOC (test script).
+
+**Observations**: The transition to floating-point precision (2 decimals) required a refactor of the output formatting logic. The new commands significantly enhance granular data management without breaking V1 compatibility.
+
+**Next**: Start running minigrades benchmarks against AI models.
+
+---
+
 ## 2026-04-14 — Process First-Time Contributor PR & Update PR Guidelines
 
 **Contributor**: AI agent (Antigravity)

@@ -30,8 +30,10 @@ Supported commands:
     minigrades add <id> <name>
     minigrades add-grade <id> <grade>
     minigrades del-grade <id> <grade>
+    minigrades change-grade <id> <old_grade> <new_grade>
     minigrades delete <id>
     minigrades list
+    minigrades info <id>
     minigrades average <id>
     minigrades report
 
@@ -181,7 +183,7 @@ ID | Name | Grades | Average
 ----------------------------
 <id> | <name> | <g1>,<g2> | <avg>
 
-Average displayed with 1 decimal place.
+Average displayed with exactly 2 decimal places.
 If no grades, display "-" for grades and "-" for average.
 Students listed in insertion order (file order).
 
@@ -206,7 +208,7 @@ Calculate arithmetic mean of all grades.
 Print:
     Average for student <id> is <average>.
 
-Average displayed with 1 decimal place (e.g., 50.0).
+Average displayed with exactly 2 decimal places (e.g., 50.00).
 
 ----------------------------------------
 3.8 report
@@ -228,6 +230,62 @@ ID | NAME | GRADES | AVERAGE
 
 Print:
     Report saved to .minigrades/report.txt
+
+
+----------------------------------------
+3.9 change-grade <id> <old_grade> <new_grade>
+----------------------------------------
+
+If not initialized:
+    print "Not initialized. Run: minigrades init"
+    exit 1
+
+If id, old_grade, or new_grade is not numeric:
+    print "Invalid input: Please enter a numeric value."
+    exit 1
+
+If new_grade < 0 or new_grade > 100:
+    print "Invalid grade: Grades must be between 0 and 100."
+    exit 1
+
+If student not found:
+    print "Error: No student found with ID <id>."
+    exit 1
+
+If old_grade not in student's grade list:
+    print "Error: Grade <old_grade> not found for this student."
+    exit 1
+
+Replace the first occurrence of old_grade with new_grade.
+
+Print:
+    Grade changed successfully from <old_grade> to <new_grade> for student <id>.
+
+----------------------------------------
+3.10 info <id>
+----------------------------------------
+
+If not initialized:
+    print "Not initialized. Run: minigrades init"
+    exit 1
+
+If id is not numeric:
+    print "Invalid input: Please enter a numeric value."
+    exit 1
+
+If student not found:
+    print "Error: No student found with ID <id>."
+    exit 1
+
+Output format:
+ID: <id>, Name: <name>, Grades: [<g1>, <g2>], Average: <avg>
+
+If grades list is empty, Average will be "-"
+Example Output:
+ID: 101, Name: Berke, Grades: [70, 30], Average: 50.00
+ID: 102, Name: Efe, Grades: [], Average: -
+
+Average displayed with exactly 2 decimal places.
 
 ========================================
 4. Error Handling

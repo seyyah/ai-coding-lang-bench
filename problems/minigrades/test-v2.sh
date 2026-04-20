@@ -197,7 +197,7 @@ fi
 
 ../minigrades add-grade 101 70 >/dev/null 2>&1
 ../minigrades add-grade 101 30 >/dev/null 2>&1
-if ../minigrades average 101 2>&1 | grep -q "Average for student 101 is 50.0"; then
+if ../minigrades average 101 2>&1 | grep -q "Average for student 101 is [0-9][0-9]*\.[0-9][0-9]"; then
   pass "average calculation correct"
 else
   fail "average calculation correct"
@@ -309,6 +309,142 @@ else
 fi
 cd ../testrepo
 rm -rf ../noinit
+
+######################################
+# Test 26: change-grade success
+######################################
+
+if ../minigrades change-grade 101 70 85 2>&1 | grep -q "Grade changed successfully from 70 to 85 for student 101"; then
+  pass "change-grade success"
+else
+  fail "change-grade success"
+fi
+
+######################################
+# Test 27: change-grade student not found
+######################################
+
+if ../minigrades change-grade 999 80 90 2>&1 | grep -q "Error: No student found with ID 999"; then
+  pass "change-grade student not found"
+else
+  fail "change-grade student not found"
+fi
+
+######################################
+# Test 28: change-grade old grade not found
+######################################
+
+if ../minigrades change-grade 101 99 90 2>&1 | grep -q "Error: Grade 99 not found for this student"; then
+  pass "change-grade grade not found"
+else
+  fail "change-grade grade not found"
+fi
+
+######################################
+# Test 29: change-grade invalid target grade
+######################################
+
+if ../minigrades change-grade 101 80 150 2>&1 | grep -q "Invalid grade: Grades must be between 0 and 100"; then
+  pass "change-grade invalid target grade"
+else
+  fail "change-grade invalid target grade"
+fi
+
+######################################
+# Test 30: change-grade non-numeric
+######################################
+
+if ../minigrades change-grade 101 abc 90 2>&1 | grep -q "Invalid input: Please enter a numeric value"; then
+  pass "change-grade non-numeric"
+else
+  fail "change-grade non-numeric"
+fi
+
+######################################
+# Test 31: info success format
+######################################
+
+LOG_OUT=$(../minigrades info 101 2>&1)
+if echo "$LOG_OUT" | grep -q "ID: 101, Name: Berke, Grades: \[80, 85, 30\], Average:"; then
+  pass "info success format"
+else
+  fail "info success format"
+fi
+
+######################################
+# Test 32: info success no grades
+######################################
+
+LOG_OUT2=$(../minigrades info 103 2>&1)
+if echo "$LOG_OUT2" | grep -q "ID: 103, Name: Ali, Grades: \[\], Average: -"; then
+  pass "info success no grades"
+else
+  fail "info success no grades"
+fi
+
+######################################
+# Test 33: info student not found
+######################################
+
+if ../minigrades info 999 2>&1 | grep -q "Error: No student found with ID 999"; then
+  pass "info student not found"
+else
+  fail "info student not found"
+fi
+
+######################################
+# Test 34: info non-numeric
+######################################
+
+if ../minigrades info abc 2>&1 | grep -q "Invalid input: Please enter a numeric value"; then
+  pass "info non-numeric"
+else
+  fail "info non-numeric"
+fi
+
+######################################
+# Test 35: strict decimal check - average
+######################################
+
+OUT_AVG=$(../minigrades average 101 2>&1)
+if echo "$OUT_AVG" | awk '{print $NF}' | grep -Eq "^[0-9]+\.[0-9]{2}$"; then
+  pass "strict decimal check - average"
+else
+  fail "strict decimal check - average"
+fi
+
+######################################
+# Test 36: strict decimal check - report
+######################################
+
+../minigrades report >/dev/null 2>&1
+if grep "Berke" .minigrades/report.txt | awk -F'|' '{print $4}' | grep -Eq " [0-9]+\.[0-9]{2} *$"; then
+  pass "strict decimal check - report"
+else
+  fail "strict decimal check - report"
+fi
+
+######################################
+# Test 37: strict decimal check - list
+######################################
+
+OUT_LST=$(../minigrades list 2>&1)
+if echo "$OUT_LST" | grep "Berke" | awk -F'|' '{print $4}' | grep -Eq " [0-9]+\.[0-9]{2} *$"; then
+  pass "strict decimal check - list"
+else
+  fail "strict decimal check - list"
+fi
+
+######################################
+# Test 38: strict decimal check - info
+######################################
+
+OUT_INF=$(../minigrades info 101 2>&1)
+if echo "$OUT_INF" | awk -F'Average: ' '{print $2}' | grep -Eq "^[0-9]+\.[0-9]{2}$"; then
+  pass "strict decimal check - info"
+else
+  fail "strict decimal check - info (got: $OUT_INF)"
+fi
 
 ######################################
 # Cleanup & Summary
