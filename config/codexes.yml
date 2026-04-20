@@ -39,6 +39,12 @@ codexes:
       # These values are picked up by the calculate_cost method in GeminiCodex
       price_input_1m: 0.25
       price_output_1m: 1.50
+  minirecipe:
+    enabled: true
+    class: MinirecipeCodex
+    description: >
+      Mini-Recipe project adapter. 
+      Handles recipe data and ID tracking logic.
 
   aider:
     enabled: false
