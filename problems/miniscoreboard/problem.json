@@ -10,3 +10,4 @@
   "v3_spec": "SPEC-v3.txt",
   "v3_test": "test-v3.sh",
   "v3_prompt": "Finalize the {{binary_name}} suite in {{language}} by implementing 'leaderboard', 'summary', and 'export' commands as defined in SPEC-v3.txt. Ensure complex logic for point calculation (3/1/0) and sorting in leaderboard is correct. Verification: bash test-v3.sh"
+}
