@@ -1,7 +1,7 @@
 PROJECT: mini-grades
 AUTHOR: Davud Kılıç - 251478023
-VERSION: v1
-DATE: 2026-03-28
+VERSION: v2
+DATE: 2026-04-19
 
 ========================================
 OVERVIEW
@@ -46,7 +46,16 @@ Example output:
   #1 - Ali Veli
   #2 - Ayse Kaya
 If no students exist, prints "No students found."
-NOTE: This is a v1 intermediate command. "rapor" will replace/extend it in a future version.
+NOTE: Intermediate command. "rapor" will replace/extend it in a future version.
+
+--- ara ---
+Usage: python grades.py ara <keyword>
+Searches all students whose name contains the given keyword (case-insensitive).
+Prints matching students one per line in the same format as listele.
+If no match found, prints "No students found matching '<keyword>'."
+Example:
+  python grades.py ara Ali
+  -> #1 - Ali Veli
 
 --- ortalama ---
 Usage: python grades.py ortalama 1
@@ -55,7 +64,16 @@ Prints "Student #1 (<name>) average: <avg>"
 Average is rounded to 2 decimal places.
 If student has no grades, prints "Student #1 has no grades yet."
 If student does not exist, prints "Student #1 not found."
-STATUS: Not yet implemented.
+
+--- not-listele ---
+Usage: python grades.py not-listele 1
+Lists all grades for student #1, numbered.
+Format:
+  Student #1 (<name>) grades:
+    1. 85
+    2. 90
+If student has no grades, prints "Student #1 (<name>) has no grades yet."
+If student does not exist, prints "Student #1 not found."
 
 --- rapor ---
 Usage: python grades.py rapor
@@ -110,3 +128,8 @@ v1 (2026-03-28)
   - listele komutu eklendi.
   - while dongusu ile dosyadan satir satir okuma implemente edildi.
   - Unknown command hatasi eklendi.
+
+v2 (2026-04-19)
+  - ara komutu eklendi (string 'in' operatoru + for dongusu ile isim araması).
+  - ortalama komutu eklendi (for dongusu ile not toplama ve hesaplama).
+  - not-listele komutu eklendi (belirli bir ogrencinin notlarini for dongusu ile listeler).
