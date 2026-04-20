@@ -1,0 +1,15 @@
+
+  "name": "mini-todo",
+  "author": "Ceren Cenikli",
+  "student_id": "251478097",
+  "description": "A minimalist CLI task manager. Version 2 introduces the 'clear' command to purge completed (CLOSED) tasks from the registry.",
+  "spec_v1": "SPEC v1.txt",
+  "spec_v2": "SPEC v2.txt",
+  "features": [
+    "init",
+    "add",
+    "list",
+    "done",
+    "delete",
+    "clear"
+  ]

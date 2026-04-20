@@ -1,0 +1,47 @@
+PROJECT: mini-todo
+AUTHOR: [Ceren Cenikli] (251478097)
+VERSION: v1.1
+DATE: 2026-03-28
+
+========================================
+OVERVIEW
+========================================
+mini-todo is a minimalist command-line task management tool.
+Its primary purpose is to provide a distraction-free environment for tracking immediate daily goals.
+All persistent records are stored within a hidden directory named .todo_data/ located in the current working directory.
+
+========================================
+COMMANDS
+========================================
+
+--- init ---
+Usage: python todo.py init 
+Behavior: Checks for the .todo_data/ directory. If not present, creates the directory and an empty registry.txt file.
+
+--- add ---
+Usage: python todo.py add "Task description" <priority> 
+Behavior: Appends a new entry to registry.txt. Each task includes: id, status (default: ACTIVE), priority (1-3), and created_date.
+
+--- list ---
+Usage: python todo.py list 
+Behavior: Parses registry.txt and displays tasks grouped into categories: --- ACTIVE --- and --- CLOSED ---.
+
+--- done ---
+Usage: python todo.py done <id> 
+Behavior: Locates task #<id> and toggles its status field from ACTIVE to CLOSED.
+
+--- delete ---
+Usage: python todo.py delete <id> 
+Behavior: Permanently removes the line associated with task #<id> from registry.txt.
+
+--- clear ---
+Usage: python todo.py clear
+Behavior: registry.txt dosyasını tarar ve "CLOSED" statüsündeki tüm görevleri belirleyerek bu satırları dosyadan kalıcı olarak siler.
+Output: İşlem başarılıysa "[CLEANUP] <count> completed tasks have been removed." mesajını basar.
+
+========================================
+DATA FORMAT
+========================================
+File Path: .todo_data/registry.txt
+Format: Plain-text, one task per line. Fields are separated by the pipe (|) delimiter.
+Schema Order: id|status|priority|created_date|description
