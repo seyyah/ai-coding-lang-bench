@@ -1,0 +1,11 @@
+{
+    "name": "MiniRecipe",
+    "author": "İlker Barış Belyurt",
+    "binary_name": "minirecipe",
+    "v1_spec": "SPEC-v1.txt",
+    "v1_test": "test-v1.sh",
+    "v1_prompt": "Implement the command-line recipe manager {{binary_name}} precisely as described in SPEC-v1.txt using {{language}}.",
+    "v2_spec": "SPEC-v2.txt",
+    "v2_test": "test-v2.sh",
+    "v2_prompt": "Read SPEC-v2.txt and extend your existing {{binary_name}} program to support unique ID generation and automatic date tracking for every recipe entry."
+}
