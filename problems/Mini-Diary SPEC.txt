@@ -1,0 +1,111 @@
+Mini-Diary SPEC
+
+PROJECT: mini-diary
+AUTHOR: Semih Oktay KARAOĞLU (241478004)
+VERSION: v1
+DATE: 2026-03-15
+
+========================================
+OVERVIEW
+========================================
+
+mini-diary is a command-line personal diary manager.
+It stores diary entries in a plain text file and supports
+initialization, adding entries, listing entries, deleting entries,
+and searching entries by date.
+
+All data is persisted in a directory called .minidiary/
+in the current working directory.
+
+========================================
+COMMANDS
+========================================
+
+--- init ---
+Usage: python minidiary.py init
+Behavior:
+  Creates a .minidiary/ directory and an empty entries.dat file.
+  If .minidiary/ already exists, prints "Already initialized" and exits.
+Output:
+  - First time: "Initialized empty mini-diary in .minidiary/"
+  - Already exists: "Already initialized"
+
+--- add ---
+Usage: python minidiary.py add <entry_text>
+Behavior:
+  Appends a new diary entry to entries.dat with auto-incremented ID
+  and current date in YYYY-MM-DD format.
+Output:
+  - "Added entry #<id>: <entry_text> (<YYYY-MM-DD>)"
+Example:
+  Added entry #1: Today ı went to university (2026-03-15)
+
+--- list ---
+Usage: python minidiary.py list
+Behavior:
+  Prints all diary entries, one per line, in the format:
+    [ID] <entry_text> (<YYYY-MM-DD>)
+  If no entries exist, prints "No entries found."
+Output examples:
+  - [1] Today ı went to university  (2026-03-15)
+  - [2] I studied coding (2026-03-14)
+  - No entries: "No entries found."
+
+--- delete ---
+Usage: python minidiary.py delete <id>
+Behavior:
+  Removes diary entry with given ID from entries.dat.
+  If entry does not exist, prints "Entry #<id> not found."
+Output:
+  - Deleted successfully: "Deleted entry #1."
+  - Entry not found: "Entry #1 not found."
+
+--- search ---
+Usage: python minidiary.py search <YYYY-MM-DD>
+Behavior:
+  Prints all diary entries matching the given date.
+  If no entries for that date, prints "No entries found for <date>."
+Output examples:
+  - [1] Today went to university (2026-03-15)
+  - [2] I studied coding (2026-03-15)
+  - No entries: "No entries found for 2026-03-15."
+
+========================================
+DATA FORMAT
+========================================
+
+File: .minidiary/entries.dat
+Format: One entry per line, fields separated by |
+Fields:
+  1. ID (integer, auto-increment)
+  2. Entry text (string)
+  3. Date (YYYY-MM-DD)
+Example:
+1|Today went to university|2026-03-15
+2|ı studied coding|2026-03-14
+
+Requirement Update: All data must be saved using UTF-8 encoding to support various characters. Deleted IDs cannot be reused; new entries must always use the auto-increment formula (highest_id + 1).
+
+========================================
+ERROR HANDLING
+========================================
+
+- Running any command before "init":
+    Output: "Not initialized. Run: python minidiary.py init"
+
+- Invalid command:
+    Output: "Unknown command: <command>"
+
+- Missing arguments:
+    - add without text:
+        Output: "Usage: python minidiary.py add <entry_text>"
+    - delete without ID:
+        Output: "Usage: python minidiary.py delete <id>"
+    - search without date:
+        Output: "Usage: python minidiary.py search <YYYY-MM-DD>"
+
+- Delete or search with non-existent ID/date:
+    - delete: "Entry #<id> not found."
+    - search: "No entries found for <date>"
+- Search with invalid date format: 
+    Output: 'Invalid date format. Use YYYY-MM-DD'
