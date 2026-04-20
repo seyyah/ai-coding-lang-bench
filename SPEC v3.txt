@@ -1,0 +1,57 @@
+PROJECT: mini-bookmark
+AUTHOR: Hüdanur Şener (251478066)
+VERSION: v3
+DATE: 2026-04-20
+
+========================================
+OVERVIEW
+========================================
+mini-bookmark is a CLI tool to save and manage web URLs[cite: 13].
+It stores bookmarks in a plain text file. 
+All data is kept in a directory named .minibookmark/[cite: 14].
+
+========================================
+COMMANDS
+========================================
+
+--- init ---
+Usage: python minibookmark.py init
+Creates .minibookmark/ directory and an empty links.dat file[cite: 15].
+If it exists, prints "Already initialized."
+
+--- add ---
+Usage: python minibookmark.py add "Title" "URL"
+(V2 Update) Saves a new bookmark with an auto-increment ID. 
+URL must start with "http" or "https"[cite: 16].
+Format: id|title|url|date
+Prints: "Added bookmark #<id>: <title>"
+
+--- list ---
+Usage: python minibookmark.py list
+(V2 Update: Implemented) Shows all saved bookmarks in a formatted table[cite: 17].
+Displays ID, Title, URL, and Date columns.
+
+--- delete ---
+Usage: python minibookmark.py delete <id>
+(V2 Update: Implemented) Removes a bookmark by its specific ID from links.dat[cite: 18].
+Prints: "Bookmark #<id> deleted." if successful.
+
+--- search ---
+Usage: python minibookmark.py search <keyword>
+Searches for bookmarks by title keyword (Case-insensitive)[cite: 19].
+
+========================================
+DATA FORMAT
+========================================
+File: .minibookmark/links.dat
+Format: id|title|url|YYYY-MM-DD
+Example: 1|Google|http://google.com|2026-04-20
+
+========================================
+ERROR HANDLING
+========================================
+- Running without init: "Not initialized. Run: python minibookmark.py init"
+- Unknown command: "Unknown command: <command>"
+- Missing arguments: "Usage: python minibookmark.py <command> [args]"
+- Invalid URL (V2): "Error: URL must start with 'http' or 'https'."
+- ID Not Found (V2): "Bookmark #<id> not found."
