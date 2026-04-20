@@ -1,0 +1,82 @@
+PROJECT: mini-vocab
+AUTHOR: Elif Hazar (251478082)
+VERSION: v1
+DATE: 2026-03-25
+
+========================================
+OVERVIEW
+========================================
+
+mini-vocab is a command-line vocabulary manager.
+It stores vocabulary words, their translations, and learning status
+in a plain text file. It supports adding, listing, marking as learned, 
+and deleting words.
+
+All data is persisted in a directory called .minivocab/
+in the current working directory.
+
+========================================
+COMMANDS
+========================================
+
+--- init ---
+Usage: python minivocab.py init
+Creates a .minivocab/ directory and an empty words.dat file.
+If .minivocab/ already exists, print "Already initialized" and exit.
+
+--- add ---
+Usage: python minivocab.py add "apple" "elma"
+Appends a new word to words.dat with status LEARNING.
+Each word has: id (auto-increment), word, translation, status.
+Prints "Added word #<id>: <word> - <translation>"
+
+--- list ---
+Usage: python minivocab.py list
+Prints all words, one per line:
+  [1] [LEARNING] apple - elma
+  [2] [LEARNED] book - kitap
+If no words exist, prints "No words found."
+
+--- learn ---
+Usage: python minivocab.py learn 1
+Changes word #1 status from LEARNING to LEARNED.
+Prints "Word #1 marked as learned."
+If word does not exist, prints "Word #1 not found."
+
+--- delete ---
+Usage: python minivocab.py delete 1
+Removes word #1 from words.dat.
+Prints "Deleted word #1."
+If word does not exist, prints "Word #1 not found."
+
+--- search ---
+Usage: python minivocab.py search "apple"
+Searches for a word in words.dat.
+Prints the matching word: "[1] [LEARNING] apple - elma"
+If not found, prints "Word not found."
+
+--- stats ---
+Usage: python minivocab.py stats
+Prints the total number of words and their learning status.
+Example Output:
+Total Words: 15
+LEARNING: 10
+LEARNED: 5
+
+========================================
+DATA FORMAT
+========================================
+
+File: .minivocab/words.dat
+Format: One word per line, fields separated by |
+Example:
+1|apple|elma|LEARNING
+2|book|kitap|LEARNED
+
+========================================
+ERROR HANDLING
+========================================
+
+- Running any command before "init": print "Not initialized. Run: python minivocab.py init"
+- Invalid command: print "Unknown command: <command>"
+- Missing arguments: print "Usage: python minivocab.py <command> [args]"
