@@ -1,0 +1,70 @@
+PROJECT: miniscoreboard
+AUTHOR: Utkuhan Akar (V3 Upgrade)
+VERSION: v3
+DATE: 2026-04-20
+
+========================================
+OVERVIEW
+========================================
+
+miniscoreboard is a command-line sports match management tool.
+V3 adds advanced analytics, league standings, and data portability.
+
+All infrastructure and V1/V2 commands remain mandatory.
+- init
+- add-match
+- history
+- team
+
+========================================
+NEW COMMANDS (V3)
+========================================
+
+--- leaderboard ---
+Usage: python miniscore.py leaderboard
+Calculates points for all teams recorded in matches.dat.
+- Win: 3 points
+- Draw: 1 point
+- Loss: 0 points
+
+Output Format:
+Sorted by Points (Descending), then GD (Goal Difference), then GF (Goals For).
+[Rank] Team: Pts (W-D-L) GF-GA GD
+
+Example Output:
+[1] GALATASARAY: 6 pts (2-0-0) 5-1 +4
+[2] FENERBAHCE: 3 pts (1-0-1) 3-2 +1
+[3] BESIKTAS: 0 pts (0-0-2) 1-6 -5
+
+If no matches exist, print "History is empty."
+
+--- summary ---
+Usage: python miniscore.py summary
+Overview of league activity.
+
+Output Format:
+Total Teams: <Count>
+Total Matches: <Count>
+Total Goals: <Count>
+Average Goals/Match: <Avg> (Fixed to 2 decimal places)
+
+--- export ---
+Usage: python miniscore.py export
+Converts matches.dat into a JSON file named .miniscore/matches.json.
+Prints "Exported <Count> matches to .miniscore/matches.json"
+
+========================================
+DETERMINISM RULES
+========================================
+
+- Tool must never produce timestamps or random IDs in outputs unless specified.
+- Sorting in leaderboard must be stable. If two teams are equal in Pts, GD, and GF, sort alphabetically by Team Name.
+- Output formatting (spaces, case) must exactly match the examples.
+
+========================================
+ERROR HANDLING
+========================================
+
+- Inherit all V1/V2 error cases.
+- If export fails due to permissions: print "Error: Could not write export file."
+- If leaderboard is requested with 0 matches: print "History is empty."
