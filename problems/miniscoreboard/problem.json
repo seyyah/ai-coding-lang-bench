@@ -6,8 +6,5 @@
   "v1_prompt": "Implement {{binary_name}} as described in SPEC-v1.txt. Use standard libraries. Verification: bash test-v1.sh",
   "v2_spec": "SPEC-v2.txt",
   "v2_test": "test-v2.sh",
-  "v2_prompt": "Extend {{binary_name}} to support 'history' and 'team' commands according to SPEC-v2.txt. Verification: bash test-v2.sh",
-  "v3_spec": "SPEC-v3.txt",
-  "v3_test": "test-v3.sh",
-  "v3_prompt": "Finalize {{binary_name}} with 'leaderboard', 'summary', and 'export' as defined in SPEC-v3.txt. Verification: bash test-v3.sh"
+  "v2_prompt": "Extend {{binary_name}} to support 'history' and 'team' commands according to SPEC-v2.txt. Verification: bash test-v2.sh"
 }
