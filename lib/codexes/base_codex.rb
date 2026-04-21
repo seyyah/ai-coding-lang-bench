@@ -123,7 +123,12 @@ class BaseCodex
     written_files = []
 
     # 1. Process Metadata-driven Named Blocks
+    # First-wins: later blocks that resolve to the same filename (commonly
+    # because infer_filename matched a backticked `<binary_name>` reference in
+    # a post-amble like "chmod +x minigit" or "bash test-v2.sh") must not
+    # overwrite the primary implementation block that appeared earlier.
     blocks.select { |b| b[:filename] }.each do |block|
+      next if written_files.include?(block[:filename])
       path = File.join(dir, block[:filename])
       FileUtils.mkdir_p(File.dirname(path))
       File.write(path, block[:code])

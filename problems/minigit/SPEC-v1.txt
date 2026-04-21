@@ -29,6 +29,7 @@ Supported commands:
     minigit add <file>
     minigit commit -m "<message>"
     minigit log
+    minigit status
 
 ========================================
 2. Repository Structure
@@ -153,6 +154,13 @@ Else traverse parents:
 commit <hash>
 Date: <timestamp>
 Message: <message>
+
+----------------------------------------
+4.5 status
+----------------------------------------
+
+Print staged files from the index, one per line.
+If index empty, print "Nothing staged".
 
 ========================================
 5. Determinism Rules

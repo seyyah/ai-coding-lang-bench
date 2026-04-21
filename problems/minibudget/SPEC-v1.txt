@@ -1,0 +1,36 @@
+MiniBudget Specification
+Version: 1.0
+Command name: minibudget
+
+========================================
+1. Overview
+========================================
+
+MiniBudget is a CLI tool to track income and expenses.
+Data must be stored in: .minibudget/data.txt
+
+Supported commands:
+    minibudget init
+    minibudget add <amount> <description>
+    minibudget list
+
+========================================
+2. Command Specifications
+========================================
+
+2.1 init
+Create .minibudget directory.
+If exists: print "Already initialized"
+
+2.2 add <amount> <description>
+Append line to .minibudget/data.txt:
+<timestamp>|<amount>|<description>
+Note: Use integers for amount.
+
+2.3 list
+Print each entry in format:
+[<timestamp>] <amount>: <description>
+If empty: print "No entries"
+
+========================================
+END

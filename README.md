@@ -26,6 +26,17 @@ Be part of the discovery. Help us find the ultimate AI-native programming langua
 
 ---
 
+## 🚀 V2 Evolution (Current Phase)
+
+We have transitioned to V2 of the initiative. Key goals for this phase include enhancing adapter reliability and expanding problem depth.
+
+### ✅ V2 Tasks Completed
+- **[codex] Gemini Cached Token Support**: Updated `GeminiCodex` to accurately track `cachedTokenCount` for precise cost analysis.
+- **[problem] MiniGit 'status' Command**: Expanded `minigit` specification and test suite to include repository state monitoring.
+- **[spec] Artifact & Metric Guidelines**: Updated `AGENT.md` with strict rules for artifact management and timing accuracy.
+
+---
+
 ## ⚡ Quick Start: Join the Arena
 
 You don't need to be an expert to contribute. You can run your first benchmark in less than 2 minutes and join the movement.
