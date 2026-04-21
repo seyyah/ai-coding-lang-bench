@@ -1,0 +1,231 @@
+name: "Validate: New Problem"
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "problems/**"
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  validate-problem:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch base branch
+        run: git fetch origin ${{ github.base_ref }}
+
+      - name: Validate problem structure
+        id: validate
+        run: |
+          set +e
+          ERRORS=""
+          WARNINGS=""
+
+          # 1. Get all changed files relative to base
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+
+          # 2. Check that ALL changes are under problems/
+          NON_PROBLEM_FILES=$(echo "$CHANGED_FILES" | grep -v '^problems/' || true)
+          if [ -n "$NON_PROBLEM_FILES" ]; then
+            ERRORS="$ERRORS\n❌ **Mixed contribution detected.** This PR modifies files outside \`problems/\`. A problem PR must ONLY touch files under \`problems/<name>/\`.\n\nFiles outside problems/:\n\`\`\`\n$NON_PROBLEM_FILES\n\`\`\`\n"
+          fi
+
+          # 3. Extract unique problem directories touched
+          PROBLEM_DIRS=$(echo "$CHANGED_FILES" | grep '^problems/' | cut -d'/' -f2 | sort -u)
+          PROBLEM_COUNT=$(echo "$PROBLEM_DIRS" | wc -l)
+
+          if [ -z "$PROBLEM_DIRS" ]; then
+            ERRORS="$ERRORS\n❌ No problem directory found in changed files.\n"
+          elif [ "$PROBLEM_COUNT" -gt 1 ]; then
+            ERRORS="$ERRORS\n❌ **Multiple problems in one PR.** Please submit one problem per PR.\n\nDirectories found: \`$(echo $PROBLEM_DIRS | tr '\n' ', ')\`\n"
+          fi
+
+          PROBLEM_NAME=$(echo "$PROBLEM_DIRS" | head -1)
+          echo "Problem name: $PROBLEM_NAME"
+
+          # 4. Check naming convention (must start with 'mini', no hyphens, all lowercase)
+          if ! echo "$PROBLEM_NAME" | grep -qE '^mini[a-z]+$'; then
+            ERRORS="$ERRORS\n❌ **Invalid problem name:** \`$PROBLEM_NAME\`\n\nProblem names must:\n- Start with \`mini\` (e.g., \`minigit\`, \`minigrades\`)\n- Be all lowercase with no hyphens or special characters\n- Use format: \`mini<name>\` not \`mini-<name>\`\n"
+          fi
+
+          # 5. Check that this is a NEW problem (directory should not exist on base)
+          if git show origin/${{ github.base_ref }}:problems/$PROBLEM_NAME/problem.json &>/dev/null; then
+            ERRORS="$ERRORS\n❌ **Problem \`$PROBLEM_NAME\` already exists** on the main branch. You cannot modify existing problems via this workflow.\n"
+          fi
+
+          # 6. Check required files
+          PROBLEM_DIR="problems/$PROBLEM_NAME"
+          REQUIRED_FILES="problem.json SPEC-v1.txt SPEC-v2.txt test-v1.sh test-v2.sh"
+
+          for f in $REQUIRED_FILES; do
+            if [ ! -f "$PROBLEM_DIR/$f" ]; then
+              ERRORS="$ERRORS\n❌ **Missing required file:** \`$PROBLEM_DIR/$f\`\n"
+            fi
+          done
+
+          # 7. Check for extra files (only the 5 required files allowed)
+          if [ -d "$PROBLEM_DIR" ]; then
+            ACTUAL_FILES=$(ls -1 "$PROBLEM_DIR" 2>/dev/null | sort)
+            EXPECTED_FILES=$(echo "$REQUIRED_FILES" | tr ' ' '\n' | sort)
+            EXTRA_FILES=$(comm -23 <(echo "$ACTUAL_FILES") <(echo "$EXPECTED_FILES"))
+            if [ -n "$EXTRA_FILES" ]; then
+              ERRORS="$ERRORS\n❌ **Extra files detected** in \`$PROBLEM_DIR/\`. Only these 5 files are allowed:\n\`problem.json\`, \`SPEC-v1.txt\`, \`SPEC-v2.txt\`, \`test-v1.sh\`, \`test-v2.sh\`\n\nExtra files found:\n\`\`\`\n$EXTRA_FILES\n\`\`\`\n"
+            fi
+          fi
+
+          # 8. Validate problem.json schema
+          if [ -f "$PROBLEM_DIR/problem.json" ]; then
+            if ! python3 -c "
+          import json, sys
+          try:
+              with open('$PROBLEM_DIR/problem.json') as f:
+                  data = json.load(f)
+              required = ['name', 'binary_name', 'v1_spec', 'v1_test', 'v1_prompt', 'v2_spec', 'v2_test', 'v2_prompt']
+              missing = [k for k in required if k not in data]
+              if missing:
+                  print('MISSING_KEYS:' + ','.join(missing))
+                  sys.exit(1)
+          except json.JSONDecodeError as e:
+              print(f'JSON_ERROR:{e}')
+              sys.exit(1)
+          " 2>&1; then
+              RESULT=$?
+              OUTPUT=$(python3 -c "
+          import json, sys
+          try:
+              with open('$PROBLEM_DIR/problem.json') as f:
+                  data = json.load(f)
+              required = ['name', 'binary_name', 'v1_spec', 'v1_test', 'v1_prompt', 'v2_spec', 'v2_test', 'v2_prompt']
+              missing = [k for k in required if k not in data]
+              if missing:
+                  print('MISSING_KEYS:' + ','.join(missing))
+                  sys.exit(1)
+          except json.JSONDecodeError as e:
+              print(f'JSON_ERROR:{e}')
+              sys.exit(1)
+          " 2>&1 || true)
+
+              if echo "$OUTPUT" | grep -q "MISSING_KEYS:"; then
+                KEYS=$(echo "$OUTPUT" | grep "MISSING_KEYS:" | sed 's/MISSING_KEYS://')
+                ERRORS="$ERRORS\n❌ **problem.json missing required keys:** \`$KEYS\`\n\nRequired keys: \`name\`, \`binary_name\`, \`v1_spec\`, \`v1_test\`, \`v1_prompt\`, \`v2_spec\`, \`v2_test\`, \`v2_prompt\`\n"
+              elif echo "$OUTPUT" | grep -q "JSON_ERROR:"; then
+                ERRORS="$ERRORS\n❌ **problem.json is not valid JSON.**\n"
+              fi
+            fi
+          fi
+
+          # 9. Check test scripts have proper shebang
+          for test_file in test-v1.sh test-v2.sh; do
+            if [ -f "$PROBLEM_DIR/$test_file" ]; then
+              FIRST_LINE=$(head -1 "$PROBLEM_DIR/$test_file")
+              if ! echo "$FIRST_LINE" | grep -qE '^#!/(bin/)?(ba)?sh'; then
+                WARNINGS="$WARNINGS\n⚠️ \`$test_file\` is missing a proper shebang line (e.g., \`#!/bin/bash\`)\n"
+              fi
+            fi
+          done
+
+          # 10. Write results
+          if [ -n "$ERRORS" ]; then
+            echo "status=failure" >> $GITHUB_OUTPUT
+            {
+              echo "errors<<ERRORS_EOF"
+              echo -e "$ERRORS"
+              echo "ERRORS_EOF"
+            } >> $GITHUB_OUTPUT
+          else
+            echo "status=success" >> $GITHUB_OUTPUT
+          fi
+
+          if [ -n "$WARNINGS" ]; then
+            {
+              echo "warnings<<WARNINGS_EOF"
+              echo -e "$WARNINGS"
+              echo "WARNINGS_EOF"
+            } >> $GITHUB_OUTPUT
+          fi
+
+          echo "problem_name=$PROBLEM_NAME" >> $GITHUB_OUTPUT
+
+          # Fail the job if there are errors
+          if [ -n "$ERRORS" ]; then
+            exit 1
+          fi
+
+      - name: Comment on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const errors = `${{ steps.validate.outputs.errors }}`;
+            const warnings = `${{ steps.validate.outputs.warnings }}`;
+            const problemName = `${{ steps.validate.outputs.problem_name }}`;
+
+            let body = `## 🔍 Problem Validation Failed\n\n`;
+            body += `**Problem:** \`${problemName}\`\n\n`;
+            body += `### Issues Found\n\n${errors}\n`;
+
+            if (warnings) {
+              body += `### Warnings\n\n${warnings}\n`;
+            }
+
+            body += `---\n\n`;
+            body += `### 📖 Required Structure\n\n`;
+            body += `\`\`\`\nproblems/<problemname>/\n  problem.json       # metadata + prompt templates\n  SPEC-v1.txt        # v1 specification\n  SPEC-v2.txt        # v2 specification\n  test-v1.sh         # v1 test suite (bash)\n  test-v2.sh         # v2 test suite (bash)\n\`\`\`\n\n`;
+            body += `📖 See [AGENT.md](./AGENT.md) for the full contributor protocol.\n`;
+            body += `🔄 Push fixes to this branch and the checks will re-run automatically.`;
+
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+      - name: Comment on success
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const problemName = `${{ steps.validate.outputs.problem_name }}`;
+            const warnings = `${{ steps.validate.outputs.warnings }}`;
+
+            let body = `## ✅ Problem Validation Passed\n\n`;
+            body += `**Problem:** \`${problemName}\` — structure is valid!\n\n`;
+
+            if (warnings) {
+              body += `### ⚠️ Warnings\n\n${warnings}\n`;
+            }
+
+            body += `This PR is ready for maintainer review. 🚀`;
+
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+      - name: Add label on success
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['✅ problem-validated']
+            });

@@ -70,11 +70,13 @@ class GeminiCodex < BaseCodex
   def build_metrics(usage, elapsed)
     input  = usage['promptTokenCount'] || 0
     output = usage['candidatesTokenCount'] || 0
+    cached = usage['cachedContentTokenCount'] || 0
     
     {
       input_tokens: input,
       output_tokens: output,
-      cost_usd: calculate_cost(input, output),
+      cached_tokens: cached,
+      cost_usd: calculate_cost(input, output, cached: cached),
       model: @model,
       duration_ms: (elapsed * 1000).round
     }

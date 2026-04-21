@@ -1,0 +1,163 @@
+PROJECT: mini-inventory
+AUTHOR: Tunahan Caner YILDIZ (251478112)
+VERSION: v1
+DATE: 2026-03-15
+
+========================================
+OVERVIEW
+========================================
+
+mini-inventory is a command-line inventory manager.
+It stores product records in a plain text file and supports
+initializing the system, adding products, listing products,
+updating stock quantities, and deleting products.
+
+All data is stored in a directory called .miniinventory/
+in the current working directory.
+
+========================================
+COMMANDS
+========================================
+
+--- init ---
+Usage: miniinventory init
+
+Creates a .miniinventory/ directory and an empty inventory.dat file.
+If .miniinventory/ already exists, print "Already initialized" and exit.
+
+Output:
+- Success: "Initialized empty mini-inventory in .miniinventory/"
+- Error: "Already initialized"
+
+--- add ---
+Usage: miniinventory add "Pencil" 50
+
+Appends a new product to inventory.dat.
+Each product has:
+- id (auto-increment)
+- name
+- quantity
+- created_date
+- Error if product with the same name already exists:
+  "Product already exists"
+- Error if name is empty or only whitespace:
+  "Invalid product name"
+
+Quantity must be a non-negative integer.
+
+Output:
+- Success: "Added product #<id>: <name> (<quantity>)"
+- Error if system is not initialized:
+  "Not initialized. Run: miniinventory init"
+- Error if quantity is invalid:
+  "Invalid quantity"
+- Error if arguments are missing:
+  "Usage: miniinventory add <name> <quantity>"
+
+--- list ---
+Usage: miniinventory list
+
+Prints all products, one per line, in this format:
+[1] Pencil - Quantity: 50 (2026-03-15)
+[2] Notebook - Quantity: 20 (2026-03-15)
+
+If no products exist, print:
+"No products found."
+
+If system is not initialized, print:
+"Not initialized. Run: miniinventory init"
+
+In version v1, this command is not fully implemented yet.
+The current placeholder output is:
+"Command 'list' will be implemented in future weeks."
+
+--- update ---
+Usage: miniinventory update 1 80
+
+Updates the quantity of product #1 to 80.
+The given quantity must be a non-negative integer.
+
+Output:
+- Success: "Product #1 updated to quantity 80."
+- Error if product does not exist:
+  "Product #1 not found."
+- Error if quantity is invalid:
+  "Invalid quantity"
+- Error if system is not initialized:
+  "Not initialized. Run: miniinventory init"
+
+In version v1, this command is not fully implemented yet.
+The current placeholder output is:
+"Command 'update' will be implemented in future weeks."
+
+--- delete ---
+Usage: miniinventory delete 1
+
+Removes product #1 from inventory.dat.
+
+Output:
+- Success: "Deleted product #1."
+- Error if product does not exist:
+  "Product #1 not found."
+- Error if system is not initialized:
+  "Not initialized. Run: miniinventory init"
+
+In version v1, this command is not fully implemented yet.
+The current placeholder output is:
+"Command 'delete' will be implemented in future weeks."
+
+========================================
+DATA FORMAT
+========================================
+
+File: .miniinventory/inventory.dat
+
+Format:
+One product per line, fields separated by |
+
+Fields:
+id|name|quantity|created_date
+
+Example:
+1|Pencil|50|2026-03-15
+2|Notebook|20|2026-03-15
+
+ID RULES:
+- IDs start from 1
+- Each new product gets the next highest ID
+- Deleted IDs are NOT reused
+
+========================================
+ERROR HANDLING
+========================================
+
+- Running any command before "init":
+  print "Not initialized. Run: miniinventory init"
+
+- Invalid command:
+  print "Unknown command: <command>"
+
+- Missing main command:
+  print "Usage: miniinventory <command> [args]"
+
+- Invalid quantity:
+  print "Invalid quantity"
+
+========================================
+VERSION v1 SCOPE
+========================================
+
+The v1 implementation is intentionally limited.
+
+Implemented commands:
+- init
+- add
+
+Not yet implemented:
+- list
+- update
+- delete
+
+For commands not yet implemented in v1, the program prints:
+"Command '<command>' will be implemented in future weeks."
+

@@ -1,0 +1,89 @@
+name: "Release: Semantic Version"
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG#v}"
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Releasing $TAG (version $VERSION)"
+
+      - name: Extract changelog for this version
+        id: changelog
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          
+          # Extract the section for this version from CHANGELOG.md
+          NOTES=$(awk -v ver="## [$VERSION]" '
+            $0 ~ ver { found=1; next }
+            found && /^## \[/ { exit }
+            found { print }
+          ' CHANGELOG.md)
+
+          if [ -z "$NOTES" ]; then
+            NOTES="Release ${{ steps.version.outputs.tag }}"
+          fi
+
+          # Write to file for the release body
+          echo "$NOTES" > /tmp/release_notes.md
+
+          # Also append contributor info
+          CONTRIBUTORS=$(awk -v ver="## [$VERSION]" '
+            $0 ~ ver { found=1 }
+            found && /^### Contributors/ { contrib=1; next }
+            contrib && /^$/ { exit }
+            contrib && /^## \[/ { exit }
+            contrib { print }
+          ' CHANGELOG.md)
+
+          if [ -n "$CONTRIBUTORS" ]; then
+            echo "" >> /tmp/release_notes.md
+            echo "### 🏆 Contributors" >> /tmp/release_notes.md
+            echo "$CONTRIBUTORS" >> /tmp/release_notes.md
+          fi
+
+          echo "Release notes:"
+          cat /tmp/release_notes.md
+
+      - name: Create GitHub Release
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const notes = fs.readFileSync('/tmp/release_notes.md', 'utf8');
+            const tag = `${{ steps.version.outputs.tag }}`;
+            const version = `${{ steps.version.outputs.version }}`;
+
+            const isPrerelease = tag.includes('-alpha') || tag.includes('-beta') || tag.includes('-rc');
+
+            await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: tag,
+              name: `🚀 Which Language ${tag}`,
+              body: notes,
+              draft: false,
+              prerelease: isPrerelease,
+              generate_release_notes: false
+            });
+
+            console.log(`Created release for ${tag}`);

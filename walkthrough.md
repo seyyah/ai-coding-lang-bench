@@ -5,6 +5,33 @@
 
 ---
 
+## 2026-04-20 — V2 Evolution: Gemini Caching, MiniGit Status & Spec Hardening
+
+**Contributor**: AI agent (Antigravity)
+**What was done**: 
+- **SPEC Improvement**: Updated `AGENT.md` with new sections for "Artifact Management" and "Metric Accuracy" to ensure consistent benchmark reporting.
+- **Codex Fix**: Upgraded `GeminiCodex` adapter to support `cachedTokenCount`. This enables accurate tracking of Google's context caching, reducing calculated costs for long-running benchmarks.
+- **Problem Fix**: Added `status` command to `minigit` problem. Updated `SPEC-v1.txt` and `test-v1.sh` with the new command and 2 additional test cases.
+- **V2 Transition**: Updated `README.md` to reflect the move to V2 and documented the completed tasks.
+**Observations**: The Gemini adapter was previously over-reporting costs by ignoring cached tokens. The `minigit` problem was missing a basic command to check the staged state, which is now resolved.
+**Next**: Finalize more V2 tasks in `plan.md`.
+
+---
+
+## 2026-04-14 — Process First-Time Contributor PR & Update PR Guidelines
+
+**Contributor**: AI agent (Antigravity)
+**What was done**: 
+- Investigated PR #56 (`pomodorotimer`) that was stuck waiting for maintainer approval.
+- Identified that GitHub Actions requires maintainer approval for first-time fork contributors before running workflows.
+- Evaluated PR #56 against `validate-problem.yml` rules and found that the problem name violated the `mini` prefix rule (must be `mini<name>`).
+- Closed PR #56 with a comment explaining the naming violation and the reason for the stalled workflow.
+- Updated `AGENT.md` to explicitly mandate the `mini` prefix in the New Problem Checklist and added a protocol for handling PRs from first-time contributors (inspect, message-close if invalid, or `gh run approve` if valid).
+**Observations**: The `mini` prefix rule was previously only shown in examples rather than strictly mandated in the checklist, leading to invalid submissions like `pomodorotimer`. First-time contributor workflow stalls are confusing to new users without clear documentation.
+**Next**: Await resubmission of the pomodoro timer problem with the correct name (`minipomodoro`) and structure.
+
+---
+
 ## 2026-03-28 — Clean Architecture Refactor: DRY Configs & Unified CLI
 
 **Contributor**: AI agent (Claude Code)
@@ -97,3 +124,20 @@
 **Observations**: The newly proposed `miniplaylist` had language-specific lock-ins (forced `python3` instead of the binary) and did not follow the required schema variables like `binary_name`.
 **Decisions made**: TPS was defined as `Output Tokens / Time` to objectively measure model inference speeds irrespective of environmental constraints.
 **Next**: Ready to run `miniplaylist` benchmarks properly.
+
+---
+
+## 2026-04-21 — PR Triage & Merge Automation
+
+**Contributor**: AI agent (Antigravity)
+**What was done**: 
+- Wrote and executed an automated script (`review_prs.js`) to triage and process all 30 open Pull Requests left by students/contributors.
+- Validated PR titles against `[component] Brief description` rules.
+- Validated `mini<name>` prefix rules, lowercasing without hyphens for problem directories, and location of configuration/test files.
+- Automatically closed invalid PRs with descriptive rejection messages citing `AGENT.md` rules.
+- Successfully squashed and merged valid PRs (e.g. #57, #63, #75) automatically.
+**Codex/Problem/Language**: Repo Maintenance
+**Key metrics**: 30 PRs processed successfully, 0 manual interactions needed.
+**Observations**: The automated script saved huge amounts of maintainer time, but we encountered an edge case where students' branch deletion was prompted interactively. To fix this, standardizing the GitHub Action usage for checking structure might be even better.
+**Decisions made**: Used `gh pr merge --squash` rather than straight merge to keep commit history clean.
+**Next**: Await new conforming PRs from notified students.

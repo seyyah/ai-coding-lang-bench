@@ -1,0 +1,197 @@
+MiniLibrary Specification
+Version: 1.0
+Command name: minilibrary
+External libraries: NOT allowed
+Standard library: Allowed
+Persistent storage: Local filesystem only
+
+========================================
+1. Overview
+========================================
+
+MiniLibrary is a minimal command-line book management
+and library tracking tool.
+
+The executable must be called:
+
+    minilibrary
+
+All data must be stored in:
+
+    .minilibrary/
+
+All commands operate relative to current directory.
+
+----------------------------------------
+
+Supported commands:
+
+    minilibrary init
+    minilibrary add <title> <author>
+    minilibrary list
+    minilibrary borrow <id>
+    minilibrary return <id>
+    minilibrary delete <id>
+
+========================================
+2. Data Storage
+========================================
+
+After init:
+
+    .minilibrary/
+        books.dat
+
+books.dat:
+    One book per line.
+    Format: <id>|<title>|<author>|<status>|<added_date>|<borrow_date>
+
+    Status is either AVAILABLE or BORROWED.
+    borrow_date is empty when the book is not borrowed.
+
+    Example:
+    1|The Little Prince|Antoine de Saint-Exupery|AVAILABLE|2026-03-16|
+    2|Clean Code|Robert C. Martin|BORROWED|2026-03-16|2026-03-20
+
+========================================
+3. Command Specifications
+========================================
+
+----------------------------------------
+3.1 init
+----------------------------------------
+
+Create .minilibrary/ directory and empty books.dat file.
+
+If already exists:
+    print "Already initialized"
+Exit 0.
+
+If created:
+    print "Initialized empty mini-library in .minilibrary/"
+Exit 0.
+
+----------------------------------------
+3.2 add <title> <author>
+----------------------------------------
+
+If not initialized:
+    print "Not initialized. Run: python minilibrary.py init"
+    exit 1
+
+Calculate new book ID as current line count + 1.
+Get today's date in YYYY-MM-DD format.
+Append to books.dat:
+    <id>|<title>|<author>|AVAILABLE|<today>|
+
+Print:
+    Added book #<id>: <title> by <author>
+
+----------------------------------------
+3.3 list
+----------------------------------------
+
+If not initialized:
+    print "Not initialized. Run: python minilibrary.py init"
+    exit 1
+
+If no books:
+    print "No books found."
+    exit 0
+
+For each book, output one line:
+    If AVAILABLE:
+        [<id>] [AVAILABLE] <title> - <author> (<added_date>)
+    If BORROWED:
+        [<id>] [BORROWED] <title> - <author> (<added_date>) [Due: <due_date>]
+
+Due date is calculated as borrow_date + 14 days.
+Lines are indented with two leading spaces.
+
+----------------------------------------
+3.4 borrow <id>
+----------------------------------------
+
+If not initialized:
+    print "Not initialized. Run: python minilibrary.py init"
+    exit 1
+
+If book not found:
+    print "Book #<id> not found."
+    exit 1
+
+If book is already borrowed:
+    Calculate remaining days until due date (borrow_date + 14 days).
+    If remaining > 0:
+        print "Book #<id> is already borrowed. It will be available in <remaining> days."
+    Else:
+        print "Book #<id> is overdue. It should be returned immediately."
+    exit 0
+
+If book is available:
+    Change status to BORROWED, set borrow_date to today.
+    Calculate due date as today + 14 days.
+    print "Book #<id> borrowed. Due date: <due_date>"
+
+----------------------------------------
+3.5 return <id>
+----------------------------------------
+
+If not initialized:
+    print "Not initialized. Run: python minilibrary.py init"
+    exit 1
+
+If book not found:
+    print "Book #<id> not found."
+    exit 1
+
+If book is not borrowed:
+    print "Book #<id> is not borrowed."
+    exit 0
+
+If book is borrowed:
+    Change status to AVAILABLE, clear borrow_date.
+    print "Book #<id> returned."
+
+----------------------------------------
+3.6 delete <id>
+----------------------------------------
+
+If not initialized:
+    print "Not initialized. Run: python minilibrary.py init"
+    exit 1
+
+If book not found:
+    print "Book #<id> not found."
+    exit 1
+
+Remove the book's line from books.dat.
+
+Print:
+    Deleted book #<id>.
+
+========================================
+4. Error Handling
+========================================
+
+- Unknown command:
+    print "Unknown command: <command>"
+    exit 1
+
+- Missing arguments:
+    print "Usage: python minilibrary.py <command> [args]"
+    exit 1
+
+========================================
+5. Determinism Rules
+========================================
+
+- No extra spaces in output (except the two-space indent in list)
+- No debug output
+- Exact string matching required
+- Dates in YYYY-MM-DD format
+- Borrow duration is always 14 days
+
+========================================
+END
+========================================

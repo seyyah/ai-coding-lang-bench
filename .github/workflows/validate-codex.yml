@@ -1,0 +1,170 @@
+name: "Validate: New Codex Adapter"
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "lib/codexes/**"
+      - "config/codexes.yml"
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  validate-codex:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch base branch
+        run: git fetch origin ${{ github.base_ref }}
+
+      - name: Validate codex adapter
+        id: validate
+        run: |
+          set +e
+          ERRORS=""
+
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+
+          # 1. Check for files outside allowed paths
+          ALLOWED_PATTERN='^(lib/codexes/|config/codexes\.yml)$'
+          NON_CODEX_FILES=$(echo "$CHANGED_FILES" | grep -vE '^(lib/codexes/|config/codexes\.yml)' || true)
+          if [ -n "$NON_CODEX_FILES" ]; then
+            ERRORS="$ERRORS\n❌ **Mixed contribution detected.** A codex adapter PR should only touch \`lib/codexes/\` and \`config/codexes.yml\`.\n\nUnexpected files:\n\`\`\`\n$NON_CODEX_FILES\n\`\`\`\n"
+          fi
+
+          # 2. Check for a new adapter file (not modifying existing ones)
+          NEW_ADAPTERS=$(echo "$CHANGED_FILES" | grep '^lib/codexes/.*_codex\.rb$' || true)
+          MODIFIED_EXISTING=$(echo "$CHANGED_FILES" | grep '^lib/codexes/' | while read f; do
+            if git show origin/${{ github.base_ref }}:"$f" &>/dev/null; then
+              echo "$f"
+            fi
+          done)
+
+          if [ -z "$NEW_ADAPTERS" ]; then
+            ERRORS="$ERRORS\n❌ **No new adapter file found.** Expected a file matching \`lib/codexes/<name>_codex.rb\`.\n"
+          fi
+
+          if [ -n "$MODIFIED_EXISTING" ]; then
+            ERRORS="$ERRORS\n❌ **Modifying existing adapter files is not allowed:**\n\`\`\`\n$MODIFIED_EXISTING\n\`\`\`\n"
+          fi
+
+          # 3. Check that core files are not touched
+          CORE_FILES="lib/codexes/base_codex.rb lib/codex_loader.rb lib/language_loader.rb"
+          for core in $CORE_FILES; do
+            if echo "$CHANGED_FILES" | grep -q "^${core}$"; then
+              ERRORS="$ERRORS\n❌ **Core file \`$core\` must not be modified.**\n"
+            fi
+          done
+
+          # 4. Validate adapter file content
+          ADAPTER_NAME=""
+          if [ -n "$NEW_ADAPTERS" ]; then
+            ADAPTER_FILE=$(echo "$NEW_ADAPTERS" | head -1)
+            ADAPTER_NAME=$(basename "$ADAPTER_FILE" .rb | sed 's/_codex$//')
+            echo "Adapter name: $ADAPTER_NAME"
+
+            # Check for BaseCodex inheritance
+            if ! grep -qE "class\s+\w+\s*<\s*BaseCodex" "$ADAPTER_FILE"; then
+              ERRORS="$ERRORS\n❌ **Adapter must extend \`BaseCodex\`.** Expected: \`class ${ADAPTER_NAME^}Codex < BaseCodex\`\n"
+            fi
+
+            # Check for required methods
+            if ! grep -q 'def run_generation' "$ADAPTER_FILE"; then
+              ERRORS="$ERRORS\n❌ **Missing required method:** \`run_generation(prompt, dir:, log_path:)\`\n"
+            fi
+
+            if ! grep -q 'def version' "$ADAPTER_FILE"; then
+              ERRORS="$ERRORS\n❌ **Missing required method:** \`version\`\n"
+            fi
+          fi
+
+          # 5. Check config/codexes.yml was updated
+          if ! echo "$CHANGED_FILES" | grep -q '^config/codexes\.yml$'; then
+            ERRORS="$ERRORS\n❌ **\`config/codexes.yml\` not updated.** You must add a configuration block for the new adapter.\n"
+          fi
+
+          # Write results
+          if [ -n "$ERRORS" ]; then
+            echo "status=failure" >> $GITHUB_OUTPUT
+            {
+              echo "errors<<ERRORS_EOF"
+              echo -e "$ERRORS"
+              echo "ERRORS_EOF"
+            } >> $GITHUB_OUTPUT
+          else
+            echo "status=success" >> $GITHUB_OUTPUT
+          fi
+
+          echo "adapter_name=$ADAPTER_NAME" >> $GITHUB_OUTPUT
+
+          if [ -n "$ERRORS" ]; then
+            exit 1
+          fi
+
+      - name: Comment on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const errors = `${{ steps.validate.outputs.errors }}`;
+            const adapterName = `${{ steps.validate.outputs.adapter_name }}`;
+
+            let body = `## 🔍 Codex Adapter Validation Failed\n\n`;
+            if (adapterName) body += `**Adapter:** \`${adapterName}\`\n\n`;
+            body += `### Issues Found\n\n${errors}\n`;
+            body += `---\n\n`;
+            body += `### 📖 New Codex Adapter Checklist\n\n`;
+            body += `- \`lib/codexes/<name>_codex.rb\` extending \`BaseCodex\`\n`;
+            body += `- Implement \`run_generation(prompt, dir:, log_path:)\`\n`;
+            body += `- Implement \`version\`\n`;
+            body += `- Add configuration block to \`config/codexes.yml\`\n\n`;
+            body += `📖 See [AGENT.md](./AGENT.md) for the full contributor protocol.\n`;
+            body += `🔄 Push fixes and the checks will re-run automatically.`;
+
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+      - name: Comment on success
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const adapterName = `${{ steps.validate.outputs.adapter_name }}`;
+
+            let body = `## ✅ Codex Adapter Validation Passed\n\n`;
+            body += `**Adapter:** \`${adapterName}\` — structure is valid!\n\n`;
+            body += `This PR is ready for maintainer review. 🚀`;
+
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+      - name: Add label on success
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['✅ codex-validated']
+            });

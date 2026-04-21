@@ -1,0 +1,97 @@
+name: "Auto: Update Contributors"
+
+on:
+  pull_request_target:
+    branches: [main]
+    types: [closed]
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  update-contributors:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Determine contribution type
+        id: contrib
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          CHANGED_FILES=$(gh pr view "$PR_NUMBER" --json files --jq '.files[].path')
+          echo "Changed files: $CHANGED_FILES"
+
+          ROLE=""
+          if echo "$CHANGED_FILES" | grep -q '^problems/'; then
+            ROLE="🎯 Problem Architect"
+          elif echo "$CHANGED_FILES" | grep -q '^lib/codexes/'; then
+            ROLE="🧠 Codex Whisperer"
+          elif echo "$CHANGED_FILES" | grep -q '^artifacts/'; then
+            ROLE="📊 Benchmark Runner"
+          else
+            ROLE="💻 Contributor"
+          fi
+
+          echo "role=$ROLE" >> $GITHUB_OUTPUT
+          echo "Detected role: $ROLE"
+
+      - name: Update CHANGELOG.md
+        env:
+          USERNAME: ${{ github.event.pull_request.user.login }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          ROLE: ${{ steps.contrib.outputs.role }}
+        run: |
+          python3 << 'PYTHON_SCRIPT'
+          import os, sys
+          from datetime import datetime
+
+          username = os.environ["USERNAME"]
+          pr_number = os.environ["PR_NUMBER"]
+          pr_title = os.environ["PR_TITLE"]
+          role = os.environ["ROLE"]
+
+          with open("CHANGELOG.md", "r") as f:
+              content = f.read()
+
+          # Find the [Unreleased] section
+          unreleased_marker = "## [Unreleased]"
+          idx = content.find(unreleased_marker)
+          if idx == -1:
+              print("ERROR: Could not find [Unreleased] section in CHANGELOG.md")
+              sys.exit(1)
+
+          # Insert after the [Unreleased] header line
+          insert_pos = content.find("\n", idx) + 1
+
+          # Check if this PR is already recorded
+          if f"#{pr_number}" in content:
+              print(f"PR #{pr_number} already in CHANGELOG.md, skipping.")
+              sys.exit(0)
+
+          entry = f"\n- {pr_title} by @{username} (#{pr_number}) — {role}\n"
+          new_content = content[:insert_pos] + entry + content[insert_pos:]
+
+          with open("CHANGELOG.md", "w") as f:
+              f.write(new_content)
+
+          print(f"Added PR #{pr_number} to CHANGELOG.md [Unreleased] section")
+          PYTHON_SCRIPT
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md
+          git diff --cached --quiet && echo "No changes to commit" && exit 0
+          git commit -m "docs: add @${{ github.event.pull_request.user.login }} to CHANGELOG.md (#${{ github.event.pull_request.number }})"
+          git push
+

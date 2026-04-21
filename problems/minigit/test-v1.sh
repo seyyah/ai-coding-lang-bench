@@ -200,6 +200,38 @@ else
 fi
 
 ######################################
+# Test 12: status shows staged files
+######################################
+
+mkdir -p testrepo_status && cd testrepo_status
+../minigit init >/dev/null 2>&1
+echo "staged1" > s1.txt
+echo "staged2" > s2.txt
+../minigit add s1.txt >/dev/null 2>&1
+../minigit add s2.txt >/dev/null 2>&1
+
+STATUS_OUT=$(../minigit status)
+
+if echo "$STATUS_OUT" | grep -q "s1.txt" && echo "$STATUS_OUT" | grep -q "s2.txt"; then
+  pass "status shows multiple staged files"
+else
+  fail "status shows multiple staged files"
+fi
+
+######################################
+# Test 13: status with empty index
+######################################
+
+../minigit commit -m "done" >/dev/null 2>&1
+if ../minigit status | grep -q "Nothing staged"; then
+  pass "status shows nothing staged after commit"
+else
+  fail "status shows nothing staged after commit"
+fi
+cd ..
+rm -rf testrepo_status
+
+######################################
 # Cleanup & Summary
 ######################################
 

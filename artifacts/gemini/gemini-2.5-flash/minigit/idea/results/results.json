@@ -1,0 +1,37 @@
+[
+  {
+    "language": "python",
+    "trial": 1,
+    "codex": "gemini",
+    "v1_dir": "/home/seyyah/works/which-language/artifacts/gemini/gemini-2.5-flash/minigit/idea/generated/minigit-python-1-v1",
+    "v2_dir": "/home/seyyah/works/which-language/artifacts/gemini/gemini-2.5-flash/minigit/idea/generated/minigit-python-1-v2",
+    "v1_time": 31.5,
+    "v1_pass": false,
+    "v1_passed_count": 11,
+    "v1_failed_count": 0,
+    "v1_total_count": 11,
+    "v1_loc": 263,
+    "v2_time": 89.0,
+    "v2_pass": false,
+    "v2_passed_count": 14,
+    "v2_failed_count": 16,
+    "v2_total_count": 30,
+    "v2_loc": 377,
+    "v1_metrics": {
+      "input_tokens": 2977,
+      "output_tokens": 3597,
+      "cached_tokens": 0,
+      "cost_usd": 0.0098856,
+      "model": "gemini-2.5-flash",
+      "duration_ms": 31450
+    },
+    "v2_metrics": {
+      "input_tokens": 2526,
+      "output_tokens": 3900,
+      "cached_tokens": 2029,
+      "cost_usd": 0.0105078,
+      "model": "gemini-2.5-flash",
+      "duration_ms": 88972
+    }
+  }
+]

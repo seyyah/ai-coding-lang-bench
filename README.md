@@ -26,6 +26,17 @@ Be part of the discovery. Help us find the ultimate AI-native programming langua
 
 ---
 
+## 🚀 V2 Evolution (Current Phase)
+
+We have transitioned to V2 of the initiative. Key goals for this phase include enhancing adapter reliability and expanding problem depth.
+
+### ✅ V2 Tasks Completed
+- **[codex] Gemini Cached Token Support**: Updated `GeminiCodex` to accurately track `cachedTokenCount` for precise cost analysis.
+- **[problem] MiniGit 'status' Command**: Expanded `minigit` specification and test suite to include repository state monitoring.
+- **[spec] Artifact & Metric Guidelines**: Updated `AGENT.md` with strict rules for artifact management and timing accuracy.
+
+---
+
 ## ⚡ Quick Start: Join the Arena
 
 You don't need to be an expert to contribute. You can run your first benchmark in less than 2 minutes and join the movement.
@@ -102,6 +113,11 @@ We are constantly expanding our coverage. Here is where the initiative stands to
 - 💾 **minigit** — Minimal version control system
 - 🎓 **minigrades** — Student grade manager
 - 🎵 **miniplaylist** — Playlist management system
+- ⏱️ **minitimer** — Simple task-time manager
+- 📊 **miniscoreboard** — Lightweight match manager and logger
+- 📖 **minilibrary** - Book management and library tracking tool
+- 📦 **miniinventory** - Inventory manager
+- 📝 **miniquiz** - Quiz application
 
 ---
 
@@ -123,20 +139,13 @@ bin/which-language run gemini minigit --lang python --trials 3
 
 ---
 
-## 🏆 Hall of Fame
+## 🏆 Contributors
 
-This project thrives on the brilliant minds driving it forward. We celebrate every contribution! Here are the legends who have shaped the initiative:
+This project thrives on the brilliant minds driving it forward. We celebrate every contribution!
+See the [CHANGELOG.md](./CHANGELOG.md) for a full list of legends who have shaped the initiative.
 
-<div align="center">
-
-| [<img src="https://github.com/mame.png?size=100" width="100px;"/><br /><sub><b>mame</b></sub>](https://github.com/mame) | [<img src="https://github.com/berkevnl.png?size=100" width="100px;"/><br /><sub><b>berkevnl</b></sub>](https://github.com/berkevnl) | [<img src="https://github.com/Ahmetngz.png?size=100" width="100px;"/><br /><sub><b>Ahmetngz</b></sub>](https://github.com/Ahmetngz) |
-| :---: | :---: | :---: |
-| 🚀 Visionary | 💻 Core Architect | 💻 Core Architect |
-
-</div>
-
-### Become a Legend
-Want your face on the Hall of Fame? See our strict but fair [Contributor Protocol (AGENT.md)](./AGENT.md). We are actively hunting for:
+### Become a Contributor
+Want to join the movement? See our strict but fair [Contributor Protocol (AGENT.md)](./AGENT.md). We are actively hunting for:
 - **Codex Whisperers:** Implement new adapters in `lib/codexes`
 - **Data Scientists:** Run benchmarks on your machines and submit results
 - **Problem Architects:** Design new, brutal testing scenarios in `problems/`
