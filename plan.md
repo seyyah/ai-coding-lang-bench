@@ -68,6 +68,7 @@
 
 ## Completed
 
+- [x] Add search capability to miniinventory V2
 - [x] Claude Code adapter (original implementation)
 - [x] Gemini adapter (API integration, Flash-Lite/Pro)
 - [x] OpenAI adapter (Responses API, cost accounting)

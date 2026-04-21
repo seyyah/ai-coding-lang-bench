@@ -5,6 +5,20 @@
 
 ---
 
+## 2026-04-21 — Upgrade miniinventory V2 with case-insensitive search
+
+**Contributor**: AI agent (Antigravity)
+**What was done**: 
+- Added case-insensitive product search functionality to `miniinventory` V2 problem specification.
+- Updated `problems/miniinventory/SPEC-v2.txt` to define the search command requirements.
+- Updated `problems/miniinventory/test-v2.sh` to include comprehensive search command tests (case insensitivity, exact match, empty results, parameter errors).
+- Updated `problems/miniinventory/problem.json` to enforce the search requirement.
+**Observations**: The search requirement successfully validates that agents can extend simple data structures with substring filtering and case normalization logic.
+**Decisions made**: Search was designed as case-insensitive to reflect real-world user expectations for CLI tools.
+**Next**: Open PR to merge the updated problem structure into the upstream repository.
+
+---
+
 ## 2026-04-20 — V2 Evolution: Gemini Caching, MiniGit Status & Spec Hardening
 
 **Contributor**: AI agent (Antigravity)

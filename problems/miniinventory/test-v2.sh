@@ -60,6 +60,7 @@ if ../miniinventory add Pencil 50 2>&1 | grep -q "Not initialized"; then pass "a
 if ../miniinventory list 2>&1 | grep -q "Not initialized"; then pass "list before init"; else fail "list before init"; fi
 if ../miniinventory update 1 80 2>&1 | grep -q "Not initialized"; then pass "update before init"; else fail "update before init"; fi
 if ../miniinventory delete 1 2>&1 | grep -q "Not initialized"; then pass "delete before init"; else fail "delete before init"; fi
+if ../miniinventory search Pen 2>&1 | grep -q "Not initialized"; then pass "search before init"; else fail "search before init"; fi
 
 ######################################
 # Test 3: add and duplicate check
@@ -164,7 +165,42 @@ else
 fi
 
 ######################################
-# Test 8: unknown/missing command
+# Test 8: search product
+######################################
+rm -rf .miniinventory
+../miniinventory init >/dev/null 2>&1
+../miniinventory add Pencil 50 >/dev/null 2>&1
+../miniinventory add Notebook 20 >/dev/null 2>&1
+../miniinventory add "Blue Pen" 10 >/dev/null 2>&1
+
+OUTPUT=$(../miniinventory search "Notebook" 2>&1)
+if echo "$OUTPUT" | grep -q "\[2\] Notebook - Quantity: 20" && ! echo "$OUTPUT" | grep -q "Pencil"; then
+  pass "search finds exact match"
+else
+  fail "search finds exact match"
+fi
+
+OUTPUT=$(../miniinventory search "pEn" 2>&1)
+if echo "$OUTPUT" | grep -q "\[1\] Pencil" && echo "$OUTPUT" | grep -q "\[3\] Blue Pen" && ! echo "$OUTPUT" | grep -q "Notebook"; then
+  pass "search is case insensitive and finds multiple"
+else
+  fail "search is case insensitive and finds multiple"
+fi
+
+if ../miniinventory search "NotExists" 2>&1 | grep -q "No products match the search."; then
+  pass "search no match"
+else
+  fail "search no match"
+fi
+
+if ../miniinventory search 2>&1 | grep -q "Usage"; then
+  pass "search missing arguments"
+else
+  fail "search missing arguments"
+fi
+
+######################################
+# Test 9: unknown/missing command
 ######################################
 if ../miniinventory fly 2>&1 | grep -q "Unknown command: fly"; then
   pass "unknown command"
