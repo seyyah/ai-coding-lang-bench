@@ -2,3 +2,5 @@ PROJECT: minibudget
 OVERVIEW: A command-line income and expense tracker.
 COMMANDS: init, add, list.
 ERROR HANDLING: If amount is negative, print "Error: Amount must be positive."
+NEW COMMAND: delete <id> - Removes a transaction by its ID.
+ERROR HANDLING: If ID does not exist during delete, print "Error: Transaction not found."
