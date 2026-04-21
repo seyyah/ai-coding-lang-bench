@@ -3,11 +3,11 @@
   "binary_name": "miniscore",
   "v1_spec": "SPEC-v1.txt",
   "v1_test": "test-v1.sh",
-  "v1_prompt": "Implement {{binary_name}} as described in SPEC-v1.txt using {{language}}. The solution must be a standalone executable script (e.g., with a shebang and proper permissions). Use only standard libraries. Handle 'init' and 'add-match' commands with exact output matching. Verification: bash test-v1.sh",
+  "v1_prompt": "Implement {{binary_name}} as described in SPEC-v1.txt. Use standard libraries. Verification: bash test-v1.sh",
   "v2_spec": "SPEC-v2.txt",
   "v2_test": "test-v2.sh",
-  "v2_prompt": "Extend the existing {{binary_name}} implementation in {{language}} to support 'history' and 'team' commands according to SPEC-v2.txt. Maintain strict output formatting and error handling. Verification: bash test-v2.sh",
+  "v2_prompt": "Extend {{binary_name}} to support 'history' and 'team' commands according to SPEC-v2.txt. Verification: bash test-v2.sh",
   "v3_spec": "SPEC-v3.txt",
   "v3_test": "test-v3.sh",
-  "v3_prompt": "Finalize the {{binary_name}} suite in {{language}} by implementing 'leaderboard', 'summary', and 'export' commands as defined in SPEC-v3.txt. Ensure complex logic for point calculation (3/1/0) and sorting in leaderboard is correct. Verification: bash test-v3.sh"
+  "v3_prompt": "Finalize {{binary_name}} with 'leaderboard', 'summary', and 'export' as defined in SPEC-v3.txt. Verification: bash test-v3.sh"
 }
