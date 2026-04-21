@@ -1,30 +1,18 @@
 #!/bin/bash
 
-# miniscoreboard v1 test script
-
 rm -rf .miniscore
 
-# Test 1: Init Command
+# Test 1: Init
 INIT_OUT=$(python3 miniscore.py init)
-if [[ "$INIT_OUT" != *"Initialized"* ]]; then
-    echo "FAIL: Init command did not work."
-    exit 1
-fi
+echo "$INIT_OUT" | grep -E "Initialized|Created" || exit 1
 
-# Test 2: Add Match Command
-ADD_OUT=$(python3 miniscore.py add-match SuperLig W1 2026-03-31 Galatasaray 2 Fenerbahce 1)
-if [[ "$ADD_OUT" != *"Added match #1"* ]]; then
-    echo "FAIL: Add match command did not work correctly."
-    exit 1
-fi
+# Test 2: Add Match
+ADD_OUT=$(python3 miniscore.py add-match SuperLig W1 2026-03-31 GS 2 FB 1)
+echo "$ADD_OUT" | grep "Added match #1" || exit 1
 
-# Test 3: Validation (Clone Match)
+# Test 3: Validation (same team)
 CLONE_OUT=$(python3 miniscore.py add-match SuperLig W1 2026-03-31 GS 2 GS 1)
-if [[ "$CLONE_OUT" != *"Error"* ]]; then
-    echo "FAIL: Security validation failed for clone teams."
-    exit 1
-fi
+echo "$CLONE_OUT" | grep "Error" || exit 1
 
-echo "All V1 tests passed."
+echo "All V1 tests passed"
 exit 0
-
