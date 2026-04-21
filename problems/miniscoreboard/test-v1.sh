@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 rm -rf .miniscore
 
 # Test 1: Init
