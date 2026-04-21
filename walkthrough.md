@@ -124,3 +124,20 @@
 **Observations**: The newly proposed `miniplaylist` had language-specific lock-ins (forced `python3` instead of the binary) and did not follow the required schema variables like `binary_name`.
 **Decisions made**: TPS was defined as `Output Tokens / Time` to objectively measure model inference speeds irrespective of environmental constraints.
 **Next**: Ready to run `miniplaylist` benchmarks properly.
+
+---
+
+## 2026-04-21 — PR Triage & Merge Automation
+
+**Contributor**: AI agent (Antigravity)
+**What was done**: 
+- Wrote and executed an automated script (`review_prs.js`) to triage and process all 30 open Pull Requests left by students/contributors.
+- Validated PR titles against `[component] Brief description` rules.
+- Validated `mini<name>` prefix rules, lowercasing without hyphens for problem directories, and location of configuration/test files.
+- Automatically closed invalid PRs with descriptive rejection messages citing `AGENT.md` rules.
+- Successfully squashed and merged valid PRs (e.g. #57, #63, #75) automatically.
+**Codex/Problem/Language**: Repo Maintenance
+**Key metrics**: 30 PRs processed successfully, 0 manual interactions needed.
+**Observations**: The automated script saved huge amounts of maintainer time, but we encountered an edge case where students' branch deletion was prompted interactively. To fix this, standardizing the GitHub Action usage for checking structure might be even better.
+**Decisions made**: Used `gh pr merge --squash` rather than straight merge to keep commit history clean.
+**Next**: Await new conforming PRs from notified students.
