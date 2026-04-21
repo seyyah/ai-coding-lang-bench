@@ -1,0 +1,53 @@
+{
+  "model": "gemini-3.1-flash-lite-preview",
+  "prompt": "Implement minigit as described in SPEC-v1.txt using Python. The executable must be named 'minigit' and be runnable as ./minigit. For compiled languages, include a Makefile or build script. For interpreted languages, ensure the minigit file has a proper shebang line and is executable. Verify your implementation passes all tests by running: bash test-v1.sh\n\n=== BEGIN SPEC-v1.txt ===\nMiniGit Specification\nVersion: 1.0\nCommand name: minigit\nExternal libraries: NOT allowed\nStandard library: Allowed\nPersistent storage: Local filesystem only\n\n========================================\n1. Overview\n========================================\n\nMiniGit is a minimal version control system.\n\nThe executable must be called:\n\n    minigit\n\nAll repository data must be stored in:\n\n    .minigit/\n\nAll commands operate relative to current directory.\n\n----------------------------------------\n\nSupported commands:\n\n    minigit init\n    minigit add <file>\n    minigit commit -m \"<message>\"\n    minigit log\n    minigit status\n\n========================================\n2. Repository Structure\n========================================\n\nAfter init:\n\n    .minigit/\n        objects/\n        commits/\n        index\n        HEAD\n\nHEAD:\n    latest commit hash or empty.\n\nindex:\n    staged filenames (one per line).\n\nobjects/:\n    blob storage.\n\ncommits/:\n    commit files.\n\n========================================\n3. Custom Hash Algorithm (MANDATORY)\n========================================\n\nYou MUST implement the following custom hash function.\n\nName: MiniHash\n\nInput: raw bytes of file\nOutput: 16-character lowercase hexadecimal string\n\nAlgorithm:\n\n1. Initialize:\n    h = 1469598103934665603  (64-bit unsigned integer)\n\n2. For each byte b:\n    h = h XOR b\n    h = (h * 1099511628211) mod 2^64\n\n3. After processing all bytes:\n    return lower 64 bits of h\n    formatted as 16-character zero-padded lowercase hex\n\nThis is NOT SHA.\nNo crypto libraries allowed.\n\nThe exact algorithm must match this definition.\n\n========================================\n4. Command Specifications\n========================================\n\n----------------------------------------\n4.1 init\n----------------------------------------\n\nCreate .minigit structure.\n\nIf already exists:\n    print \"Repository already initialized\"\nExit 0.\n\n----------------------------------------\n4.2 add <file>\n----------------------------------------\n\nIf file missing:\n    print \"File not found\"\n    exit 1\n\nCompute MiniHash on file content.\n\nStore blob at:\n    .minigit/objects/<hash>\n\nAppend filename to index if not already present.\n\n----------------------------------------\n4.3 commit -m \"<message>\"\n----------------------------------------\n\nIf index empty:\n    print \"Nothing to commit\"\n    exit 1\n\nCommit format (exact text):\n\nparent: <parent_hash or NONE>\ntimestamp: <unix_epoch_integer>\nmessage: <message>\nfiles:\n<filename> <blobhash>\n<filename> <blobhash>\n\nRules:\n- filenames sorted lexicographically\n- parent = HEAD or NONE\n- commit hash = MiniHash of full commit content\n- write commit file:\n      .minigit/commits/<commit_hash>\n- update HEAD\n- clear index\n\nPrint:\n    Committed <commit_hash>\n\n----------------------------------------\n4.4 log\n----------------------------------------\n\nIf no commits:\n    print \"No commits\"\n\nElse traverse parents:\n\ncommit <hash>\nDate: <timestamp>\nMessage: <message>\n\n----------------------------------------\n4.5 status\n----------------------------------------\n\nPrint staged files from the index, one per line.\nIf index empty, print \"Nothing staged\".\n\n========================================\n5. Determinism Rules\n========================================\n\n- Sort filenames\n- No extra spaces\n- No debug output\n- Exact string matching required\n\n========================================\nEND\n========================================\n\n=== END SPEC-v1.txt ===",
+  "metrics": {
+    "input_tokens": 894,
+    "output_tokens": 1210,
+    "cached_tokens": 0,
+    "cost_usd": 0.0020385,
+    "model": "gemini-3.1-flash-lite-preview",
+    "duration_ms": 28839
+  },
+  "usage": {
+    "promptTokenCount": 894,
+    "candidatesTokenCount": 1210,
+    "totalTokenCount": 2104,
+    "promptTokensDetails": [
+      {
+        "modality": "TEXT",
+        "tokenCount": 894
+      }
+    ]
+  },
+  "raw_response": {
+    "candidates": [
+      {
+        "content": {
+          "parts": [
+            {
+              "text": "Below is the implementation of `minigit` according to the provided specification.\n\n### Implementation\n\nSave the following code into a file named `minigit`.\n\n```python\n#!/usr/bin/env python3\nimport os\nimport sys\nimport time\n\nREPO_DIR = \".minigit\"\nOBJECTS_DIR = os.path.join(REPO_DIR, \"objects\")\nCOMMITS_DIR = os.path.join(REPO_DIR, \"commits\")\nINDEX_FILE = os.path.join(REPO_DIR, \"index\")\nHEAD_FILE = os.path.join(REPO_DIR, \"HEAD\")\n\ndef minihash(data: bytes) -> str:\n    h = 1469598103934665603\n    fnv_prime = 1099511628211\n    for b in data:\n        h = h ^ b\n        h = (h * fnv_prime) % (2**64)\n    return f\"{h:016x}\"\n\ndef init():\n    if os.path.exists(REPO_DIR):\n        print(\"Repository already initialized\")\n        sys.exit(0)\n    os.makedirs(OBJECTS_DIR)\n    os.makedirs(COMMITS_DIR)\n    open(INDEX_FILE, 'w').close()\n    open(HEAD_FILE, 'w').close()\n\ndef add(filename):\n    if not os.path.exists(filename):\n        print(\"File not found\")\n        sys.exit(1)\n    with open(filename, 'rb') as f:\n        data = f.read()\n    h = minihash(data)\n    with open(os.path.join(OBJECTS_DIR, h), 'wb') as f:\n        f.write(data)\n    \n    with open(INDEX_FILE, 'r') as f:\n        lines = [l.strip() for l in f.readlines()]\n    if filename not in lines:\n        with open(INDEX_FILE, 'a') as f:\n            f.write(filename + '\\n')\n\ndef commit(message):\n    with open(INDEX_FILE, 'r') as f:\n        staged_files = sorted([l.strip() for l in f.readlines() if l.strip()])\n    \n    if not staged_files:\n        print(\"Nothing to commit\")\n        sys.exit(1)\n    \n    with open(HEAD_FILE, 'r') as f:\n        parent = f.read().strip() or \"NONE\"\n    \n    content = [f\"parent: {parent}\", f\"timestamp: {int(time.time())}\", f\"message: {message}\", \"files:\"]\n    for f_name in staged_files:\n        with open(f_name, 'rb') as f:\n            content.append(f\"{f_name} {minihash(f.read())}\")\n    \n    commit_str = \"\\n\".join(content) + \"\\n\"\n    commit_hash = minihash(commit_str.encode('utf-8'))\n    \n    with open(os.path.join(COMMITS_DIR, commit_hash), 'w') as f:\n        f.write(commit_str)\n    with open(HEAD_FILE, 'w') as f:\n        f.write(commit_hash)\n    open(INDEX_FILE, 'w').close()\n    print(f\"Committed {commit_hash}\")\n\ndef log():\n    with open(HEAD_FILE, 'r') as f:\n        curr = f.read().strip()\n    if not curr:\n        print(\"No commits\")\n        return\n    while curr != \"NONE\":\n        with open(os.path.join(COMMITS_DIR, curr), 'r') as f:\n            lines = f.readlines()\n        parent = lines[0].split(\": \")[1].strip()\n        timestamp = lines[1].split(\": \")[1].strip()\n        message = lines[2].split(\": \")[1].strip()\n        print(f\"commit {curr}\")\n        print(f\"Date: {timestamp}\")\n        print(f\"Message: {message}\\n\")\n        curr = parent\n\ndef status():\n    with open(INDEX_FILE, 'r') as f:\n        files = [l.strip() for l in f.readlines() if l.strip()]\n    if not files:\n        print(\"Nothing staged\")\n    else:\n        for f in files:\n            print(f)\n\nif __name__ == \"__main__\":\n    cmd = sys.argv[1] if len(sys.argv) > 1 else None\n    if cmd == \"init\": init()\n    elif cmd == \"add\": add(sys.argv[2])\n    elif cmd == \"commit\": commit(sys.argv[3])\n    elif cmd == \"log\": log()\n    elif cmd == \"status\": status()\n```\n\n### Setup Instructions\n\n1.  Save the code above as `minigit`.\n2.  Make the file executable:\n    ```bash\n    chmod +x minigit\n    ```\n3.  Ensure your environment has Python 3 installed.\n4.  Run tests using:\n    ```bash\n    bash test-v1.sh\n    ```",
+              "thoughtSignature": "EjQKMgEMOdbH3k7SkIMPy+l8W2x1jz/KZNPALqWuVjLD0BbmSJD7BIDi1gX7OjCKz1lShcQW"
+            }
+          ],
+          "role": "model"
+        },
+        "finishReason": "STOP",
+        "index": 0
+      }
+    ],
+    "usageMetadata": {
+      "promptTokenCount": 894,
+      "candidatesTokenCount": 1210,
+      "totalTokenCount": 2104,
+      "promptTokensDetails": [
+        {
+          "modality": "TEXT",
+          "tokenCount": 894
+        }
+      ]
+    },
+    "modelVersion": "gemini-3.1-flash-lite-preview",
+    "responseId": "j3vnaaetN4mF7M8Posnu0Ac"
+  }
+}

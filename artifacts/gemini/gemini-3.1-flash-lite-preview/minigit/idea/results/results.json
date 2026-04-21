@@ -1,0 +1,93 @@
+[
+  {
+    "language": "python",
+    "trial": 1,
+    "codex": "gemini",
+    "v1_dir": "/home/eistatistik/works/dev/which-language/artifacts/gemini/gemini-3.1-flash-lite-preview/minigit/idea/generated/minigit-python-1-v1",
+    "v2_dir": "/home/eistatistik/works/dev/which-language/artifacts/gemini/gemini-3.1-flash-lite-preview/minigit/idea/generated/minigit-python-1-v2",
+    "v1_time": 24.3,
+    "v1_pass": false,
+    "v1_passed_count": 11,
+    "v1_failed_count": 0,
+    "v1_total_count": 11,
+    "v1_loc": 98,
+    "v2_time": 25.3,
+    "v2_pass": false,
+    "v2_passed_count": 21,
+    "v2_failed_count": 9,
+    "v2_total_count": 30,
+    "v2_loc": 93,
+    "v1_metrics": {
+      "input_tokens": 2977,
+      "output_tokens": 1135,
+      "cached_tokens": 0,
+      "cost_usd": 0.00244675,
+      "model": "gemini-3.1-flash-lite-preview",
+      "duration_ms": 24291
+    },
+    "v2_metrics": {
+      "input_tokens": 5344,
+      "output_tokens": 1654,
+      "cached_tokens": 0,
+      "cost_usd": 0.003817,
+      "model": "gemini-3.1-flash-lite-preview",
+      "duration_ms": 25322
+    }
+  },
+  {
+    "language": "python",
+    "trial": 2,
+    "codex": "gemini",
+    "v1_dir": "/home/eistatistik/works/dev/which-language/artifacts/gemini/gemini-3.1-flash-lite-preview/minigit/idea/generated/minigit-python-2-v1",
+    "v2_dir": "/home/eistatistik/works/dev/which-language/artifacts/gemini/gemini-3.1-flash-lite-preview/minigit/idea/generated/minigit-python-2-v2",
+    "v1_time": 11.0,
+    "v1_pass": false,
+    "v1_passed_count": 0,
+    "v1_failed_count": 5,
+    "v1_total_count": 5,
+    "v1_loc": 0,
+    "v2_time": 39.2,
+    "v2_pass": false,
+    "v2_passed_count": 27,
+    "v2_failed_count": 3,
+    "v2_total_count": 30,
+    "v2_loc": 104,
+    "v1_metrics": null,
+    "v2_metrics": {
+      "input_tokens": 5344,
+      "output_tokens": 1574,
+      "cached_tokens": 0,
+      "cost_usd": 0.003697,
+      "model": "gemini-3.1-flash-lite-preview",
+      "duration_ms": 39168
+    }
+  },
+  {
+    "language": "python",
+    "trial": 3,
+    "codex": "gemini",
+    "v1_dir": "/home/eistatistik/works/dev/which-language/artifacts/gemini/gemini-3.1-flash-lite-preview/minigit/idea/generated/minigit-python-3-v1",
+    "v2_dir": "/home/eistatistik/works/dev/which-language/artifacts/gemini/gemini-3.1-flash-lite-preview/minigit/idea/generated/minigit-python-3-v2",
+    "v1_time": 3.3,
+    "v1_pass": false,
+    "v1_passed_count": 0,
+    "v1_failed_count": 5,
+    "v1_total_count": 5,
+    "v1_loc": 0,
+    "v2_time": 25.6,
+    "v2_pass": false,
+    "v2_passed_count": 0,
+    "v2_failed_count": 5,
+    "v2_total_count": 5,
+    "v2_loc": 98,
+    "v1_metrics": null,
+    "v2_metrics": {
+      "input_tokens": 5344,
+      "output_tokens": 1533,
+      "cached_tokens": 0,
+      "cost_usd": 0.0036355,
+      "model": "gemini-3.1-flash-lite-preview",
+      "duration_ms": 25615
+    }
+  }
+]

@@ -43,13 +43,14 @@ selected_start = 1
 selected_codex = nil
 selected_problem = nil
 selected_output_root = nil
+selected_framing = nil
 dry_run = false
 
 i = 0
 while i < ARGV.length
   case ARGV[i]
   when '--lang', '-l'
-    selected_languages = ARGV[i + 1].split(',').map(&:strip)
+    selected_languages = ARGV[i + 1].split(',').map { |s| s.strip.to_sym }
     i += 2
   when '--trials', '-t'
     selected_trials = ARGV[i + 1].to_i
@@ -66,6 +67,9 @@ while i < ARGV.length
   when '--output-root'
     selected_output_root = File.expand_path(ARGV[i + 1], BASE_DIR)
     i += 2
+  when '--framing'
+    selected_framing = ARGV[i + 1]
+    i += 2
   when '--dry-run'
     dry_run = true
     i += 1
@@ -81,6 +85,7 @@ while i < ARGV.length
         --codex, -c NAME       AI codex to use: #{CodexLoader.available_codexes.join(', ')} (default: #{CodexLoader.default_codex})
         --problem, -p NAME     Problem key under problems/ (default: minigit#{available_problems.empty? ? '' : "; available: #{available_problems.join(', ')}"})
         --output-root PATH     Write generated/, logs/, and results/ under PATH
+        --framing NAME         Problem framing: idea (default) or spec. Falls back to spec if idea not defined.
         --dry-run              Dry run mode (don't actually run codex)
         --help, -h             Show this help message
 
@@ -105,6 +110,11 @@ end
 languages_to_run = selected_languages || LANGUAGES.keys
 selected_codex ||= CodexLoader.default_codex
 problem = selected_problem || 'minigit'
+requested_framing = (selected_framing || 'idea').to_s.strip.downcase
+
+unless %w[idea spec].include?(requested_framing)
+  abort "--framing must be one of: idea, spec (got: #{requested_framing})"
+end
 
 if selected_trials < 1
   abort '--trials must be at least 1'
@@ -122,18 +132,10 @@ unless unknown_languages.empty?
   ERROR
 end
 
-if selected_output_root.nil?
-  selected_output_root = CodexLoader.default_output_root(
-    selected_codex,
-    problem: problem,
-    base_dir: BASE_DIR,
-    dry_run: dry_run,
-  )
-end
-
-work_dir = File.join(selected_output_root, 'generated')
-results_dir = File.join(selected_output_root, 'results')
-logs_dir = File.join(selected_output_root, 'logs')
+# NOTE: output_root/work_dir/results_dir/logs_dir are resolved in the Main
+# section below, after problem_config (and therefore the resolved framing) is
+# available — framing may fall back from idea to spec if a problem has no IDEA
+# keys yet, and the artifact path carries the framing segment.
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -234,7 +236,7 @@ def run_tests(test_script, dir:)
   }
 end
 
-def load_problem_config(problem)
+def load_problem_config(problem, framing: 'idea')
   problem_dir = File.join(PROBLEMS_DIR, problem)
   config_path = File.join(problem_dir, 'problem.json')
 
@@ -244,8 +246,8 @@ def load_problem_config(problem)
       Problem config not found: #{config_path}
       Expected layout:
         problems/#{problem}/problem.json
-        problems/#{problem}/SPEC-v1.txt
-        problems/#{problem}/SPEC-v2.txt
+        problems/#{problem}/SPEC-v1.txt (or IDEA-v1.md)
+        problems/#{problem}/SPEC-v2.txt (or IDEA-v2.md)
         problems/#{problem}/test-v1.sh
         problems/#{problem}/test-v2.sh
       #{available.empty? ? '' : "Available problems: #{available.join(', ')}"}
@@ -253,26 +255,49 @@ def load_problem_config(problem)
   end
 
   raw = JSON.parse(File.read(config_path))
-  required_keys = %w[binary_name v1_spec v1_test v1_prompt v2_spec v2_test v2_prompt]
-  missing_keys = required_keys.reject { |key| raw[key].is_a?(String) && !raw[key].strip.empty? }
+  base_required = %w[binary_name v1_test v2_test]
+  missing_base = base_required.reject { |key| raw[key].is_a?(String) && !raw[key].strip.empty? }
+  unless missing_base.empty?
+    abort "Problem config missing keys in #{config_path}: #{missing_base.join(', ')}"
+  end
 
-  unless missing_keys.empty?
-    abort "Problem config missing keys in #{config_path}: #{missing_keys.join(', ')}"
+  resolved_framing = framing
+  idea_available = %w[v1_idea v2_idea v1_idea_prompt v2_idea_prompt].all? { |k| raw[k].is_a?(String) && !raw[k].strip.empty? }
+  spec_available = %w[v1_spec v2_spec v1_prompt v2_prompt].all? { |k| raw[k].is_a?(String) && !raw[k].strip.empty? }
+
+  if framing == 'idea' && !idea_available
+    if spec_available
+      warn "[framing] '#{problem}' has no IDEA keys yet; falling back to 'spec' framing."
+      resolved_framing = 'spec'
+    else
+      abort "Problem config lacks both idea and spec keys: #{config_path}"
+    end
+  elsif framing == 'spec' && !spec_available
+    abort "Problem config lacks spec keys (v1_spec/v2_spec/v1_prompt/v2_prompt): #{config_path}"
+  end
+
+  if resolved_framing == 'idea'
+    v1_doc_rel = raw['v1_idea']; v2_doc_rel = raw['v2_idea']
+    v1_prompt = raw['v1_idea_prompt']; v2_prompt = raw['v2_idea_prompt']
+  else
+    v1_doc_rel = raw['v1_spec']; v2_doc_rel = raw['v2_spec']
+    v1_prompt = raw['v1_prompt']; v2_prompt = raw['v2_prompt']
   end
 
   config = {
     name: raw['name'].to_s.strip.empty? ? problem : raw['name'],
     dir: problem_dir,
+    framing: resolved_framing,
     binary_name: raw['binary_name'],
-    v1_spec: File.join(problem_dir, raw['v1_spec']),
+    v1_doc: File.join(problem_dir, v1_doc_rel),
     v1_test: File.join(problem_dir, raw['v1_test']),
-    v1_prompt: raw['v1_prompt'],
-    v2_spec: File.join(problem_dir, raw['v2_spec']),
+    v1_prompt: v1_prompt,
+    v2_doc: File.join(problem_dir, v2_doc_rel),
     v2_test: File.join(problem_dir, raw['v2_test']),
-    v2_prompt: raw['v2_prompt'],
+    v2_prompt: v2_prompt,
   }
 
-  asset_keys = %i[v1_spec v1_test v2_spec v2_test]
+  asset_keys = %i[v1_doc v1_test v2_doc v2_test]
   missing_assets = asset_keys.filter_map do |key|
     next if File.exist?(config[key])
 
@@ -280,7 +305,7 @@ def load_problem_config(problem)
   end
 
   unless missing_assets.empty?
-    abort "Problem assets missing for '#{problem}':\n#{missing_assets.join("\n")}"
+    abort "Problem assets missing for '#{problem}' (framing=#{resolved_framing}):\n#{missing_assets.join("\n")}"
   end
 
   config
@@ -290,12 +315,30 @@ end
 
 def render_problem_prompt(template, language:, binary_name:, problem_name:)
   {
-    '{{language}}' => language.capitalize,
-    '{{binary_name}}' => binary_name,
-    '{{problem_name}}' => problem_name,
+    '{{language}}' => language.to_s.capitalize,
+    '{{binary_name}}' => binary_name.to_s,
+    '{{problem_name}}' => problem_name.to_s,
   }.reduce(template.dup) do |result, (token, value)|
     result.gsub(token, value)
   end
+end
+
+# Appends the full text of a problem document (SPEC or IDEA) to the prompt as a
+# delimited block. Required because API-based codices (Gemini, OpenAI, Groq)
+# have no filesystem access — a prompt that only references the filename (e.g.
+# "as described in IDEA-v1.md") would leave the model guessing from the name
+# alone. Agentic codices that can read the file still benefit from the inline
+# copy (cache-friendly, no extra tool call).
+def attach_doc_content(prompt, doc_path)
+  doc_name = File.basename(doc_path)
+  content = File.read(doc_path)
+  <<~PROMPT.rstrip
+    #{prompt}
+
+    === BEGIN #{doc_name} ===
+    #{content}
+    === END #{doc_name} ===
+  PROMPT
 end
 
 def write_benchmark_metadata(dir, language:, binary_name:)
@@ -313,13 +356,32 @@ puts '=' * 60
 puts
 
 # Initialize codex
-problem_config = load_problem_config(problem)
+problem_config = load_problem_config(problem, framing: requested_framing)
+resolved_framing = problem_config[:framing]
+
+if selected_output_root.nil?
+  base_root = CodexLoader.default_output_root(
+    selected_codex,
+    problem: problem,
+    base_dir: BASE_DIR,
+    dry_run: dry_run,
+  )
+  # Framing segment isolates spec/ vs idea/ runs so their artifacts, results
+  # and reports don't collide and can be A/B compared downstream.
+  selected_output_root = File.join(base_root, resolved_framing)
+end
+
+work_dir = File.join(selected_output_root, 'generated')
+results_dir = File.join(selected_output_root, 'results')
+logs_dir = File.join(selected_output_root, 'logs')
+
 codex = dry_run ? nil : CodexLoader.create_codex(selected_codex)
 codex_version = dry_run ? 'dry-run' : codex.version
 
 puts "Codex: #{selected_codex}"
 puts "Codex Version: #{codex_version}"
 puts "Problem: #{problem}"
+puts "Framing: #{resolved_framing}#{requested_framing != resolved_framing ? " (requested: #{requested_framing}, fell back)" : ''}"
 puts "Problem Assets: #{problem_config[:dir]}"
 puts "Languages: #{languages_to_run.join(', ')}"
 puts "Trials: #{selected_start}..#{selected_start + selected_trials - 1} (#{selected_trials} trials)"
@@ -363,7 +425,7 @@ selected_trials.times do |trial_idx|
     puts "Trial #{trial} (#{trial_idx + 1}/#{selected_trials}) - #{lang}"
     puts '=' * 60
 
-    dir_name = lang.tr('/', '-')
+    dir_name = lang.to_s.tr('/', '-')
     v1_dir = File.join(work_dir, "#{problem_run_name}-#{dir_name}-#{trial}-v1")
     v2_dir = File.join(work_dir, "#{problem_run_name}-#{dir_name}-#{trial}-v2")
     FileUtils.rm_rf(v1_dir)
@@ -380,7 +442,7 @@ selected_trials.times do |trial_idx|
 
     # --- Phase 1: v1 ---
     puts "\n--- Phase 1: v1 ---"
-    FileUtils.cp(problem_config[:v1_spec], v1_dir)
+    FileUtils.cp(problem_config[:v1_doc], v1_dir)
     FileUtils.cp(problem_config[:v1_test], v1_dir)
 
     v1_prompt = render_problem_prompt(
@@ -390,6 +452,7 @@ selected_trials.times do |trial_idx|
       problem_name: problem_config[:name]
     )
     v1_prompt += " #{LANGUAGES[lang][:extra_prompt]}" if LANGUAGES[lang][:extra_prompt]
+    v1_prompt = attach_doc_content(v1_prompt, problem_config[:v1_doc])
 
     if dry_run
       puts "  [DRY RUN] Would run #{selected_codex} with prompt for v1 #{lang}"
@@ -422,7 +485,7 @@ selected_trials.times do |trial_idx|
     puts "\n--- Phase 2: v2 ---"
     FileUtils.cp_r(v1_dir, v2_dir)
     write_benchmark_metadata(v2_dir, language: lang, binary_name: problem_config[:binary_name])
-    FileUtils.cp(problem_config[:v2_spec], v2_dir)
+    FileUtils.cp(problem_config[:v2_doc], v2_dir)
     FileUtils.cp(problem_config[:v2_test], v2_dir)
 
     v2_prompt = render_problem_prompt(
@@ -432,6 +495,8 @@ selected_trials.times do |trial_idx|
       problem_name: problem_config[:name]
     )
     v2_prompt += " #{LANGUAGES[lang][:extra_prompt]}" if LANGUAGES[lang][:extra_prompt]
+    v2_prompt = attach_doc_content(v2_prompt, problem_config[:v1_doc])
+    v2_prompt = attach_doc_content(v2_prompt, problem_config[:v2_doc])
 
     if dry_run
       puts "  [DRY RUN] Would run #{selected_codex} with prompt for v2 #{lang}"
@@ -478,6 +543,7 @@ meta = {
   date: Time.now.strftime('%Y-%m-%d %H:%M:%S'),
   codex: selected_codex,
   problem: problem,
+  framing: resolved_framing,
   codex_version: codex_version,
   trials: selected_trials,
   versions: versions,

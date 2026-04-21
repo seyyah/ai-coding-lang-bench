@@ -1,0 +1,21 @@
+MiniBudget Specification
+Version: 2.0 (Extends v1.0)
+
+New commands:
+    minibudget delete <index>
+    minibudget summary
+
+========================================
+1. Command Specifications
+========================================
+
+1.1 delete <index>
+Remove entry at 1-based index from data.txt.
+Print: "Deleted index <index>"
+
+1.2 summary
+Print total balance (sum of all amounts).
+Format: "Total Balance: <sum>"
+
+========================================
+END

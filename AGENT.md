@@ -134,6 +134,24 @@ When adding support for a new AI coding system:
 
 ---
 
+## Artifact management
+
+Artifacts produced during benchmarks (logs, code, metrics) must follow these rules:
+
+1. **Naming**: Artifact directories should follow the pattern `artifacts/run-<timestamp>-<codex>-<problem>`.
+2. **Persistence**: Never commit raw logs from `lib/logs/` or `tmp/` unless they are explicitly finalized benchmark results.
+3. **Reproducibility**: Include the exact command used to generate the artifact in a `meta.json` file within the artifact directory.
+
+## Metric accuracy
+
+When implementing `build_metrics` in an adapter:
+
+- **Token Counting**: Always extract `promptTokenCount`, `candidatesTokenCount`, and `cachedTokenCount` if available.
+- **Cost Calculation**: Use `calculate_cost(input, output, cached: ...)` from `BaseCodex` to ensure uniform pricing application.
+- **Timing**: Use monotonic time measurement to avoid issues with system clock drifts.
+
+---
+
 ## For AI agents specifically
 
 If you are an AI agent (Claude, Gemini, Codex, etc.) working in this repo:

@@ -1,0 +1,79 @@
+PROJECT SPECIFICATION: mini-todo (SPEC2)
+
+AUTHOR: Ceren Cenikli (251478097)
+
+VERSION: v2.0
+
+DATE: 2026-03-30
+
+1. OVERVIEW
+
+mini-todo is a minimalist command-line task management tool. Its primary purpose is to provide a distraction-free environment for tracking immediate daily goals. All persistent records are stored within a hidden directory named .todo_data/ in the current working directory.
+
+2. COMMANDS
+
+init
+
+Usage: ./minitodo init
+
+Behavior: Checks for .todo_data/. If missing, creates the directory and an empty registry.txt.
+
+Output: [SYSTEM] New data environment created in .todo_data/.
+
+add
+
+Usage: ./minitodo add "Task description" <priority>
+
+Behavior: Appends a new entry (id, status, priority, created_date) to the registry.
+
+Output: [SUCCESS] Entry #<id> has been registered.
+
+list
+
+Usage: ./minitodo list
+
+Behavior: Parses the registry and displays tasks grouped into --- ACTIVE --- and --- CLOSED ---.
+
+done
+
+Usage: ./minitodo done <id>
+
+Behavior: Toggles task status from ACTIVE to CLOSED.
+
+Output: [UPDATE] Entry #<id> is now marked as CLOSED.
+
+delete
+
+Usage: ./minitodo delete <id>
+
+Behavior: Permanently removes the line associated with task <id>.
+
+Output: [REMOVED] Entry #<id> has been permanently erased.
+
+clear (NEW)
+
+Usage: ./minitodo clear
+
+Behavior: Wipes all task entries from registry.txt while maintaining the file structure.
+
+Output: [CLEANUP] All entries have been purged. Registry is now empty.
+
+3. DATA FORMAT
+
+File Path: .todo_data/registry.txt
+
+Format: Plain-text, one task per line.
+
+Delimiter: Pipe (|)
+
+Schema: id|status|priority|created_date|description
+
+4. ERROR HANDLING
+
+Uninitialized Environment: [FATAL] Data environment not found. Please run: ./minitodo init
+
+Invalid Command: [ERROR] Unknown command: <input_command>.
+
+Missing Arguments: [USAGE] Syntax error. Required format: ./minitodo <command> [args]
+
+Non-Existent ID: [ERROR] Target ID #<id> does not exist in the current registry.
