@@ -48,4 +48,4 @@ ERROR HANDLING
 - Inputs containing '|': print "Error: The '|' character is reserved."
 - Non-numeric scores: print "Error: Scores must be positive numbers."
 - Empty team names: print "Error: Team names cannot be empty."
-- Team playing itself: print "Error: A team cannot play against itself."
+- Team playing itself: print "Error: A team cannot play against itself." 
