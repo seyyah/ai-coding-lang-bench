@@ -1,0 +1,7 @@
+{
+  "name": "minigrades",
+  "contributor_id": "9251478112",
+  "contributor_name": "M-YEMIN MEVALDI",
+  "description": "Student grade management system with auto-increment IDs, date tracking, and CRUD operations.",
+  "commands": ["init", "add", "list", "update", "delete"]
+}

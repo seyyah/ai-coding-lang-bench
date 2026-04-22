@@ -1,0 +1,7 @@
+The system is updated with full CRUD functionality and enhanced data tracking.
+Contributor: M-YEMIN MEVALDI (9251478112)
+
+CHANGES FROM V1:
+1. Data Format: Each record follows 'id|student_name|grade|date'.
+2. Date: System automatically appends current date (YYYY-MM-DD).
+3. ID Logic: ID is calculated as 'highest_existing_id + 1'.
